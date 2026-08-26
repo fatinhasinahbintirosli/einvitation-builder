@@ -17,13 +17,19 @@ export default function InvitationCard({
   const [isOpen, setIsOpen] = useState(false);
   const [currentSlide, setCurrentSlide] = useState(0);
   const [isPlaying, setIsPlaying] = useState(false);
-  const [isRotating, setIsRotating] = useState(false);
+  const [doorHidden, setDoorHidden] = useState(false);
   
   const audioRef = useRef<HTMLAudioElement | null>(null);
-  const scrollContainerRef = useRef<HTMLDivElement | null>(null);
-  const totalSlides = data.slides?.length || 1;
+  const touchStartY = useRef<number | null>(null);
 
-  const toggleMusic = () => {
+  const slides = data?.slides && data.slides.length > 0 ? data.slides : [
+    { id: '1', type: 'intro' as const, title: 'Jemputan', bodyText: 'Tiada maklumat helaian.' }
+  ];
+  const totalSlides = slides.length;
+  const currentSlideData = slides[currentSlide] || slides[0];
+
+  const toggleMusic = (e: React.MouseEvent) => {
+    e.stopPropagation();
     if (!audioRef.current) return;
     if (isPlaying) {
       audioRef.current.pause();
@@ -33,41 +39,70 @@ export default function InvitationCard({
     }
   };
 
-  const handleOpen = () => {
-    setIsRotating(true);
+  const handleOpenCard = () => {
     if (audioRef.current && !isPlaying) {
       audioRef.current.play().then(() => setIsPlaying(true)).catch(() => {});
     }
+    setIsOpen(true);
+    // Padamkan sepenuhnya lapisan pintu dari aliran klik selepas animasi buka selesai
     setTimeout(() => {
-      setIsOpen(true);
-      setIsRotating(false);
-    }, 600);
+      setDoorHidden(true);
+    }, 700);
   };
 
-  // Navigasi ke Slaid Tertentu
-  const scrollToSlide = (index: number) => {
-    if (scrollContainerRef.current) {
-      scrollContainerRef.current.scrollTo({
-        top: index * 780,
-        behavior: 'smooth'
-      });
-      setCurrentSlide(index);
+  const handleCloseCard = () => {
+    setDoorHidden(false);
+    setTimeout(() => {
+      setIsOpen(false);
+      setCurrentSlide(0);
+    }, 50);
+  };
+
+  const nextSlide = (e?: React.MouseEvent) => {
+    if (e) e.stopPropagation();
+    if (currentSlide < totalSlides - 1) {
+      setCurrentSlide(prev => prev + 1);
+    } else {
+      handleCloseCard();
     }
   };
 
-  // Pengesan Slaid Aktif Semasa Pengguna Skrol Secara Manual
-  const handleScroll = (e: React.UIEvent<HTMLDivElement>) => {
-    const scrollTop = e.currentTarget.scrollTop;
-    const activeIndex = Math.round(scrollTop / 780);
-    if (activeIndex !== currentSlide && activeIndex >= 0 && activeIndex < totalSlides) {
-      setCurrentSlide(activeIndex);
+  const prevSlide = (e?: React.MouseEvent) => {
+    if (e) e.stopPropagation();
+    if (currentSlide > 0) {
+      setCurrentSlide(prev => prev - 1);
     }
+  };
+
+  // Navigasi Leretan Jari Skrin Sentuh (Touch Swipe)
+  const handleTouchStart = (e: React.TouchEvent) => {
+    touchStartY.current = e.touches[0].clientY;
+  };
+
+  const handleTouchEnd = (e: React.TouchEvent) => {
+    if (!isOpen || touchStartY.current === null) return;
+    const diff = touchStartY.current - e.changedTouches[0].clientY;
+
+    if (diff > 45) {
+      nextSlide(); // Leret ke atas -> Slaid seterusnya
+    } else if (diff < -45) {
+      prevSlide(); // Leret ke bawah -> Slaid sebelumnya
+    }
+    touchStartY.current = null;
   };
 
   return (
-    <div className="relative w-full max-w-[400px] h-[780px] rounded-[36px] overflow-hidden shadow-2xl border-4 border-slate-700 bg-slate-950 flex flex-col justify-center items-center select-none">
-      
-      {/* 1. LAPISAN WATERMARK JIKA BELUM BAYAR */}
+    <div 
+      onTouchStart={handleTouchStart}
+      onTouchEnd={handleTouchEnd}
+      className="relative w-full max-w-[390px] h-[760px] rounded-[36px] overflow-hidden shadow-2xl border-4 border-slate-700 bg-slate-950 flex flex-col justify-between items-center select-none"
+      style={{
+        backgroundImage: `url(${data.theme?.bgPatternUrl || ''})`,
+        backgroundSize: 'cover',
+        backgroundPosition: 'center'
+      }}
+    >
+      {/* 1. LAPISAN WATERMARK JIKA BELUM DIBAYAR */}
       {!isPaid && (
         <div className="absolute inset-0 z-[100] pointer-events-none flex flex-col items-center justify-around opacity-25">
           {[...Array(6)].map((_, i) => (
@@ -83,224 +118,215 @@ export default function InvitationCard({
         <audio ref={audioRef} loop src={data.cover.audioUrl} />
       )}
 
-      {/* 3. BUTANG KAWALAN MUZIK */}
+      {/* 3. BAR ATAS: INDIKATOR CERITA (STORY PROGRESS BARS) & BUTANG MUZIK */}
       {isOpen && (
-        <button
-          onClick={toggleMusic}
-          type="button"
-          className="absolute top-4 right-4 z-50 w-10 h-10 rounded-full flex items-center justify-center text-white border border-amber-300 shadow-xl transition-transform active:scale-90"
-          style={{ backgroundColor: data.theme?.primaryColor || '#3d5343' }}
-        >
-          <i className={`fa-solid ${isPlaying ? 'fa-compact-disc fa-spin' : 'fa-volume-xmark'}`} />
-        </button>
-      )}
-
-      {/* 4. PENUNJUK INDIKATOR TITIK (SLIDE DOTS) */}
-      {isOpen && (
-        <div className="absolute right-3 top-1/2 -translate-y-1/2 z-50 flex flex-col gap-2 bg-black/40 backdrop-blur-md py-2.5 px-1.5 rounded-full border border-white/10">
-          {data.slides.map((_, i) => (
-            <button
-              key={i}
-              onClick={() => scrollToSlide(i)}
-              className={`w-2 rounded-full transition-all duration-300 ${
-                currentSlide === i ? 'bg-amber-400 h-5' : 'bg-white/40 h-2 hover:bg-white/80'
-              }`}
-            />
-          ))}
-        </div>
-      )}
-
-      {/* ================= 5. COVER / SLIDING DOOR ================= */}
-      <div 
-        className={`absolute inset-0 z-40 transition-all duration-700 ${
-          isOpen ? 'opacity-0 pointer-events-none invisible' : 'opacity-100 pointer-events-auto visible'
-        }`}
-      >
-        {/* Pintu Kiri */}
-        <div 
-          className={`absolute top-0 left-0 w-1/2 h-full transition-transform duration-700 ${
-            isOpen ? '-translate-x-full' : 'translate-x-0'
-          }`}
-          style={{ backgroundColor: data.theme?.primaryColor || '#3d5343' }}
-        />
-
-        {/* Pintu Kanan */}
-        <div 
-          className={`absolute top-0 right-0 w-1/2 h-full transition-transform duration-700 flex items-center ${
-            isOpen ? 'translate-x-full' : 'translate-x-0'
-          }`}
-          style={{ backgroundColor: data.theme?.primaryColor || '#3d5343' }}
-        >
-          {/* Tombol Bismillah */}
-          <div 
-            onClick={handleOpen}
-            className={`-translate-x-1/2 cursor-pointer transition-transform duration-500 hover:scale-105 active:scale-95 ${
-              isRotating ? 'rotate-[360deg] scale-110' : ''
-            }`}
-          >
-            <div className="w-16 h-16 rounded-full bg-gradient-to-tr from-amber-600 via-amber-300 to-amber-700 border-2 border-white shadow-2xl flex items-center justify-center text-xs text-amber-950 font-bold">
-              Bismillah
-            </div>
-          </div>
-        </div>
-
-        {/* Kandungan Muka Depan */}
-        <div className="absolute inset-0 flex flex-col items-center justify-center text-center p-6 text-white z-10">
-          <div className="text-amber-300 text-lg mb-2">❧ ❦ ☙</div>
-          <p className="tracking-[4px] uppercase text-xs text-slate-200" style={{ fontFamily: 'Cinzel, serif' }}>
-            {data.cover?.tagline}
-          </p>
-          <h1 className="text-4xl text-white my-3" style={{ fontFamily: 'Great Vibes, cursive' }}>
-            {data.cover?.mainTitle}
-          </h1>
-          <p className="text-xs tracking-widest text-amber-200" style={{ fontFamily: 'Cinzel, serif' }}>
-            {data.cover?.dateText}
-          </p>
-
-          <div className="mt-6 px-4 py-2 bg-white/10 backdrop-blur-md rounded-xl border border-white/20">
-            <span className="text-[10px] tracking-wider uppercase block text-slate-300">Kepada:</span>
-            <span className="font-semibold text-sm" style={{ fontFamily: 'Playfair Display, serif' }}>
-              {guestName}
-            </span>
+        <div className="w-full px-5 pt-5 pb-2 z-30 flex items-center justify-between gap-3">
+          {/* Progress Bars */}
+          <div className="flex-1 flex gap-1.5">
+            {slides.map((_, i) => (
+              <div 
+                key={i} 
+                onClick={() => setCurrentSlide(i)}
+                className="h-1.5 flex-1 rounded-full bg-white/30 overflow-hidden cursor-pointer backdrop-blur-sm"
+              >
+                <div 
+                  className={`h-full transition-all duration-300 ${
+                    i <= currentSlide ? 'bg-amber-400 w-full' : 'w-0'
+                  }`} 
+                />
+              </div>
+            ))}
           </div>
 
+          {/* Butang Muzik */}
           <button
-            onClick={handleOpen}
+            onClick={toggleMusic}
             type="button"
-            className="mt-6 px-6 py-2.5 rounded-full border border-amber-300 bg-black/50 backdrop-blur text-xs tracking-widest uppercase hover:bg-amber-500 hover:text-white transition-all flex items-center gap-2 cursor-pointer shadow-lg active:scale-95"
-            style={{ fontFamily: 'Cinzel, serif' }}
+            className="w-8 h-8 rounded-full flex items-center justify-center text-white border border-amber-300/60 shadow-lg shrink-0"
+            style={{ backgroundColor: data.theme?.primaryColor || '#3d5343' }}
           >
-            <i className="fa-regular fa-envelope-open" /> BUKA JEMPUTAN
+            <i className={`fa-solid text-xs ${isPlaying ? 'fa-compact-disc fa-spin' : 'fa-volume-xmark'}`} />
           </button>
         </div>
-      </div>
+      )}
 
-      {/* ================= 6. SLIDES CONTAINER (NATIVE SNAP-SCROLL) ================= */}
-      <div 
-        ref={scrollContainerRef}
-        onScroll={handleScroll}
-        className={`w-full h-[780px] ${
-          isOpen ? 'overflow-y-auto' : 'overflow-hidden'
-        } snap-y snap-mandatory scroll-smooth [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]`}
-        style={{
-          backgroundImage: `url(${data.theme?.bgPatternUrl || ''})`,
-          backgroundSize: 'cover'
-        }}
-      >
-        {data.slides.map((slide, idx) => (
+      {/* ================= 4. KANDUNGAN UTAMA HELAIAN (SLIDE ACTIVE) ================= */}
+      {isOpen && (
+        <div className="w-full flex-1 px-4 py-2 flex flex-col justify-center items-center z-20">
           <div 
-            key={slide.id || idx} 
-            className="w-full h-[780px] p-5 flex flex-col justify-center items-center snap-start snap-always shrink-0 relative"
+            key={currentSlide}
+            className="w-full min-h-[500px] max-h-[540px] rounded-2xl p-6 text-center shadow-2xl border flex flex-col justify-between items-center bg-white/95 animate-fadeIn"
+            style={{
+              borderColor: `${data.theme?.goldColor || '#b59049'}60`,
+              color: '#2c332e'
+            }}
           >
-            <div 
-              className="w-full max-h-[580px] rounded-2xl p-6 text-center shadow-2xl border relative flex flex-col justify-between items-center bg-white/95"
-              style={{
-                borderColor: `${data.theme?.goldColor || '#b59049'}50`,
-                color: '#2c332e'
-              }}
-            >
-              <span className="text-xs uppercase font-bold tracking-widest" style={{ color: data.theme?.goldColor || '#b59049', fontFamily: 'Cinzel, serif' }}>
-                {slide.title || 'Jemputan'}
+            {/* Header Helaian */}
+            <div className="w-full text-center">
+              <span className="text-[11px] uppercase font-bold tracking-[3px] block" style={{ color: data.theme?.goldColor || '#b59049', fontFamily: 'Cinzel, serif' }}>
+                {currentSlideData.title || 'Jemputan'}
               </span>
+              <div className="w-8 h-0.5 mx-auto mt-1 rounded-full" style={{ backgroundColor: data.theme?.goldColor || '#b59049' }} />
+            </div>
 
-              {/* Slaid: INTRO */}
-              {slide.type === 'intro' && (
-                <div className="space-y-4 my-auto">
+            {/* Kandungan Mengikut Jenis Slaid */}
+            <div className="my-auto w-full flex flex-col items-center justify-center py-2">
+              {currentSlideData.type === 'intro' && (
+                <div className="space-y-3">
                   <p className="text-xs text-slate-600 leading-relaxed max-w-[280px] mx-auto">
-                    {slide.bodyText}
+                    {currentSlideData.bodyText}
                   </p>
-                  {slide.imageUrl && (
-                    <div className="relative w-28 h-36 mx-auto rounded-full border-2 p-1 overflow-hidden shadow-inner" style={{ borderColor: data.theme?.goldColor || '#b59049' }}>
-                      <img src={slide.imageUrl} alt="Visual" className="w-full h-full object-cover rounded-full" />
+                  {currentSlideData.imageUrl && (
+                    <div className="relative w-28 h-32 mx-auto rounded-full border-2 p-1 overflow-hidden shadow-inner my-2" style={{ borderColor: data.theme?.goldColor || '#b59049' }}>
+                      <img src={currentSlideData.imageUrl} alt="Visual" className="w-full h-full object-cover rounded-full" />
                     </div>
                   )}
-                  <h2 className="text-xl font-bold" style={{ color: data.theme?.primaryColor || '#3d5343', fontFamily: 'Playfair Display, serif' }}>
-                    {slide.subtitle}
+                  <h2 className="text-lg font-bold" style={{ color: data.theme?.primaryColor || '#3d5343', fontFamily: 'Playfair Display, serif' }}>
+                    {currentSlideData.subtitle}
                   </h2>
                 </div>
               )}
 
-              {/* Slaid: TENTATIVE */}
-              {slide.type === 'tentative' && (
-                <div className="w-full space-y-3 my-auto">
-                  {slide.timeline?.map((item, tIdx) => (
-                    <div key={tIdx} className="flex justify-between border-b border-dashed border-amber-900/20 pb-2 text-xs">
-                      <span className="font-bold text-amber-800">{item.time}</span>
-                      <span className="text-slate-700">{item.activity}</span>
+              {currentSlideData.type === 'tentative' && (
+                <div className="w-full space-y-2.5 max-w-[280px]">
+                  {currentSlideData.timeline?.map((item, tIdx) => (
+                    <div key={tIdx} className="flex justify-between items-center border-b border-dashed border-amber-900/20 pb-1.5 text-xs">
+                      <span className="font-bold text-amber-800 shrink-0">{item.time}</span>
+                      <span className="text-slate-700 text-right">{item.activity}</span>
                     </div>
                   ))}
                 </div>
               )}
 
-              {/* Slaid: LOCATION */}
-              {slide.type === 'location' && slide.locationDetails && (
-                <div className="space-y-4 my-auto">
+              {currentSlideData.type === 'location' && currentSlideData.locationDetails && (
+                <div className="space-y-3 max-w-[280px]">
                   <h3 className="text-base font-bold" style={{ color: data.theme?.primaryColor || '#3d5343' }}>
-                    {slide.locationDetails.venueName}
+                    {currentSlideData.locationDetails.venueName}
                   </h3>
                   <p className="text-xs text-slate-600 leading-relaxed whitespace-pre-line">
-                    {slide.locationDetails.address}
+                    {currentSlideData.locationDetails.address}
                   </p>
-                  <div className="flex justify-center gap-3 pt-2">
-                    <a href={slide.locationDetails.gmapsUrl} target="_blank" rel="noreferrer" className="px-3.5 py-2 rounded-full text-[11px] text-white bg-slate-800 hover:bg-slate-700 flex items-center gap-1.5 shadow">
+                  <div className="flex justify-center gap-2.5 pt-2">
+                    <a href={currentSlideData.locationDetails.gmapsUrl} target="_blank" rel="noreferrer" className="px-3.5 py-1.5 rounded-full text-[10px] text-white bg-slate-800 hover:bg-slate-700 flex items-center gap-1.5 shadow">
                       <i className="fa-solid fa-map-pin text-red-400" /> Google Maps
                     </a>
-                    <a href={slide.locationDetails.wazeUrl} target="_blank" rel="noreferrer" className="px-3.5 py-2 rounded-full text-[11px] text-white bg-cyan-700 hover:bg-cyan-600 flex items-center gap-1.5 shadow">
+                    <a href={currentSlideData.locationDetails.wazeUrl} target="_blank" rel="noreferrer" className="px-3.5 py-1.5 rounded-full text-[10px] text-white bg-cyan-700 hover:bg-cyan-600 flex items-center gap-1.5 shadow">
                       <i className="fa-brands fa-waze" /> Waze
                     </a>
                   </div>
                 </div>
               )}
 
-              {/* Slaid: THANK YOU */}
-              {slide.type === 'thank_you' && (
-                <div className="space-y-3 my-auto">
+              {currentSlideData.type === 'thank_you' && (
+                <div className="space-y-3">
                   <div className="text-2xl text-amber-600">❧ ❦ ☙</div>
-                  <p className="text-xs leading-relaxed text-slate-700">
-                    {slide.bodyText || 'Sekalung penghargaan dan terima kasih atas kehadiran dan doa tulus ikhlas anda.'}
+                  <p className="text-xs leading-relaxed text-slate-700 max-w-[280px] mx-auto">
+                    {currentSlideData.bodyText || 'Sekalung penghargaan dan terima kasih atas kehadiran dan doa tulus ikhlas anda.'}
                   </p>
                   <div className="text-amber-600 text-lg">𖥸</div>
                 </div>
               )}
+            </div>
 
-              {/* BUTANG NAVIGASI BAWAH */}
-              <div className="w-full flex justify-between items-center pt-2 mt-auto border-t border-slate-200/60">
-                {idx > 0 ? (
-                  <button 
-                    onClick={() => scrollToSlide(idx - 1)} 
-                    type="button"
-                    className="text-[10px] uppercase tracking-widest text-slate-500 hover:text-slate-800 flex items-center gap-1 font-semibold px-2 py-1"
-                  >
-                    <i className="fa-solid fa-chevron-up text-xs" /> KEMBALI
-                  </button>
-                ) : <div />}
+            {/* BUTANG NAVIGASI BAWAH (SENTIASA BOLEH DITEKAN) */}
+            <div className="w-full flex justify-between items-center pt-3 border-t border-slate-200">
+              {currentSlide > 0 ? (
+                <button 
+                  onClick={prevSlide} 
+                  type="button"
+                  className="px-3 py-1.5 rounded-lg text-slate-600 hover:text-slate-900 text-xs font-semibold flex items-center gap-1 bg-slate-100 active:scale-95 transition-all"
+                >
+                  <i className="fa-solid fa-arrow-left text-[10px]" /> KEMBALI
+                </button>
+              ) : <div />}
 
-                {idx < totalSlides - 1 ? (
-                  <button 
-                    onClick={() => scrollToSlide(idx + 1)} 
-                    type="button"
-                    className="text-[11px] uppercase tracking-widest text-amber-800 font-bold flex items-center gap-1.5 animate-bounce px-3 py-1 rounded-full bg-amber-500/10 hover:bg-amber-500/20"
-                    style={{ fontFamily: 'Cinzel, serif' }}
-                  >
-                    SETERUSNYA <i className="fa-solid fa-chevron-down text-xs" />
-                  </button>
-                ) : (
-                  <button 
-                    onClick={() => {
-                      setIsOpen(false);
-                      scrollToSlide(0);
-                    }} 
-                    type="button"
-                    className="text-[10px] uppercase tracking-widest text-slate-500 hover:text-slate-800 flex items-center gap-1 font-semibold px-2 py-1"
-                  >
-                    <i className="fa-solid fa-lock text-xs" /> TUTUP KAD
-                  </button>
-                )}
+              {currentSlide < totalSlides - 1 ? (
+                <button 
+                  onClick={nextSlide} 
+                  type="button"
+                  className="ml-auto px-4 py-1.5 rounded-full bg-amber-500 hover:bg-amber-600 text-black text-xs font-bold uppercase tracking-wider flex items-center gap-1.5 shadow-md active:scale-95 transition-all"
+                  style={{ fontFamily: 'Cinzel, serif' }}
+                >
+                  SELAK <i className="fa-solid fa-arrow-right text-[10px]" />
+                </button>
+              ) : (
+                <button 
+                  onClick={handleCloseCard} 
+                  type="button"
+                  className="ml-auto px-4 py-1.5 rounded-full bg-slate-800 text-white text-xs font-semibold flex items-center gap-1.5 shadow active:scale-95"
+                >
+                  <i className="fa-solid fa-lock text-[10px]" /> TUTUP KAD
+                </button>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ================= 5. COVER / SLIDING DOOR (DIBUANG BILA DIBUKA) ================= */}
+      {!doorHidden && (
+        <div 
+          className={`absolute inset-0 z-40 transition-opacity duration-700 ${
+            isOpen ? 'opacity-0 pointer-events-none' : 'opacity-100 pointer-events-auto'
+          }`}
+        >
+          {/* Pintu Kiri */}
+          <div 
+            className={`absolute top-0 left-0 w-1/2 h-full transition-transform duration-700 ${
+              isOpen ? '-translate-x-full' : 'translate-x-0'
+            }`}
+            style={{ backgroundColor: data.theme?.primaryColor || '#3d5343' }}
+          />
+
+          {/* Pintu Kanan */}
+          <div 
+            className={`absolute top-0 right-0 w-1/2 h-full transition-transform duration-700 flex items-center ${
+              isOpen ? 'translate-x-full' : 'translate-x-0'
+            }`}
+            style={{ backgroundColor: data.theme?.primaryColor || '#3d5343' }}
+          >
+            {/* Tombol Bismillah */}
+            <div 
+              onClick={handleOpenCard}
+              className="absolute left-0 -translate-x-1/2 cursor-pointer transition-transform hover:scale-105 active:scale-95"
+            >
+              <div className="w-16 h-16 rounded-full bg-gradient-to-tr from-amber-600 via-amber-300 to-amber-700 border-2 border-white shadow-2xl flex items-center justify-center text-xs text-amber-950 font-bold">
+                Bismillah
               </div>
             </div>
           </div>
-        ))}
-      </div>
+
+          {/* Kandungan Muka Depan */}
+          <div className="absolute inset-0 flex flex-col items-center justify-center text-center p-6 text-white z-10">
+            <div className="text-amber-300 text-lg mb-2">❧ ❦ ☙</div>
+            <p className="tracking-[4px] uppercase text-xs text-slate-200" style={{ fontFamily: 'Cinzel, serif' }}>
+              {data.cover?.tagline}
+            </p>
+            <h1 className="text-4xl text-white my-3" style={{ fontFamily: 'Great Vibes, cursive' }}>
+              {data.cover?.mainTitle}
+            </h1>
+            <p className="text-xs tracking-widest text-amber-200" style={{ fontFamily: 'Cinzel, serif' }}>
+              {data.cover?.dateText}
+            </p>
+
+            <div className="mt-6 px-4 py-2 bg-white/10 backdrop-blur-md rounded-xl border border-white/20">
+              <span className="text-[10px] tracking-wider uppercase block text-slate-300">Kepada:</span>
+              <span className="font-semibold text-sm" style={{ fontFamily: 'Playfair Display, serif' }}>
+                {guestName}
+              </span>
+            </div>
+
+            <button
+              onClick={handleOpenCard}
+              type="button"
+              className="mt-6 px-6 py-2.5 rounded-full border border-amber-300 bg-black/50 backdrop-blur text-xs tracking-widest uppercase hover:bg-amber-500 hover:text-white transition-all flex items-center gap-2 cursor-pointer shadow-lg active:scale-95"
+              style={{ fontFamily: 'Cinzel, serif' }}
+            >
+              <i className="fa-regular fa-envelope-open" /> BUKA JEMPUTAN
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
