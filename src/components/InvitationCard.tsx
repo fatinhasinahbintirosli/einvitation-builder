@@ -20,9 +20,7 @@ export default function InvitationCard({
   const [isRotating, setIsRotating] = useState(false);
   
   const audioRef = useRef<HTMLAudioElement | null>(null);
-  const touchStartY = useRef<number | null>(null);
-  const isThrottled = useRef(false);
-
+  const scrollContainerRef = useRef<HTMLDivElement | null>(null);
   const totalSlides = data.slides?.length || 1;
 
   const toggleMusic = () => {
@@ -46,65 +44,29 @@ export default function InvitationCard({
     }, 600);
   };
 
-  const goToSlide = (index: number) => {
-    if (index >= 0 && index < totalSlides) {
+  // Navigasi ke Slaid Tertentu
+  const scrollToSlide = (index: number) => {
+    if (scrollContainerRef.current) {
+      scrollContainerRef.current.scrollTo({
+        top: index * 780,
+        behavior: 'smooth'
+      });
       setCurrentSlide(index);
     }
   };
 
-  const nextSlide = () => {
-    if (currentSlide < totalSlides - 1) {
-      setCurrentSlide(prev => prev + 1);
+  // Pengesan Slaid Aktif Semasa Pengguna Skrol Secara Manual
+  const handleScroll = (e: React.UIEvent<HTMLDivElement>) => {
+    const scrollTop = e.currentTarget.scrollTop;
+    const activeIndex = Math.round(scrollTop / 780);
+    if (activeIndex !== currentSlide && activeIndex >= 0 && activeIndex < totalSlides) {
+      setCurrentSlide(activeIndex);
     }
-  };
-
-  const prevSlide = () => {
-    if (currentSlide > 0) {
-      setCurrentSlide(prev => prev - 1);
-    }
-  };
-
-  // Navigasi Roda Tetikus (Wheel) dengan Throttling
-  const handleWheel = (e: React.WheelEvent) => {
-    if (!isOpen || isThrottled.current) return;
-    
-    if (e.deltaY > 25) {
-      isThrottled.current = true;
-      nextSlide();
-      setTimeout(() => { isThrottled.current = false; }, 400);
-    } else if (e.deltaY < -25) {
-      isThrottled.current = true;
-      prevSlide();
-      setTimeout(() => { isThrottled.current = false; }, 400);
-    }
-  };
-
-  // Navigasi Sentuhan Telefon (Touch Swipe)
-  const handleTouchStart = (e: React.TouchEvent) => {
-    touchStartY.current = e.touches[0].clientY;
-  };
-
-  const handleTouchEnd = (e: React.TouchEvent) => {
-    if (!isOpen || touchStartY.current === null) return;
-    
-    const touchEndY = e.changedTouches[0].clientY;
-    const diff = touchStartY.current - touchEndY;
-
-    if (diff > 40) {
-      nextSlide(); // Leret ke atas -> Slaid seterusnya
-    } else if (diff < -40) {
-      prevSlide(); // Leret ke bawah -> Slaid sebelumnya
-    }
-    touchStartY.current = null;
   };
 
   return (
-    <div 
-      onWheel={handleWheel}
-      onTouchStart={handleTouchStart}
-      onTouchEnd={handleTouchEnd}
-      className="relative w-full max-w-[400px] h-[780px] rounded-[36px] overflow-hidden shadow-2xl border-4 border-slate-700 bg-slate-950 flex flex-col justify-center items-center select-none"
-    >
+    <div className="relative w-full max-w-[400px] h-[780px] rounded-[36px] overflow-hidden shadow-2xl border-4 border-slate-700 bg-slate-950 flex flex-col justify-center items-center select-none">
+      
       {/* 1. LAPISAN WATERMARK JIKA BELUM BAYAR */}
       {!isPaid && (
         <div className="absolute inset-0 z-[100] pointer-events-none flex flex-col items-center justify-around opacity-25">
@@ -135,13 +97,13 @@ export default function InvitationCard({
 
       {/* 4. PENUNJUK INDIKATOR TITIK (SLIDE DOTS) */}
       {isOpen && (
-        <div className="absolute right-3 top-1/2 -translate-y-1/2 z-50 flex flex-col gap-2 bg-black/30 backdrop-blur-md py-2.5 px-1.5 rounded-full border border-white/10">
+        <div className="absolute right-3 top-1/2 -translate-y-1/2 z-50 flex flex-col gap-2 bg-black/40 backdrop-blur-md py-2.5 px-1.5 rounded-full border border-white/10">
           {data.slides.map((_, i) => (
             <button
               key={i}
-              onClick={() => goToSlide(i)}
-              className={`w-2 h-2 rounded-full transition-all ${
-                currentSlide === i ? 'bg-amber-400 h-5' : 'bg-white/40 hover:bg-white/80'
+              onClick={() => scrollToSlide(i)}
+              className={`w-2 rounded-full transition-all duration-300 ${
+                currentSlide === i ? 'bg-amber-400 h-5' : 'bg-white/40 h-2 hover:bg-white/80'
               }`}
             />
           ))}
@@ -213,17 +175,23 @@ export default function InvitationCard({
         </div>
       </div>
 
-      {/* ================= 6. SLIDES CONTAINER ================= */}
+      {/* ================= 6. SLIDES CONTAINER (NATIVE SNAP-SCROLL) ================= */}
       <div 
-        className="w-full h-full relative transition-transform duration-500 ease-out"
+        ref={scrollContainerRef}
+        onScroll={handleScroll}
+        className={`w-full h-[780px] ${
+          isOpen ? 'overflow-y-auto' : 'overflow-hidden'
+        } snap-y snap-mandatory scroll-smooth [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]`}
         style={{
-          transform: `translateY(-${currentSlide * 100}%)`,
           backgroundImage: `url(${data.theme?.bgPatternUrl || ''})`,
           backgroundSize: 'cover'
         }}
       >
         {data.slides.map((slide, idx) => (
-          <div key={slide.id || idx} className="w-full h-[780px] p-5 flex flex-col justify-center items-center relative">
+          <div 
+            key={slide.id || idx} 
+            className="w-full h-[780px] p-5 flex flex-col justify-center items-center snap-start snap-always shrink-0 relative"
+          >
             <div 
               className="w-full max-h-[580px] rounded-2xl p-6 text-center shadow-2xl border relative flex flex-col justify-between items-center bg-white/95"
               style={{
@@ -235,7 +203,7 @@ export default function InvitationCard({
                 {slide.title || 'Jemputan'}
               </span>
 
-              {/* Jenis: INTRO */}
+              {/* Slaid: INTRO */}
               {slide.type === 'intro' && (
                 <div className="space-y-4 my-auto">
                   <p className="text-xs text-slate-600 leading-relaxed max-w-[280px] mx-auto">
@@ -252,7 +220,7 @@ export default function InvitationCard({
                 </div>
               )}
 
-              {/* Jenis: TENTATIVE */}
+              {/* Slaid: TENTATIVE */}
               {slide.type === 'tentative' && (
                 <div className="w-full space-y-3 my-auto">
                   {slide.timeline?.map((item, tIdx) => (
@@ -264,7 +232,7 @@ export default function InvitationCard({
                 </div>
               )}
 
-              {/* Jenis: LOCATION */}
+              {/* Slaid: LOCATION */}
               {slide.type === 'location' && slide.locationDetails && (
                 <div className="space-y-4 my-auto">
                   <h3 className="text-base font-bold" style={{ color: data.theme?.primaryColor || '#3d5343' }}>
@@ -284,7 +252,7 @@ export default function InvitationCard({
                 </div>
               )}
 
-              {/* Jenis: THANK YOU */}
+              {/* Slaid: THANK YOU */}
               {slide.type === 'thank_you' && (
                 <div className="space-y-3 my-auto">
                   <div className="text-2xl text-amber-600">❧ ❦ ☙</div>
@@ -299,7 +267,7 @@ export default function InvitationCard({
               <div className="w-full flex justify-between items-center pt-2 mt-auto border-t border-slate-200/60">
                 {idx > 0 ? (
                   <button 
-                    onClick={prevSlide} 
+                    onClick={() => scrollToSlide(idx - 1)} 
                     type="button"
                     className="text-[10px] uppercase tracking-widest text-slate-500 hover:text-slate-800 flex items-center gap-1 font-semibold px-2 py-1"
                   >
@@ -309,7 +277,7 @@ export default function InvitationCard({
 
                 {idx < totalSlides - 1 ? (
                   <button 
-                    onClick={nextSlide} 
+                    onClick={() => scrollToSlide(idx + 1)} 
                     type="button"
                     className="text-[11px] uppercase tracking-widest text-amber-800 font-bold flex items-center gap-1.5 animate-bounce px-3 py-1 rounded-full bg-amber-500/10 hover:bg-amber-500/20"
                     style={{ fontFamily: 'Cinzel, serif' }}
@@ -318,7 +286,10 @@ export default function InvitationCard({
                   </button>
                 ) : (
                   <button 
-                    onClick={() => setIsOpen(false)} 
+                    onClick={() => {
+                      setIsOpen(false);
+                      scrollToSlide(0);
+                    }} 
                     type="button"
                     className="text-[10px] uppercase tracking-widest text-slate-500 hover:text-slate-800 flex items-center gap-1 font-semibold px-2 py-1"
                   >
