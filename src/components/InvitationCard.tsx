@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useRef } from 'react';
 import { CardData } from '@/types/invitation';
 
 interface Props {
@@ -16,6 +16,7 @@ export default function InvitationCard({ data, isPaid = false, guestName = "Dato
   const [isLockedEnd, setIsLockedEnd] = useState(false);
   const [isRotating, setIsRotating] = useState(false);
   const audioRef = useRef<HTMLAudioElement | null>(null);
+  const touchStartY = useRef<number>(0);
 
   const toggleMusic = () => {
     if (!audioRef.current) return;
@@ -40,17 +41,52 @@ export default function InvitationCard({ data, isPaid = false, guestName = "Dato
   };
 
   const nextSlide = () => {
-    if (currentSlide >= data.slides.length - 1) {
+    if (currentSlide < data.slides.length - 1) {
+      setCurrentSlide(prev => prev + 1);
+    } else {
       setIsOpen(false);
       setIsLockedEnd(true);
-      return;
     }
-    setCurrentSlide(prev => prev + 1);
+  };
+
+  const prevSlide = () => {
+    if (currentSlide > 0) {
+      setCurrentSlide(prev => prev - 1);
+    }
+  };
+
+  // Sokongan Skrol Roda Tetikus (Mouse Wheel)
+  const handleWheel = (e: React.WheelEvent) => {
+    if (!isOpen) return;
+    if (e.deltaY > 40) {
+      nextSlide();
+    } else if (e.deltaY < -40) {
+      prevSlide();
+    }
+  };
+
+  // Sokongan Leret Skrin Sentuh (Mobile Touch Swipe)
+  const handleTouchStart = (e: React.TouchEvent) => {
+    touchStartY.current = e.touches[0].clientY;
+  };
+
+  const handleTouchEnd = (e: React.TouchEvent) => {
+    if (!isOpen) return;
+    const diff = touchStartY.current - e.changedTouches[0].clientY;
+    if (diff > 50) {
+      nextSlide(); // Leret ke atas -> Slaid seterusnya
+    } else if (diff < -50) {
+      prevSlide(); // Leret ke bawah -> Slaid sebelumnya
+    }
   };
 
   return (
-    <div className="relative w-full max-w-[400px] h-[780px] rounded-[36px] overflow-hidden shadow-2xl border-4 border-slate-700 bg-black flex flex-col justify-center items-center select-none">
-      
+    <div 
+      onWheel={handleWheel}
+      onTouchStart={handleTouchStart}
+      onTouchEnd={handleTouchEnd}
+      className="relative w-full max-w-[400px] h-[780px] rounded-[36px] overflow-hidden shadow-2xl border-4 border-slate-700 bg-black flex flex-col justify-center items-center select-none"
+    >
       {/* LAPISAN WATERMARK JIKA BELUM BAYAR */}
       {!isPaid && (
         <div className="absolute inset-0 z-[100000] pointer-events-none flex flex-col items-center justify-around opacity-30">
@@ -62,7 +98,7 @@ export default function InvitationCard({ data, isPaid = false, guestName = "Dato
         </div>
       )}
 
-      {/* Audio Engine */}
+      {/* Audio Element */}
       {data.cover.audioUrl && (
         <audio ref={audioRef} loop src={data.cover.audioUrl} />
       )}
@@ -223,7 +259,7 @@ export default function InvitationCard({ data, isPaid = false, guestName = "Dato
                 </div>
               )}
 
-              {/* Butang Navigasi Selak */}
+              {/* Butang Navigasi Bawah */}
               <button 
                 onClick={nextSlide} 
                 className="text-[10px] uppercase tracking-widest text-amber-700 flex flex-col items-center gap-1 animate-bounce cursor-pointer mt-4"
