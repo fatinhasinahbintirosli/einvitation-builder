@@ -49,9 +49,39 @@ export default function BuilderForm({
 }: Props) {
   const [activeTab, setActiveTab] = useState<'theme' | 'cover' | 'slides'>('theme');
   const [uploadError, setUploadError] = useState<string | null>(null);
+  const [isCheckingOut, setIsCheckingOut] = useState(false);
 
   const updateData = (newData: CardData) => {
     onChange(newData);
+  };
+
+  // Panggilan Checkout Stripe
+  const handleStripeCheckout = async () => {
+    if (!slug) return;
+    setIsCheckingOut(true);
+
+    try {
+      if (onSave) {
+        await onSave();
+      }
+
+      const res = await fetch('/api/checkout', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ slug: slug.trim().toLowerCase() }),
+      });
+
+      const resData = await res.json();
+      if (resData.url) {
+        window.location.href = resData.url;
+      } else {
+        alert('Ralat memulakan pembayaran: ' + (resData.error || 'Sila cuba lagi.'));
+      }
+    } catch (err: any) {
+      alert('Ralat rangkaian: ' + err.message);
+    } finally {
+      setIsCheckingOut(false);
+    }
   };
 
   const handleWallpaperUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -112,7 +142,7 @@ export default function BuilderForm({
       locationDetails: {
         venueName: 'Dewan Gemilang Perdana',
         address: 'No. 123, Jalan Raja Chulan, Kuala Lumpur',
-        gmapsUrl: 'https://maps.google.com',
+        gmapsUrl: 'http://googleusercontent.com/maps.google.com/4',
         wazeUrl: 'https://waze.com'
       }
     };
@@ -137,7 +167,7 @@ export default function BuilderForm({
       updated.locationDetails = {
         venueName: 'Nama Dewan / Tempat',
         address: 'Alamat Penuh Majlis',
-        gmapsUrl: 'https://maps.google.com',
+        gmapsUrl: 'http://googleusercontent.com/maps.google.com/4',
         wazeUrl: 'https://waze.com'
       };
     } else if (newType === 'tentative' && !currentSlide.timeline) {
@@ -441,7 +471,7 @@ export default function BuilderForm({
                         onChange={(e) => updateSlide(idx, {
                           locationDetails: { ...(slide.locationDetails || { venueName: '', address: '', gmapsUrl: '', wazeUrl: '' }), gmapsUrl: e.target.value }
                         })}
-                        placeholder="https://maps.google.com/..."
+                        placeholder="http://googleusercontent.com/maps.google.com/4..."
                         className="w-full px-3 py-2 rounded-lg bg-slate-900 border border-slate-700 text-xs outline-none focus:border-amber-400"
                       />
                     </div>
@@ -588,7 +618,7 @@ export default function BuilderForm({
         </div>
       )}
 
-      {/* ================= BAHAGIAN SIMPAN / JANA DUA LINK ================= */}
+      {/* ================= BAHAGIAN SIMPAN & STRIPE CHECKOUT ================= */}
       {onSave && (
         <div className="p-4 rounded-2xl bg-slate-950/80 border border-slate-800 space-y-3 pt-3">
           {setSlug && slug !== undefined && (
@@ -623,7 +653,7 @@ export default function BuilderForm({
             )}
           </button>
 
-          {/* DUAL LINK SECTION: PERCUMA VS PREMIUM PREVIEW */}
+          {/* DUAL LINK SECTION */}
           {generatedUrl && (
             <div className="p-4 rounded-2xl bg-slate-900 border border-amber-500/30 space-y-3.5">
               <div className="text-center">
@@ -632,7 +662,7 @@ export default function BuilderForm({
                 </span>
               </div>
 
-              {/* 1. LINK PERCUMA (2 Slaid, Tanpa Watermark) */}
+              {/* 1. LINK PERCUMA */}
               <div className="p-3 rounded-xl bg-slate-950 border border-emerald-500/30 space-y-1.5">
                 <div className="flex justify-between items-center text-[11px]">
                   <span className="text-emerald-400 font-bold">1. Pautan Percuma (2 Helaian, Tanpa Watermark)</span>
@@ -648,7 +678,7 @@ export default function BuilderForm({
                 </a>
               </div>
 
-              {/* 2. LINK PREMIUM PREVIEW (Semua Slaid, Ada Watermark) */}
+              {/* 2. LINK PREMIUM PREVIEW */}
               <div className="p-3 rounded-xl bg-slate-950 border border-amber-500/40 space-y-1.5">
                 <div className="flex justify-between items-center text-[11px]">
                   <span className="text-amber-400 font-bold">2. Pautan Premium Preview (Semua Helaian, Ada Watermark)</span>
@@ -664,20 +694,28 @@ export default function BuilderForm({
                 </a>
               </div>
 
-              {/* CTA Buka Kunci Versi Penuh Bersih Tanpa Watermark */}
-              <div className="pt-1 flex flex-col sm:flex-row items-center justify-between gap-2.5">
+              {/* BUTANG CHECKOUT SEBENAR STRIPE */}
+              <div className="pt-2 flex flex-col sm:flex-row items-center justify-between gap-2.5">
                 <div className="text-left">
-                  <span className="text-xs font-bold text-amber-200 block">Ingin Buang Watermark Untuk Semua Helaian?</span>
-                  <span className="text-[10px] text-slate-400 block">Dapatkan versi rasmi tanpa sebarang watermark.</span>
+                  <span className="text-xs font-bold text-amber-200 block">Buka Kunci Rasmi Tanpa Watermark</span>
+                  <span className="text-[10px] text-slate-400 block">Bayaran sekali sahaja via kad / FPX melalui Stripe.</span>
                 </div>
-                <a
-                  href={`https://wa.me/60123456789?text=Hai%20Admin,%20saya%20ingin%20buka%20kunci%20premium%20untuk%20kad:%20${encodeURIComponent(generatedUrl)}`}
-                  target="_blank"
-                  rel="noreferrer"
-                  className="w-full sm:w-auto px-4 py-2 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold text-xs uppercase tracking-wider text-center shadow whitespace-nowrap"
+                <button
+                  type="button"
+                  onClick={handleStripeCheckout}
+                  disabled={isCheckingOut}
+                  className="w-full sm:w-auto px-5 py-2.5 rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-slate-950 font-bold text-xs uppercase tracking-wider text-center shadow-lg active:scale-95 transition-all cursor-pointer whitespace-nowrap flex items-center justify-center gap-2"
                 >
-                  Buka Kunci (RM 15)
-                </a>
+                  {isCheckingOut ? (
+                    <>
+                      <i className="fa-solid fa-spinner fa-spin" /> Membuka Stripe...
+                    </>
+                  ) : (
+                    <>
+                      <i className="fa-brands fa-stripe text-base" /> Buka Kunci (RM 15)
+                    </>
+                  )}
+                </button>
               </div>
             </div>
           )}
