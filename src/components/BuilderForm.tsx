@@ -1,7 +1,10 @@
 'use client';
 
 import React, { useState } from 'react';
-import { CardData, SlideData } from '@/types/invitation';
+import { CardData } from '@/types/invitation';
+
+// Jenis Data Tempatan (Mengelakkan Ralat Import)
+type SlideItem = CardData['slides'][number];
 
 interface Props {
   data: CardData;
@@ -77,7 +80,7 @@ export default function BuilderForm({
     reader.readAsDataURL(file);
   };
 
-  // Muat Naik Gambar Bulat Pengantin / Bayi
+  // Muat Naik Gambar Bulat
   const handleSlideImageUpload = (slideIndex: number, e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
@@ -95,8 +98,8 @@ export default function BuilderForm({
     reader.readAsDataURL(file);
   };
 
-  // Kemas kini helaian tertentu
-  const updateSlide = (index: number, updatedFields: Partial<SlideData>) => {
+  // Kemas kini helaian
+  const updateSlide = (index: number, updatedFields: Partial<SlideItem>) => {
     const updatedSlides = [...data.slides];
     updatedSlides[index] = {
       ...updatedSlides[index],
