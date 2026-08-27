@@ -12,7 +12,7 @@ interface Props {
 // Komponen Typing Effect Halus (Tanpa Simbol |)
 function TypewriterText({ 
   text = '', 
-  speed = 50, 
+  speed = 45, 
   delay = 200, 
   className = '', 
   style 
@@ -67,7 +67,7 @@ export function InvitationCard({
     { id: '1', type: 'intro', title: 'Jemputan', bodyText: 'Tiada maklumat helaian.' }
   ];
 
-  // Logik Freemium: Hadkan kepada 2 slaid pertama jika belum dibayar
+  // Logik Freemium: 2 Helaian sahaja jika belum berbayar
   const slides = isPaid ? rawSlides : rawSlides.slice(0, 2);
   const totalSlides = slides.length;
 
@@ -177,7 +177,7 @@ export function InvitationCard({
         <i className={`fa-solid text-sm ${isPlaying ? 'fa-compact-disc fa-spin text-amber-300' : 'fa-volume-xmark text-slate-400'}`} />
       </button>
 
-      {/* ================= 4. MUKA DEPAN (SLIDE NAIK SECARA ELEGAN) ================= */}
+      {/* ================= 4. MUKA DEPAN (SLIDE NAIK ELEGAN) ================= */}
       <div 
         className={`absolute inset-0 z-50 flex flex-col items-center justify-center p-6 text-white transition-all duration-[1200ms] ease-[cubic-bezier(0.16,1,0.3,1)] ${
           isOpen ? '-translate-y-full opacity-0 pointer-events-none' : 'translate-y-0 opacity-100 pointer-events-auto'
@@ -243,7 +243,7 @@ export function InvitationCard({
                 <div className="w-full flex justify-between items-center text-amber-700/60 text-xs px-1">
                   <span>❧</span>
                   <span className="text-[11px] font-bold uppercase tracking-[2px]" style={{ color: data?.theme?.goldColor || '#b59049', fontFamily: 'Cinzel, serif' }}>
-                    {slide.title || 'JEMPUTAN MAJLIS'}
+                    {slide.title || (slide.type === 'location' ? 'LOKASI MAJLIS' : 'JEMPUTAN MAJLIS')}
                   </span>
                   <span>☙</span>
                 </div>
@@ -251,7 +251,7 @@ export function InvitationCard({
                 {/* Kandungan Helaian */}
                 <div className="my-auto w-full py-1 flex flex-col items-center justify-center">
                   
-                  {/* Slaid: INTRO */}
+                  {/* JENIS 1: INTRO */}
                   {slide.type === 'intro' && (
                     <div className="space-y-3 w-full">
                       <p className="text-sm text-slate-800 font-arabic leading-loose">
@@ -266,7 +266,6 @@ export function InvitationCard({
                         )}
                       </p>
 
-                      {/* Bingkai Gambar Bulat Bergelang Emas */}
                       {slide.imageUrl && (
                         <div className="relative my-2 flex flex-col items-center">
                           <div 
@@ -288,7 +287,55 @@ export function InvitationCard({
                     </div>
                   )}
 
-                  {/* Slaid: TENTATIVE */}
+                  {/* JENIS 2: LOCATION (HELAIAN LOKASI) */}
+                  {slide.type === 'location' && slide.locationDetails && (
+                    <div className="space-y-4 max-w-[280px] w-full flex flex-col items-center">
+                      <div className="w-12 h-12 rounded-full bg-amber-500/10 border border-amber-500/30 flex items-center justify-center text-amber-700 text-lg">
+                        <i className="fa-solid fa-map-location-dot" />
+                      </div>
+
+                      <div className="space-y-1">
+                        <h3 className="text-base font-bold" style={{ color: data?.theme?.primaryColor || '#3d5343' }}>
+                          {slide.locationDetails.venueName}
+                        </h3>
+                        <p className="text-xs text-slate-600 leading-relaxed whitespace-pre-line min-h-[44px]">
+                          {isCurrent ? (
+                            <TypewriterText text={slide.locationDetails.address} speed={40} delay={250} />
+                          ) : (
+                            slide.locationDetails.address
+                          )}
+                        </p>
+                      </div>
+
+                      {/* Butang Navigasi Peta (Google Maps & Waze) */}
+                      <div className="flex justify-center gap-3 pt-2 w-full">
+                        {slide.locationDetails.gmapsUrl && (
+                          <a 
+                            href={slide.locationDetails.gmapsUrl} 
+                            target="_blank" 
+                            rel="noreferrer" 
+                            onClick={(e) => e.stopPropagation()}
+                            className="flex-1 py-2.5 px-3 rounded-xl text-xs font-semibold text-white bg-slate-900 hover:bg-slate-800 flex items-center justify-center gap-2 shadow-md active:scale-95 transition-transform"
+                          >
+                            <i className="fa-solid fa-location-arrow text-red-400 text-sm" /> Google Maps
+                          </a>
+                        )}
+                        {slide.locationDetails.wazeUrl && (
+                          <a 
+                            href={slide.locationDetails.wazeUrl} 
+                            target="_blank" 
+                            rel="noreferrer" 
+                            onClick={(e) => e.stopPropagation()}
+                            className="flex-1 py-2.5 px-3 rounded-xl text-xs font-semibold text-white bg-cyan-700 hover:bg-cyan-600 flex items-center justify-center gap-2 shadow-md active:scale-95 transition-transform"
+                          >
+                            <i className="fa-brands fa-waze text-white text-sm" /> Waze
+                          </a>
+                        )}
+                      </div>
+                    </div>
+                  )}
+
+                  {/* JENIS 3: TENTATIVE */}
                   {slide.type === 'tentative' && (
                     <div className="w-full space-y-3.5 max-w-[270px]">
                       {slide.timeline?.map((item, tIdx) => (
@@ -306,31 +353,7 @@ export function InvitationCard({
                     </div>
                   )}
 
-                  {/* Slaid: LOCATION */}
-                  {slide.type === 'location' && slide.locationDetails && (
-                    <div className="space-y-3 max-w-[270px]">
-                      <h3 className="text-base font-bold" style={{ color: data?.theme?.primaryColor || '#3d5343' }}>
-                        {slide.locationDetails.venueName}
-                      </h3>
-                      <p className="text-xs text-slate-600 leading-relaxed whitespace-pre-line min-h-[44px]">
-                        {isCurrent ? (
-                          <TypewriterText text={slide.locationDetails.address} speed={45} delay={250} />
-                        ) : (
-                          slide.locationDetails.address
-                        )}
-                      </p>
-                      <div className="flex justify-center gap-3 pt-3">
-                        <a href={slide.locationDetails.gmapsUrl} target="_blank" rel="noreferrer" className="px-4 py-2 rounded-full text-[11px] font-semibold text-white bg-slate-800 hover:bg-slate-700 flex items-center gap-1.5 shadow active:scale-95 transition-transform">
-                          <i className="fa-solid fa-map-pin text-red-400" /> Google Maps
-                        </a>
-                        <a href={slide.locationDetails.wazeUrl} target="_blank" rel="noreferrer" className="px-4 py-2 rounded-full text-[11px] font-semibold text-white bg-cyan-700 hover:bg-cyan-600 flex items-center gap-1.5 shadow active:scale-95 transition-transform">
-                          <i className="fa-brands fa-waze" /> Waze
-                        </a>
-                      </div>
-                    </div>
-                  )}
-
-                  {/* Slaid: THANK YOU */}
+                  {/* JENIS 4: THANK YOU */}
                   {slide.type === 'thank_you' && (
                     <div className="space-y-3">
                       <div className="text-3xl text-amber-600">❧ ❦ ☙</div>
@@ -345,14 +368,14 @@ export function InvitationCard({
                     </div>
                   )}
 
-                  {/* NOTIS KUNCI FREEMIUM UNTUK PENGGUNA PERCUMA */}
+                  {/* NOTIS KUNCI FREEMIUM UNTUK PENGGUNA PERCUMA DI HELAIAN KE-2 */}
                   {!isPaid && idx === 1 && (
                     <div className="mt-2 w-full p-2.5 rounded-xl bg-amber-500/15 border border-amber-500/30 text-center">
                       <p className="text-[10px] text-amber-900 font-bold uppercase tracking-wider">
-                        🔒 Helaian Peta & Tentatif Terkunci
+                        🔒 Helaian Tentatif & RSVP Terkunci
                       </p>
                       <p className="text-[9px] text-slate-600 mt-0.5">
-                        Tingkatkan ke versi berbayar untuk membuka 4 helaian penuh.
+                        Tingkatkan ke versi berbayar untuk membuka 4 helaian penuh tanpa watermark.
                       </p>
                     </div>
                   )}
