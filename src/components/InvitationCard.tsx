@@ -8,6 +8,7 @@ interface Props {
   showWatermark?: boolean;
   maxSlides?: number;
   guestName?: string;
+  activeSlideIndex?: number | 'cover';
 }
 
 // Komponen Typing Effect
@@ -55,7 +56,8 @@ export function InvitationCard({
   data, 
   showWatermark = false, 
   maxSlides, 
-  guestName = "Dato' / Datin / Tuan / Puan" 
+  guestName = "Dato' / Datin / Tuan / Puan",
+  activeSlideIndex
 }: Props) {
   const [isOpen, setIsOpen] = useState(false);
   const [currentSlide, setCurrentSlide] = useState(0);
@@ -71,6 +73,30 @@ export function InvitationCard({
 
   const slides = maxSlides && maxSlides > 0 ? rawSlides.slice(0, maxSlides) : rawSlides;
   const totalSlides = slides.length;
+
+  // 1. AUTO-TUKAR MUZIK SERTA-MERTA BILA DIPILIH
+  useEffect(() => {
+    if (audioRef.current && data?.cover?.audioUrl) {
+      const audio = audioRef.current;
+      audio.src = data.cover.audioUrl;
+      audio.load();
+      if (isPlaying) {
+        audio.play().catch(() => {});
+      }
+    }
+  }, [data?.cover?.audioUrl, isPlaying]);
+
+  // 2. AUTO-SELAK KE HELAIAN ATAU MUKA DEPAN YANG SEDANG DIEDIT
+  useEffect(() => {
+    if (activeSlideIndex === 'cover') {
+      setIsOpen(false);
+      setCurrentSlide(0);
+    } else if (typeof activeSlideIndex === 'number' && activeSlideIndex >= 0) {
+      setIsOpen(true);
+      const targetIndex = Math.min(activeSlideIndex, totalSlides - 1);
+      setCurrentSlide(targetIndex);
+    }
+  }, [activeSlideIndex, totalSlides]);
 
   const toggleMusic = (e: React.MouseEvent) => {
     e.stopPropagation();
@@ -139,7 +165,6 @@ export function InvitationCard({
     touchStartY.current = null;
   };
 
-  // Penentuan Latar Muka Depan (Warna vs Gambar)
   const isCoverImage = data?.theme?.coverBgType === 'image' && data?.theme?.coverBgUrl;
   const coverBgColor = data?.theme?.coverBgColor || data?.theme?.primaryColor || '#2d4a3e';
 
@@ -156,7 +181,7 @@ export function InvitationCard({
         backgroundPosition: 'center'
       }}
     >
-      {/* 1. WATERMARK UNTUK PREVIEW */}
+      {/* 1. WATERMARK PREVIEW */}
       {showWatermark && (
         <div className="absolute inset-0 z-[100] pointer-events-none flex flex-col items-center justify-around opacity-25">
           {[...Array(6)].map((_, i) => (
@@ -193,7 +218,6 @@ export function InvitationCard({
           backgroundPosition: 'center'
         }}
       >
-        {/* Lapisan Tint Gelap Jika Cover Menggunakan Gambar */}
         {isCoverImage && (
           <div className="absolute inset-0 bg-black/40 backdrop-blur-[1px] pointer-events-none" />
         )}

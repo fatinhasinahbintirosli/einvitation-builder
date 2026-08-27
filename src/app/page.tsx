@@ -8,10 +8,11 @@ import { supabase } from '@/lib/supabaseClient';
 
 const initialData: CardData = {
   theme: {
-    doorStyle: 'sliding',
+    coverBgType: 'color',
+    coverBgColor: '#2d4a3e',
     backgroundColor: '#1f2621',
     cardBackgroundColor: 'rgba(255, 255, 255, 0.95)',
-    primaryColor: '#3d5343',
+    primaryColor: '#2d4a3e',
     goldColor: '#b59049',
     bgPatternUrl: 'https://images.unsplash.com/photo-1607604276583-eef5d076aa5f?q=80&w=1080&auto=format&fit=crop'
   },
@@ -65,6 +66,9 @@ export default function BuilderPage() {
   const [slug, setSlug] = useState<string>(() => `kad-${Math.random().toString(36).substring(2, 9)}`);
   const [isSaving, setIsSaving] = useState(false);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+  
+  // State untuk auto-scroll / auto-selak helaian yang sedang diedit
+  const [activeSlideIndex, setActiveSlideIndex] = useState<number | 'cover'>('cover');
 
   const handleSave = async () => {
     setIsSaving(true);
@@ -99,18 +103,17 @@ export default function BuilderPage() {
   return (
     <main className="min-h-screen p-4 md:p-8 max-w-7xl mx-auto flex flex-col items-center bg-slate-950 text-slate-100">
       
-      {/* Header Utama */}
       <header className="text-center mb-8">
         <h1 className="text-3xl sm:text-4xl font-bold text-amber-400 tracking-wider" style={{ fontFamily: 'Cinzel, serif' }}>
           E-INVITATION BUILDER STUDIO
         </h1>
         <p className="text-xs sm:text-sm text-slate-400 mt-1.5">
-          Ubah suai teks, tema, dan susunan helaian di panel kiri. Pratonton langsung bergerak di panel kanan.
+          Ubah suai teks, tema, dan susunan helaian di panel kiri. Pratonton langsung bergerak secara automatik di panel kanan.
         </p>
       </header>
 
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 w-full items-start">
-        {/* Bahagian Kiri: Borang Pengubah Suai (Builder Form) */}
+        {/* Bahagian Kiri: Borang Pengubah Suai */}
         <div className="lg:col-span-6 w-full">
           <BuilderForm
             data={cardData}
@@ -120,10 +123,12 @@ export default function BuilderPage() {
             slug={slug}
             setSlug={setSlug}
             generatedUrl={previewUrl}
+            activeSlideIndex={activeSlideIndex}
+            onActiveSlideChange={setActiveSlideIndex}
           />
         </div>
 
-        {/* Bahagian Kanan: Live Preview Kad (Semua Helaian Sedia Ditunjuk, Tanpa Watermark) */}
+        {/* Bahagian Kanan: Live Preview Kad Dinamik */}
         <div className="lg:col-span-6 flex flex-col items-center justify-center sticky top-6">
           <div className="text-center mb-2">
             <span className="text-[11px] font-bold uppercase tracking-[2px] text-amber-400/80 bg-amber-500/10 px-3 py-1 rounded-full border border-amber-500/20">
@@ -134,6 +139,7 @@ export default function BuilderPage() {
           <InvitationCard 
             data={cardData} 
             showWatermark={false} 
+            activeSlideIndex={activeSlideIndex}
           />
         </div>
       </div>

@@ -13,9 +13,10 @@ interface Props {
   slug?: string;
   setSlug?: (slug: string) => void;
   generatedUrl?: string | null;
+  activeSlideIndex?: number | 'cover';
+  onActiveSlideChange?: (index: number | 'cover') => void;
 }
 
-// Senarai Warna Tema Muka Depan
 const COLOR_PRESETS = [
   { name: 'Hijau Zamrud', hex: '#2d4a3e' },
   { name: 'Biru Gelap', hex: '#172554' },
@@ -27,7 +28,6 @@ const COLOR_PRESETS = [
   { name: 'Teal Klasik', hex: '#134e4a' },
 ];
 
-// Senarai Gambar Kertas Dinding (Wallpaper)
 const PRESET_WALLPAPERS = [
   {
     id: 'songket_gold',
@@ -51,7 +51,6 @@ const PRESET_WALLPAPERS = [
   }
 ];
 
-// Senarai Lagu Majlis Sedia Ada
 const MUSIC_PRESETS = [
   {
     name: 'Melodi Piano Lembut (Lalai)',
@@ -78,17 +77,29 @@ export default function BuilderForm({
   isSaving = false,
   slug,
   setSlug,
-  generatedUrl
+  generatedUrl,
+  activeSlideIndex,
+  onActiveSlideChange
 }: Props) {
   const [activeTab, setActiveTab] = useState<'cover' | 'slides' | 'music'>('cover');
   const [uploadError, setUploadError] = useState<string | null>(null);
   const [isCheckingOut, setIsCheckingOut] = useState(false);
 
-  // Tab pemilihan jenis latar cover (color / image)
   const bgType = data.theme?.coverBgType || 'color';
 
   const updateData = (newData: CardData) => {
     onChange(newData);
+  };
+
+  const handleTabChange = (tab: 'cover' | 'slides' | 'music') => {
+    setActiveTab(tab);
+    if (tab === 'cover') {
+      onActiveSlideChange?.('cover');
+    } else if (tab === 'slides') {
+      onActiveSlideChange?.(typeof activeSlideIndex === 'number' ? activeSlideIndex : 0);
+    } else if (tab === 'music') {
+      onActiveSlideChange?.('cover');
+    }
   };
 
   const handleStripeCheckout = async () => {
@@ -141,6 +152,7 @@ export default function BuilderForm({
           bgPatternUrl: base64Url
         }
       });
+      onActiveSlideChange?.('cover');
     };
     reader.readAsDataURL(file);
   };
@@ -158,6 +170,7 @@ export default function BuilderForm({
         imageUrl: base64Url
       };
       updateData({ ...data, slides: updatedSlides });
+      onActiveSlideChange?.(slideIndex);
     };
     reader.readAsDataURL(file);
   };
@@ -169,6 +182,7 @@ export default function BuilderForm({
       ...updatedFields
     };
     updateData({ ...data, slides: updatedSlides });
+    onActiveSlideChange?.(index);
   };
 
   const addNewSlide = () => {
@@ -183,7 +197,9 @@ export default function BuilderForm({
         wazeUrl: 'https://waze.com'
       }
     };
+    const newIndex = data.slides.length;
     updateData({ ...data, slides: [...data.slides, newSlide] });
+    onActiveSlideChange?.(newIndex);
   };
 
   const removeSlide = (index: number) => {
@@ -193,6 +209,7 @@ export default function BuilderForm({
     }
     const updatedSlides = data.slides.filter((_, idx) => idx !== index);
     updateData({ ...data, slides: updatedSlides });
+    onActiveSlideChange?.(Math.max(0, index - 1));
   };
 
   const handleTypeChange = (index: number, newType: SlideType) => {
@@ -262,7 +279,7 @@ export default function BuilderForm({
       <div className="flex rounded-xl bg-slate-950 p-1 border border-slate-800 text-xs font-semibold">
         <button
           type="button"
-          onClick={() => setActiveTab('cover')}
+          onClick={() => handleTabChange('cover')}
           className={`flex-1 py-2.5 rounded-lg transition-all ${
             activeTab === 'cover' ? 'bg-amber-500 text-slate-950 font-bold shadow' : 'text-slate-400 hover:text-white'
           }`}
@@ -271,7 +288,7 @@ export default function BuilderForm({
         </button>
         <button
           type="button"
-          onClick={() => setActiveTab('slides')}
+          onClick={() => handleTabChange('slides')}
           className={`flex-1 py-2.5 rounded-lg transition-all ${
             activeTab === 'slides' ? 'bg-amber-500 text-slate-950 font-bold shadow' : 'text-slate-400 hover:text-white'
           }`}
@@ -280,7 +297,7 @@ export default function BuilderForm({
         </button>
         <button
           type="button"
-          onClick={() => setActiveTab('music')}
+          onClick={() => handleTabChange('music')}
           className={`flex-1 py-2.5 rounded-lg transition-all ${
             activeTab === 'music' ? 'bg-amber-500 text-slate-950 font-bold shadow' : 'text-slate-400 hover:text-white'
           }`}
@@ -291,9 +308,10 @@ export default function BuilderForm({
 
       {/* ================= TAB 1: MUKA DEPAN & WALLPAPER ================= */}
       {activeTab === 'cover' && (
-        <div className="p-5 rounded-2xl bg-slate-950/70 border border-slate-800 space-y-4">
-          
-          {/* PEMILIHAN LATAR BELAKANG (COLOR VS IMAGE) */}
+        <div 
+          onClick={() => onActiveSlideChange?.('cover')}
+          className="p-5 rounded-2xl bg-slate-950/70 border border-slate-800 space-y-4"
+        >
           <div className="p-4 rounded-2xl bg-slate-900 border border-amber-500/20 space-y-3">
             <div className="flex items-center justify-between">
               <label className="text-xs font-bold text-amber-300 uppercase tracking-wider">
@@ -302,10 +320,10 @@ export default function BuilderForm({
               <div className="flex rounded-lg bg-slate-950 p-0.5 border border-slate-800 text-[11px]">
                 <button
                   type="button"
-                  onClick={() => updateData({
-                    ...data,
-                    theme: { ...data.theme, coverBgType: 'color' }
-                  })}
+                  onClick={() => {
+                    updateData({ ...data, theme: { ...data.theme, coverBgType: 'color' } });
+                    onActiveSlideChange?.('cover');
+                  }}
                   className={`px-3 py-1 rounded-md transition-all ${
                     bgType === 'color' ? 'bg-amber-500 text-slate-950 font-bold shadow' : 'text-slate-400 hover:text-white'
                   }`}
@@ -314,10 +332,10 @@ export default function BuilderForm({
                 </button>
                 <button
                   type="button"
-                  onClick={() => updateData({
-                    ...data,
-                    theme: { ...data.theme, coverBgType: 'image' }
-                  })}
+                  onClick={() => {
+                    updateData({ ...data, theme: { ...data.theme, coverBgType: 'image' } });
+                    onActiveSlideChange?.('cover');
+                  }}
                   className={`px-3 py-1 rounded-md transition-all ${
                     bgType === 'image' ? 'bg-amber-500 text-slate-950 font-bold shadow' : 'text-slate-400 hover:text-white'
                   }`}
@@ -327,7 +345,6 @@ export default function BuilderForm({
               </div>
             </div>
 
-            {/* MOD 1: PILIHAN WARNA */}
             {bgType === 'color' && (
               <div className="space-y-3 pt-1">
                 <span className="text-[11px] text-slate-400 block font-medium">Pilih warna tema muka depan:</span>
@@ -336,10 +353,13 @@ export default function BuilderForm({
                     <button
                       key={color.hex}
                       type="button"
-                      onClick={() => updateData({
-                        ...data,
-                        theme: { ...data.theme, coverBgColor: color.hex, primaryColor: color.hex }
-                      })}
+                      onClick={() => {
+                        updateData({
+                          ...data,
+                          theme: { ...data.theme, coverBgColor: color.hex, primaryColor: color.hex }
+                        });
+                        onActiveSlideChange?.('cover');
+                      }}
                       className={`h-10 rounded-xl border-2 transition-transform flex items-center justify-center ${
                         (data.theme?.coverBgColor || data.theme?.primaryColor) === color.hex
                           ? 'border-amber-400 scale-105 shadow-md'
@@ -356,14 +376,17 @@ export default function BuilderForm({
                 </div>
 
                 <div className="flex items-center gap-2 pt-1">
-                  <label className="text-[11px] text-slate-400">Atau pilih kod warna tersendiri (Hex):</label>
+                  <label className="text-[11px] text-slate-400">Atau kod warna tersendiri (Hex):</label>
                   <input
                     type="color"
                     value={data.theme?.coverBgColor || data.theme?.primaryColor || '#2d4a3e'}
-                    onChange={(e) => updateData({
-                      ...data,
-                      theme: { ...data.theme, coverBgColor: e.target.value, primaryColor: e.target.value }
-                    })}
+                    onChange={(e) => {
+                      updateData({
+                        ...data,
+                        theme: { ...data.theme, coverBgColor: e.target.value, primaryColor: e.target.value }
+                      });
+                      onActiveSlideChange?.('cover');
+                    }}
                     className="w-8 h-8 rounded-lg bg-transparent cursor-pointer border border-slate-700"
                   />
                   <span className="text-xs text-amber-300 font-mono font-bold">
@@ -373,10 +396,8 @@ export default function BuilderForm({
               </div>
             )}
 
-            {/* MOD 2: PILIHAN GAMBAR / WALLPAPER */}
             {bgType === 'image' && (
               <div className="space-y-3 pt-1">
-                {/* Upload Fail Gambar */}
                 <label className="flex flex-col items-center justify-center border-2 border-dashed border-slate-700 hover:border-amber-400/60 rounded-xl p-3 cursor-pointer bg-slate-950/60 transition-all">
                   <i className="fa-solid fa-cloud-arrow-up text-lg text-amber-400 mb-1" />
                   <span className="text-xs text-slate-300 font-medium">Muat Naik Gambar Latar Belakang</span>
@@ -385,7 +406,6 @@ export default function BuilderForm({
                 </label>
                 {uploadError && <p className="text-xs text-red-400 mt-1">{uploadError}</p>}
 
-                {/* Preset Gambar */}
                 <div>
                   <span className="text-[11px] text-slate-400 block mb-1.5 font-medium">Atau pilih corak tema sedia ada:</span>
                   <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
@@ -393,10 +413,13 @@ export default function BuilderForm({
                       <button
                         key={preset.id}
                         type="button"
-                        onClick={() => updateData({
-                          ...data,
-                          theme: { ...data.theme, coverBgUrl: preset.url, bgPatternUrl: preset.url }
-                        })}
+                        onClick={() => {
+                          updateData({
+                            ...data,
+                            theme: { ...data.theme, coverBgUrl: preset.url, bgPatternUrl: preset.url }
+                          });
+                          onActiveSlideChange?.('cover');
+                        }}
                         className={`relative h-14 rounded-lg overflow-hidden border transition-all ${
                           data.theme?.coverBgUrl === preset.url
                             ? 'border-amber-400 ring-2 ring-amber-400/40 scale-[1.02]'
@@ -415,12 +438,12 @@ export default function BuilderForm({
             )}
           </div>
           
-          {/* TEKS MUKA DEPAN */}
           <div>
             <label className="text-xs text-slate-400 block mb-1">Tagline / Panggilan Atas</label>
             <input
               type="text"
               value={data.cover?.tagline || ''}
+              onFocus={() => onActiveSlideChange?.('cover')}
               onChange={(e) => updateData({ ...data, cover: { ...data.cover, tagline: e.target.value } })}
               className="w-full px-3.5 py-2.5 rounded-xl bg-slate-900 border border-slate-700 text-xs focus:border-amber-400 outline-none"
             />
@@ -431,6 +454,7 @@ export default function BuilderForm({
             <input
               type="text"
               value={data.cover?.mainTitle || ''}
+              onFocus={() => onActiveSlideChange?.('cover')}
               onChange={(e) => updateData({ ...data, cover: { ...data.cover, mainTitle: e.target.value } })}
               className="w-full px-3.5 py-2.5 rounded-xl bg-slate-900 border border-slate-700 text-xs focus:border-amber-400 outline-none"
             />
@@ -441,6 +465,7 @@ export default function BuilderForm({
             <input
               type="text"
               value={data.cover?.dateText || ''}
+              onFocus={() => onActiveSlideChange?.('cover')}
               onChange={(e) => updateData({ ...data, cover: { ...data.cover, dateText: e.target.value } })}
               className="w-full px-3.5 py-2.5 rounded-xl bg-slate-900 border border-slate-700 text-xs focus:border-amber-400 outline-none"
             />
@@ -451,254 +476,289 @@ export default function BuilderForm({
       {/* ================= TAB 2: HELAIAN KAD ================= */}
       {activeTab === 'slides' && (
         <div className="space-y-4 max-h-[520px] overflow-y-auto pr-1">
-          {data.slides.map((slide, idx) => (
-            <div key={slide.id || idx} className="p-4 rounded-2xl bg-slate-950/80 border border-slate-800 space-y-3.5">
-              
-              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-800 pb-3">
-                <div className="flex items-center gap-2">
-                  <span className="w-5 h-5 rounded-full bg-amber-500/20 text-amber-400 text-[10px] font-bold flex items-center justify-center">
-                    {idx + 1}
-                  </span>
-                  
-                  <select
-                    value={slide.type}
-                    onChange={(e) => handleTypeChange(idx, e.target.value as SlideType)}
-                    className="px-3 py-1.5 rounded-lg bg-slate-900 border border-amber-400/40 text-amber-300 text-xs font-semibold outline-none cursor-pointer focus:border-amber-400"
-                  >
-                    <option value="intro">✨ Pengenalan & Ucapan</option>
-                    <option value="location">📍 Lokasi & Peta (Maps / Waze)</option>
-                    <option value="tentative">📅 Susunan Majlis (Tentatif)</option>
-                    <option value="image_qr">📷 Kod QR / DuitNow / Galeri</option>
-                    <option value="guestbook">📖 Buku Ucapan & Doa</option>
-                    <option value="thank_you">🙏 Ucapan Penghargaan & Penutup</option>
-                  </select>
+          {data.slides.map((slide, idx) => {
+            const isCurrentlyActive = activeSlideIndex === idx;
+
+            return (
+              <div 
+                key={slide.id || idx} 
+                onClick={() => onActiveSlideChange?.(idx)}
+                className={`p-4 rounded-2xl bg-slate-950/80 border transition-all space-y-3.5 ${
+                  isCurrentlyActive ? 'border-amber-400 ring-2 ring-amber-400/30 shadow-lg' : 'border-slate-800'
+                }`}
+              >
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-800 pb-3">
+                  <div className="flex items-center gap-2">
+                    <span className={`w-5 h-5 rounded-full text-[10px] font-bold flex items-center justify-center ${
+                      isCurrentlyActive ? 'bg-amber-500 text-slate-950' : 'bg-amber-500/20 text-amber-400'
+                    }`}>
+                      {idx + 1}
+                    </span>
+                    
+                    <select
+                      value={slide.type}
+                      onFocus={() => onActiveSlideChange?.(idx)}
+                      onChange={(e) => handleTypeChange(idx, e.target.value as SlideType)}
+                      className="px-3 py-1.5 rounded-lg bg-slate-900 border border-amber-400/40 text-amber-300 text-xs font-semibold outline-none cursor-pointer focus:border-amber-400"
+                    >
+                      <option value="intro">✨ Pengenalan & Ucapan</option>
+                      <option value="location">📍 Lokasi & Peta (Maps / Waze)</option>
+                      <option value="tentative">📅 Susunan Majlis (Tentatif)</option>
+                      <option value="image_qr">📷 Kod QR / DuitNow / Galeri</option>
+                      <option value="guestbook">📖 Buku Ucapan & Doa</option>
+                      <option value="thank_you">🙏 Ucapan Penghargaan & Penutup</option>
+                    </select>
+
+                    {isCurrentlyActive && (
+                      <span className="text-[9px] text-amber-300 bg-amber-500/15 px-2 py-0.5 rounded-md font-bold uppercase tracking-wider">
+                        Live di Preview
+                      </span>
+                    )}
+                  </div>
+
+                  <div className="flex items-center gap-2">
+                    <input
+                      type="text"
+                      value={slide.title || ''}
+                      onFocus={() => onActiveSlideChange?.(idx)}
+                      onChange={(e) => updateSlide(idx, { title: e.target.value })}
+                      placeholder="Tajuk Atas"
+                      className="px-2.5 py-1 rounded-lg bg-slate-900 border border-slate-700 text-xs text-right text-slate-300 outline-none w-32"
+                    />
+                    <button
+                      type="button"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        removeSlide(idx);
+                      }}
+                      className="text-red-400 hover:text-red-300 p-1 text-xs"
+                      title="Padam Helaian Ini"
+                    >
+                      <i className="fa-solid fa-trash-can" />
+                    </button>
+                  </div>
                 </div>
 
-                <div className="flex items-center gap-2">
-                  <input
-                    type="text"
-                    value={slide.title || ''}
-                    onChange={(e) => updateSlide(idx, { title: e.target.value })}
-                    placeholder="Tajuk Atas"
-                    className="px-2.5 py-1 rounded-lg bg-slate-900 border border-slate-700 text-xs text-right text-slate-300 outline-none w-32"
-                  />
-                  <button
-                    type="button"
-                    onClick={() => removeSlide(idx)}
-                    className="text-red-400 hover:text-red-300 p-1 text-xs"
-                    title="Padam Helaian Ini"
-                  >
-                    <i className="fa-solid fa-trash-can" />
-                  </button>
-                </div>
+                {/* INTRO */}
+                {slide.type === 'intro' && (
+                  <div className="space-y-3">
+                    <div>
+                      <label className="text-[11px] text-slate-400 block mb-1">Teks Ucapan Jemputan</label>
+                      <textarea
+                        rows={2}
+                        value={slide.bodyText || ''}
+                        onFocus={() => onActiveSlideChange?.(idx)}
+                        onChange={(e) => updateSlide(idx, { bodyText: e.target.value })}
+                        className="w-full px-3 py-2 rounded-xl bg-slate-900 border border-slate-700 text-xs outline-none focus:border-amber-400"
+                      />
+                    </div>
+                    <div>
+                      <label className="text-[11px] text-slate-400 block mb-1">Nama Penuh Yang Diraikan</label>
+                      <input
+                        type="text"
+                        value={slide.subtitle || ''}
+                        onFocus={() => onActiveSlideChange?.(idx)}
+                        onChange={(e) => updateSlide(idx, { subtitle: e.target.value })}
+                        className="w-full px-3 py-2 rounded-xl bg-slate-900 border border-slate-700 text-xs outline-none focus:border-amber-400"
+                      />
+                    </div>
+                    <div>
+                      <label className="text-[11px] text-slate-400 block mb-1">Gambar Bulat Tengah</label>
+                      <div className="flex items-center gap-3">
+                        {slide.imageUrl && (
+                          <img src={slide.imageUrl} alt="Preview" className="w-10 h-10 rounded-full object-cover border border-amber-400" />
+                        )}
+                        <label className="px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs cursor-pointer border border-slate-700">
+                          Pilih Gambar Foto
+                          <input type="file" accept="image/*" onChange={(e) => handleSlideImageUpload(idx, e)} className="hidden" />
+                        </label>
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                {/* LOCATION */}
+                {slide.type === 'location' && (
+                  <div className="space-y-3">
+                    <div>
+                      <label className="text-[11px] text-slate-400 block mb-1">Nama Tempat / Dewan</label>
+                      <input
+                        type="text"
+                        value={slide.locationDetails?.venueName || ''}
+                        onFocus={() => onActiveSlideChange?.(idx)}
+                        onChange={(e) => updateSlide(idx, {
+                          locationDetails: { ...(slide.locationDetails || { venueName: '', address: '', gmapsUrl: '', wazeUrl: '' }), venueName: e.target.value }
+                        })}
+                        className="w-full px-3 py-2 rounded-xl bg-slate-900 border border-slate-700 text-xs outline-none focus:border-amber-400"
+                      />
+                    </div>
+                    <div>
+                      <label className="text-[11px] text-slate-400 block mb-1">Alamat Penuh Majlis</label>
+                      <textarea
+                        rows={2}
+                        value={slide.locationDetails?.address || ''}
+                        onFocus={() => onActiveSlideChange?.(idx)}
+                        onChange={(e) => updateSlide(idx, {
+                          locationDetails: { ...(slide.locationDetails || { venueName: '', address: '', gmapsUrl: '', wazeUrl: '' }), address: e.target.value }
+                        })}
+                        className="w-full px-3 py-2 rounded-xl bg-slate-900 border border-slate-700 text-xs outline-none focus:border-amber-400"
+                      />
+                    </div>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                      <div>
+                        <label className="text-[10px] text-slate-400 block mb-0.5">Pautan Google Maps</label>
+                        <input
+                          type="text"
+                          value={slide.locationDetails?.gmapsUrl || ''}
+                          onFocus={() => onActiveSlideChange?.(idx)}
+                          onChange={(e) => updateSlide(idx, {
+                            locationDetails: { ...(slide.locationDetails || { venueName: '', address: '', gmapsUrl: '', wazeUrl: '' }), gmapsUrl: e.target.value }
+                          })}
+                          placeholder="http://googleusercontent.com/maps.google.com/4..."
+                          className="w-full px-3 py-2 rounded-lg bg-slate-900 border border-slate-700 text-xs outline-none focus:border-amber-400"
+                        />
+                      </div>
+                      <div>
+                        <label className="text-[10px] text-slate-400 block mb-0.5">Pautan Waze</label>
+                        <input
+                          type="text"
+                          value={slide.locationDetails?.wazeUrl || ''}
+                          onFocus={() => onActiveSlideChange?.(idx)}
+                          onChange={(e) => updateSlide(idx, {
+                            locationDetails: { ...(slide.locationDetails || { venueName: '', address: '', gmapsUrl: '', wazeUrl: '' }), wazeUrl: e.target.value }
+                          })}
+                          placeholder="https://waze.com/ul/..."
+                          className="w-full px-3 py-2 rounded-lg bg-slate-900 border border-slate-700 text-xs outline-none focus:border-amber-400"
+                        />
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                {/* TENTATIVE */}
+                {slide.type === 'tentative' && (
+                  <div className="space-y-2.5">
+                    <label className="text-[11px] text-slate-400 block">Jadual Atur Cara Majlis:</label>
+                    {(slide.timeline || []).map((tItem, tIdx) => (
+                      <div key={tIdx} className="flex gap-2 items-center">
+                        <input
+                          type="text"
+                          value={tItem.time}
+                          onFocus={() => onActiveSlideChange?.(idx)}
+                          onChange={(e) => updateTimelineItem(idx, tIdx, 'time', e.target.value)}
+                          placeholder="Masa"
+                          className="w-24 px-2.5 py-1.5 rounded-lg bg-slate-900 border border-slate-700 text-xs text-amber-300 outline-none"
+                        />
+                        <input
+                          type="text"
+                          value={tItem.activity}
+                          onFocus={() => onActiveSlideChange?.(idx)}
+                          onChange={(e) => updateTimelineItem(idx, tIdx, 'activity', e.target.value)}
+                          placeholder="Aktiviti"
+                          className="flex-1 px-2.5 py-1.5 rounded-lg bg-slate-900 border border-slate-700 text-xs outline-none"
+                        />
+                        <button
+                          type="button"
+                          onClick={() => removeTimelineItem(idx, tIdx)}
+                          className="text-red-400 hover:text-red-300 px-1 text-xs"
+                        >
+                          <i className="fa-solid fa-trash" />
+                        </button>
+                      </div>
+                    ))}
+                    <button
+                      type="button"
+                      onClick={() => addTimelineItem(idx)}
+                      className="text-xs text-amber-400 font-semibold hover:underline pt-1 flex items-center gap-1 cursor-pointer"
+                    >
+                      <i className="fa-solid fa-plus text-[10px]" /> Tambah Baris Masa
+                    </button>
+                  </div>
+                )}
+
+                {/* IMAGE_QR */}
+                {slide.type === 'image_qr' && (
+                  <div className="space-y-3">
+                    <div>
+                      <label className="text-[11px] text-slate-400 block mb-1">Tajuk QR / Imej</label>
+                      <input
+                        type="text"
+                        value={slide.subtitle || ''}
+                        onFocus={() => onActiveSlideChange?.(idx)}
+                        onChange={(e) => updateSlide(idx, { subtitle: e.target.value })}
+                        placeholder="Contoh: Kod QR DuitNow / Hadiah"
+                        className="w-full px-3 py-2 rounded-xl bg-slate-900 border border-slate-700 text-xs outline-none focus:border-amber-400"
+                      />
+                    </div>
+                    <div>
+                      <label className="text-[11px] text-slate-400 block mb-1">Penerangan Ringkas</label>
+                      <input
+                        type="text"
+                        value={slide.bodyText || ''}
+                        onFocus={() => onActiveSlideChange?.(idx)}
+                        onChange={(e) => updateSlide(idx, { bodyText: e.target.value })}
+                        placeholder="Imbas kod QR di bawah untuk ingatan tulus ikhlas anda."
+                        className="w-full px-3 py-2 rounded-xl bg-slate-900 border border-slate-700 text-xs outline-none focus:border-amber-400"
+                      />
+                    </div>
+                    <div>
+                      <label className="text-[11px] text-slate-400 block mb-1">Muat Naik Kod QR / Gambar</label>
+                      <div className="flex items-center gap-3">
+                        {slide.imageUrl && (
+                          <img src={slide.imageUrl} alt="QR" className="w-12 h-12 rounded-xl object-contain border border-amber-400 bg-white p-1" />
+                        )}
+                        <label className="px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs cursor-pointer border border-slate-700">
+                          Pilih Gambar QR
+                          <input type="file" accept="image/*" onChange={(e) => handleSlideImageUpload(idx, e)} className="hidden" />
+                        </label>
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                {/* GUESTBOOK */}
+                {slide.type === 'guestbook' && (
+                  <div className="space-y-3">
+                    <div>
+                      <label className="text-[11px] text-slate-400 block mb-1">Tajuk Ruangan</label>
+                      <input
+                        type="text"
+                        value={slide.subtitle || ''}
+                        onFocus={() => onActiveSlideChange?.(idx)}
+                        onChange={(e) => updateSlide(idx, { subtitle: e.target.value })}
+                        className="w-full px-3 py-2 rounded-xl bg-slate-900 border border-slate-700 text-xs outline-none focus:border-amber-400"
+                      />
+                    </div>
+                    <div>
+                      <label className="text-[11px] text-slate-400 block mb-1">Penerangan / Arahan Tetamu</label>
+                      <textarea
+                        rows={2}
+                        value={slide.bodyText || ''}
+                        onFocus={() => onActiveSlideChange?.(idx)}
+                        onChange={(e) => updateSlide(idx, { bodyText: e.target.value })}
+                        className="w-full px-3 py-2 rounded-xl bg-slate-900 border border-slate-700 text-xs outline-none focus:border-amber-400"
+                      />
+                    </div>
+                  </div>
+                )}
+
+                {/* THANK_YOU */}
+                {slide.type === 'thank_you' && (
+                  <div>
+                    <label className="text-[11px] text-slate-400 block mb-1">Teks Ucapan Penghargaan</label>
+                    <textarea
+                      rows={2}
+                      value={slide.bodyText || ''}
+                      onFocus={() => onActiveSlideChange?.(idx)}
+                      onChange={(e) => updateSlide(idx, { bodyText: e.target.value })}
+                      className="w-full px-3 py-2 rounded-xl bg-slate-900 border border-slate-700 text-xs outline-none focus:border-amber-400"
+                    />
+                  </div>
+                )}
+
               </div>
-
-              {/* INTRO */}
-              {slide.type === 'intro' && (
-                <div className="space-y-3">
-                  <div>
-                    <label className="text-[11px] text-slate-400 block mb-1">Teks Ucapan Jemputan</label>
-                    <textarea
-                      rows={2}
-                      value={slide.bodyText || ''}
-                      onChange={(e) => updateSlide(idx, { bodyText: e.target.value })}
-                      className="w-full px-3 py-2 rounded-xl bg-slate-900 border border-slate-700 text-xs outline-none focus:border-amber-400"
-                    />
-                  </div>
-                  <div>
-                    <label className="text-[11px] text-slate-400 block mb-1">Nama Penuh Yang Diraikan</label>
-                    <input
-                      type="text"
-                      value={slide.subtitle || ''}
-                      onChange={(e) => updateSlide(idx, { subtitle: e.target.value })}
-                      className="w-full px-3 py-2 rounded-xl bg-slate-900 border border-slate-700 text-xs outline-none focus:border-amber-400"
-                    />
-                  </div>
-                  <div>
-                    <label className="text-[11px] text-slate-400 block mb-1">Gambar Bulat Tengah</label>
-                    <div className="flex items-center gap-3">
-                      {slide.imageUrl && (
-                        <img src={slide.imageUrl} alt="Preview" className="w-10 h-10 rounded-full object-cover border border-amber-400" />
-                      )}
-                      <label className="px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs cursor-pointer border border-slate-700">
-                        Pilih Gambar Foto
-                        <input type="file" accept="image/*" onChange={(e) => handleSlideImageUpload(idx, e)} className="hidden" />
-                      </label>
-                    </div>
-                  </div>
-                </div>
-              )}
-
-              {/* LOCATION */}
-              {slide.type === 'location' && (
-                <div className="space-y-3">
-                  <div>
-                    <label className="text-[11px] text-slate-400 block mb-1">Nama Tempat / Dewan</label>
-                    <input
-                      type="text"
-                      value={slide.locationDetails?.venueName || ''}
-                      onChange={(e) => updateSlide(idx, {
-                        locationDetails: { ...(slide.locationDetails || { venueName: '', address: '', gmapsUrl: '', wazeUrl: '' }), venueName: e.target.value }
-                      })}
-                      className="w-full px-3 py-2 rounded-xl bg-slate-900 border border-slate-700 text-xs outline-none focus:border-amber-400"
-                    />
-                  </div>
-                  <div>
-                    <label className="text-[11px] text-slate-400 block mb-1">Alamat Penuh Majlis</label>
-                    <textarea
-                      rows={2}
-                      value={slide.locationDetails?.address || ''}
-                      onChange={(e) => updateSlide(idx, {
-                        locationDetails: { ...(slide.locationDetails || { venueName: '', address: '', gmapsUrl: '', wazeUrl: '' }), address: e.target.value }
-                      })}
-                      className="w-full px-3 py-2 rounded-xl bg-slate-900 border border-slate-700 text-xs outline-none focus:border-amber-400"
-                    />
-                  </div>
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                    <div>
-                      <label className="text-[10px] text-slate-400 block mb-0.5">Pautan Google Maps</label>
-                      <input
-                        type="text"
-                        value={slide.locationDetails?.gmapsUrl || ''}
-                        onChange={(e) => updateSlide(idx, {
-                          locationDetails: { ...(slide.locationDetails || { venueName: '', address: '', gmapsUrl: '', wazeUrl: '' }), gmapsUrl: e.target.value }
-                        })}
-                        placeholder="http://googleusercontent.com/maps.google.com/4..."
-                        className="w-full px-3 py-2 rounded-lg bg-slate-900 border border-slate-700 text-xs outline-none focus:border-amber-400"
-                      />
-                    </div>
-                    <div>
-                      <label className="text-[10px] text-slate-400 block mb-0.5">Pautan Waze</label>
-                      <input
-                        type="text"
-                        value={slide.locationDetails?.wazeUrl || ''}
-                        onChange={(e) => updateSlide(idx, {
-                          locationDetails: { ...(slide.locationDetails || { venueName: '', address: '', gmapsUrl: '', wazeUrl: '' }), wazeUrl: e.target.value }
-                        })}
-                        placeholder="https://waze.com/ul/..."
-                        className="w-full px-3 py-2 rounded-lg bg-slate-900 border border-slate-700 text-xs outline-none focus:border-amber-400"
-                      />
-                    </div>
-                  </div>
-                </div>
-              )}
-
-              {/* TENTATIVE */}
-              {slide.type === 'tentative' && (
-                <div className="space-y-2.5">
-                  <label className="text-[11px] text-slate-400 block">Jadual Atur Cara Majlis:</label>
-                  {(slide.timeline || []).map((tItem, tIdx) => (
-                    <div key={tIdx} className="flex gap-2 items-center">
-                      <input
-                        type="text"
-                        value={tItem.time}
-                        onChange={(e) => updateTimelineItem(idx, tIdx, 'time', e.target.value)}
-                        placeholder="Masa"
-                        className="w-24 px-2.5 py-1.5 rounded-lg bg-slate-900 border border-slate-700 text-xs text-amber-300 outline-none"
-                      />
-                      <input
-                        type="text"
-                        value={tItem.activity}
-                        onChange={(e) => updateTimelineItem(idx, tIdx, 'activity', e.target.value)}
-                        placeholder="Aktiviti"
-                        className="flex-1 px-2.5 py-1.5 rounded-lg bg-slate-900 border border-slate-700 text-xs outline-none"
-                      />
-                      <button
-                        type="button"
-                        onClick={() => removeTimelineItem(idx, tIdx)}
-                        className="text-red-400 hover:text-red-300 px-1 text-xs"
-                      >
-                        <i className="fa-solid fa-trash" />
-                      </button>
-                    </div>
-                  ))}
-                  <button
-                    type="button"
-                    onClick={() => addTimelineItem(idx)}
-                    className="text-xs text-amber-400 font-semibold hover:underline pt-1 flex items-center gap-1 cursor-pointer"
-                  >
-                    <i className="fa-solid fa-plus text-[10px]" /> Tambah Baris Masa
-                  </button>
-                </div>
-              )}
-
-              {/* IMAGE_QR */}
-              {slide.type === 'image_qr' && (
-                <div className="space-y-3">
-                  <div>
-                    <label className="text-[11px] text-slate-400 block mb-1">Tajuk QR / Imej</label>
-                    <input
-                      type="text"
-                      value={slide.subtitle || ''}
-                      onChange={(e) => updateSlide(idx, { subtitle: e.target.value })}
-                      placeholder="Contoh: Kod QR DuitNow / Hadiah"
-                      className="w-full px-3 py-2 rounded-xl bg-slate-900 border border-slate-700 text-xs outline-none focus:border-amber-400"
-                    />
-                  </div>
-                  <div>
-                    <label className="text-[11px] text-slate-400 block mb-1">Penerangan Ringkas</label>
-                    <input
-                      type="text"
-                      value={slide.bodyText || ''}
-                      onChange={(e) => updateSlide(idx, { bodyText: e.target.value })}
-                      placeholder="Imbas kod QR di bawah untuk ingatan tulus ikhlas anda."
-                      className="w-full px-3 py-2 rounded-xl bg-slate-900 border border-slate-700 text-xs outline-none focus:border-amber-400"
-                    />
-                  </div>
-                  <div>
-                    <label className="text-[11px] text-slate-400 block mb-1">Muat Naik Kod QR / Gambar</label>
-                    <div className="flex items-center gap-3">
-                      {slide.imageUrl && (
-                        <img src={slide.imageUrl} alt="QR" className="w-12 h-12 rounded-xl object-contain border border-amber-400 bg-white p-1" />
-                      )}
-                      <label className="px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs cursor-pointer border border-slate-700">
-                        Pilih Gambar QR
-                        <input type="file" accept="image/*" onChange={(e) => handleSlideImageUpload(idx, e)} className="hidden" />
-                      </label>
-                    </div>
-                  </div>
-                </div>
-              )}
-
-              {/* GUESTBOOK */}
-              {slide.type === 'guestbook' && (
-                <div className="space-y-3">
-                  <div>
-                    <label className="text-[11px] text-slate-400 block mb-1">Tajuk Ruangan</label>
-                    <input
-                      type="text"
-                      value={slide.subtitle || ''}
-                      onChange={(e) => updateSlide(idx, { subtitle: e.target.value })}
-                      className="w-full px-3 py-2 rounded-xl bg-slate-900 border border-slate-700 text-xs outline-none focus:border-amber-400"
-                    />
-                  </div>
-                  <div>
-                    <label className="text-[11px] text-slate-400 block mb-1">Penerangan / Arahan Tetamu</label>
-                    <textarea
-                      rows={2}
-                      value={slide.bodyText || ''}
-                      onChange={(e) => updateSlide(idx, { bodyText: e.target.value })}
-                      className="w-full px-3 py-2 rounded-xl bg-slate-900 border border-slate-700 text-xs outline-none focus:border-amber-400"
-                    />
-                  </div>
-                </div>
-              )}
-
-              {/* THANK_YOU */}
-              {slide.type === 'thank_you' && (
-                <div>
-                  <label className="text-[11px] text-slate-400 block mb-1">Teks Ucapan Penghargaan</label>
-                  <textarea
-                    rows={2}
-                    value={slide.bodyText || ''}
-                    onChange={(e) => updateSlide(idx, { bodyText: e.target.value })}
-                    className="w-full px-3 py-2 rounded-xl bg-slate-900 border border-slate-700 text-xs outline-none focus:border-amber-400"
-                  />
-                </div>
-              )}
-
-            </div>
-          ))}
+            );
+          })}
 
           <button
             type="button"
@@ -712,45 +772,52 @@ export default function BuilderForm({
 
       {/* ================= TAB 3: LAGU & MUZIK LATAR ================= */}
       {activeTab === 'music' && (
-        <div className="p-5 rounded-2xl bg-slate-950/70 border border-slate-800 space-y-4">
+        <div 
+          onClick={() => onActiveSlideChange?.('cover')}
+          className="p-5 rounded-2xl bg-slate-950/70 border border-slate-800 space-y-4"
+        >
           <label className="text-xs font-bold text-amber-400 uppercase tracking-wider block">
             Pilihan Lagu & Audio Latar
           </label>
 
-          {/* Senarai Lagu Preset */}
           <div className="space-y-2">
-            <span className="text-[11px] text-slate-400 block font-medium">Pilih lagu daripada koleksi sedia ada:</span>
+            <span className="text-[11px] text-slate-400 block font-medium">Klik untuk terus mendengar lagu pilihan:</span>
             <div className="space-y-2">
-              {MUSIC_PRESETS.map((track) => (
-                <div 
-                  key={track.url}
-                  onClick={() => updateData({ ...data, cover: { ...data.cover, audioUrl: track.url } })}
-                  className={`p-3 rounded-xl border flex items-center justify-between cursor-pointer transition-all ${
-                    data.cover?.audioUrl === track.url
-                      ? 'bg-amber-500/15 border-amber-400/60 shadow-md'
-                      : 'bg-slate-900 border-slate-800 hover:border-slate-700'
-                  }`}
-                >
-                  <div className="flex items-center gap-3">
-                    <div className={`w-8 h-8 rounded-full flex items-center justify-center text-xs ${
-                      data.cover?.audioUrl === track.url ? 'bg-amber-500 text-slate-950 font-bold' : 'bg-slate-800 text-slate-400'
-                    }`}>
-                      <i className="fa-solid fa-music" />
-                    </div>
-                    <span className="text-xs font-medium text-slate-200">{track.name}</span>
-                  </div>
+              {MUSIC_PRESETS.map((track) => {
+                const isSelected = data.cover?.audioUrl === track.url;
 
-                  {data.cover?.audioUrl === track.url && (
-                    <span className="text-[10px] font-bold text-amber-300 uppercase px-2 py-0.5 rounded bg-amber-500/20 border border-amber-500/30">
-                      Dipilih
-                    </span>
-                  )}
-                </div>
-              ))}
+                return (
+                  <div 
+                    key={track.url}
+                    onClick={() => {
+                      updateData({ ...data, cover: { ...data.cover, audioUrl: track.url } });
+                    }}
+                    className={`p-3 rounded-xl border flex items-center justify-between cursor-pointer transition-all ${
+                      isSelected
+                        ? 'bg-amber-500/15 border-amber-400/60 shadow-md ring-1 ring-amber-400/40'
+                        : 'bg-slate-900 border-slate-800 hover:border-slate-700'
+                    }`}
+                  >
+                    <div className="flex items-center gap-3">
+                      <div className={`w-8 h-8 rounded-full flex items-center justify-center text-xs transition-colors ${
+                        isSelected ? 'bg-amber-500 text-slate-950 font-bold' : 'bg-slate-800 text-slate-400'
+                      }`}>
+                        <i className={`fa-solid ${isSelected ? 'fa-volume-high text-slate-950' : 'fa-music'}`} />
+                      </div>
+                      <span className="text-xs font-medium text-slate-200">{track.name}</span>
+                    </div>
+
+                    {isSelected && (
+                      <span className="text-[10px] font-bold text-amber-300 uppercase px-2 py-0.5 rounded bg-amber-500/20 border border-amber-500/30">
+                        Sedang Dimainkan
+                      </span>
+                    )}
+                  </div>
+                );
+              })}
             </div>
           </div>
 
-          {/* Input Manual URL Audio */}
           <div className="pt-2 border-t border-slate-800 space-y-1.5">
             <label className="text-[11px] text-slate-400 block font-medium">Atau masukkan pautan URL MP3 anda sendiri:</label>
             <input
