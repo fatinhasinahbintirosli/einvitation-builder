@@ -126,7 +126,7 @@ export function InvitationCard({
     if (currentSlide < totalSlides - 1) {
       isTransitioning.current = true;
       setCurrentSlide(prev => prev + 1);
-      setTimeout(() => { isTransitioning.current = false; }, 1100);
+      setTimeout(() => { isTransitioning.current = false; }, 850);
     }
   };
 
@@ -135,7 +135,7 @@ export function InvitationCard({
     if (currentSlide > 0) {
       isTransitioning.current = true;
       setCurrentSlide(prev => prev - 1);
-      setTimeout(() => { isTransitioning.current = false; }, 1100);
+      setTimeout(() => { isTransitioning.current = false; }, 850);
     }
   };
 
@@ -167,9 +167,10 @@ export function InvitationCard({
   const isCoverImage = data?.theme?.coverBgType === 'image' && data?.theme?.coverBgUrl;
   const coverBgColor = data?.theme?.coverBgColor || data?.theme?.primaryColor || '#2d4a3e';
 
-  // Pengiraan Nilai Ketelusan (Transparency) Kotak Putih
-  const opacityVal = data?.theme?.cardOpacity !== undefined ? data.theme.cardOpacity : 92;
-  const cardBgStyle = `rgba(255, 255, 255, ${opacityVal / 100})`;
+  // Ketelusan Kotak Putih yang Dikira
+  const rawOpacity = typeof data?.theme?.cardOpacity === 'number' ? data.theme.cardOpacity : 92;
+  const opacityVal = Math.min(100, Math.max(20, rawOpacity));
+  const cardBgColor = `rgba(255, 255, 255, ${opacityVal / 100})`;
 
   return (
     <div 
@@ -211,8 +212,8 @@ export function InvitationCard({
 
       {/* ================= 4. MUKA DEPAN ================= */}
       <div 
-        className={`absolute inset-0 z-50 flex flex-col items-center justify-center p-6 text-white transition-all duration-[1200ms] ease-[cubic-bezier(0.16,1,0.3,1)] ${
-          isOpen ? '-translate-y-full opacity-0 pointer-events-none' : 'translate-y-0 opacity-100 pointer-events-auto'
+        className={`absolute inset-0 z-50 flex flex-col items-center justify-center p-6 text-white transition-transform duration-[1000ms] ease-[cubic-bezier(0.16,1,0.3,1)] ${
+          isOpen ? '-translate-y-full pointer-events-none' : 'translate-y-0 pointer-events-auto'
         }`}
         style={{
           backgroundColor: isCoverImage ? undefined : coverBgColor,
@@ -258,29 +259,31 @@ export function InvitationCard({
         </div>
       </div>
 
-      {/* ================= 5. HELAIAN KAD (DIPERBESARKAN 10% & DILENGKAPI TRANSPARENCY) ================= */}
+      {/* ================= 5. HELAIAN KAD (KETELUSAN KONSISTEN & TANPA DELAY) ================= */}
       <div className="relative w-full h-full overflow-hidden flex flex-col justify-center items-center">
         {slides.map((slide, idx) => {
           const offset = idx - currentSlide;
           const isCurrent = offset === 0;
+          const isNearby = Math.abs(offset) <= 1;
 
           return (
             <div
               key={slide.id || idx}
-              className="absolute inset-0 w-full h-full p-4 sm:p-5 flex flex-col justify-center items-center transition-all duration-[1100ms] ease-[cubic-bezier(0.19,1,0.22,1)]"
+              className="absolute inset-0 w-full h-full p-4 sm:p-5 flex flex-col justify-center items-center transition-transform duration-[850ms] ease-[cubic-bezier(0.16,1,0.3,1)] will-change-transform"
               style={{
-                transform: `translateY(${offset * 100}%) scale(${isCurrent ? 1 : 0.96})`,
-                opacity: isCurrent ? 1 : 0,
+                transform: `translate3d(0, ${offset * 100}%, 0)`,
+                visibility: isNearby ? 'visible' : 'hidden',
                 pointerEvents: isCurrent ? 'auto' : 'none',
                 zIndex: isCurrent ? 20 : 10
               }}
             >
-              {/* KAD PUTIH UTAMA (DIPERBESAR: Lebar 375px & Tinggi 84% / Max 600px + Dynamic Transparency) */}
+              {/* KAD PUTIH UTAMA (Ketelusan Statik & Resolusi Jelas) */}
               <div 
-                className="w-full max-w-[375px] h-[84%] max-h-[600px] rounded-[32px] p-6 sm:p-7 text-center shadow-2xl border border-white/60 flex flex-col justify-between items-center relative transition-colors duration-300 backdrop-blur-md"
+                className="w-full max-w-[375px] h-[84%] max-h-[600px] rounded-[32px] p-6 sm:p-7 text-center shadow-2xl border border-white/50 flex flex-col justify-between items-center relative backdrop-blur-md"
                 style={{ 
-                  backgroundColor: cardBgStyle,
-                  color: '#2c332e' 
+                  backgroundColor: cardBgColor,
+                  color: '#2c332e',
+                  transform: 'translateZ(0)'
                 }}
               >
                 {/* Hiasan Bucu Atas Kad */}
@@ -292,7 +295,7 @@ export function InvitationCard({
                   <span>☙</span>
                 </div>
 
-                {/* Kandungan Helaian (Saiz Teks & Visual Diperbesarkan 10%) */}
+                {/* Kandungan Helaian */}
                 <div className="my-auto w-full py-1 flex flex-col items-center justify-center">
                   
                   {/* 1. INTRO */}
@@ -306,7 +309,6 @@ export function InvitationCard({
                         {isCurrent ? <TypewriterText text={slide.bodyText || ''} speed={45} delay={250} /> : slide.bodyText}
                       </p>
 
-                      {/* Gambar Bulat Diperbesarkan (Lebar 36 x Tinggi 44) */}
                       {slide.imageUrl && (
                         <div className="relative my-2 flex flex-col items-center">
                           <div 

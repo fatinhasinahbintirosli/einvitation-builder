@@ -93,7 +93,7 @@ export default function BuilderForm({
   const [isCheckingOut, setIsCheckingOut] = useState(false);
 
   const bgType = data.theme?.coverBgType || 'color';
-  const currentOpacity = data.theme?.cardOpacity !== undefined ? data.theme.cardOpacity : 92;
+  const currentOpacity = typeof data.theme?.cardOpacity === 'number' ? data.theme.cardOpacity : 92;
 
   const updateData = (newData: CardData) => {
     onChange(newData);
@@ -316,11 +316,9 @@ export default function BuilderForm({
 
       {/* ================= TAB 1: MUKA DEPAN, WALLPAPER & TRANSPARENCY ================= */}
       {activeTab === 'cover' && (
-        <div 
-          onClick={() => onActiveSlideChange?.('cover')}
-          className="p-5 rounded-2xl bg-slate-950/70 border border-slate-800 space-y-4"
-        >
-          {/* 1. KETELUSAN KOTAK KAD (CARD TRANSPARENCY / OPACITY SLIDER) */}
+        <div className="p-5 rounded-2xl bg-slate-950/70 border border-slate-800 space-y-4">
+          
+          {/* 1. KETELUSAN KOTAK KAD (CARD TRANSPARENCY) */}
           <div className="p-4 rounded-2xl bg-slate-900 border border-amber-500/25 space-y-3">
             <div className="flex items-center justify-between">
               <label className="text-xs font-bold text-amber-300 uppercase tracking-wider flex items-center gap-1.5">
@@ -331,7 +329,6 @@ export default function BuilderForm({
               </span>
             </div>
 
-            {/* Slider Ketelusan */}
             <div className="flex items-center gap-3">
               <span className="text-[10px] text-slate-500 font-medium">Lutsinar</span>
               <input
@@ -341,18 +338,21 @@ export default function BuilderForm({
                 step="5"
                 value={currentOpacity}
                 onChange={(e) => {
+                  const val = Number(e.target.value);
                   updateData({
                     ...data,
-                    theme: { ...data.theme, cardOpacity: Number(e.target.value) }
+                    theme: { ...data.theme, cardOpacity: val }
                   });
-                  onActiveSlideChange?.(0); // Selak ke helaian pertama untuk lihat kesan
+                  // Buka slaid 1 secara automatik supaya pengguna dapat lihat kesan langsung
+                  if (activeSlideIndex === 'cover') {
+                    onActiveSlideChange?.(0);
+                  }
                 }}
                 className="w-full accent-amber-500 cursor-pointer h-2 bg-slate-950 rounded-lg"
               />
               <span className="text-[10px] text-slate-400 font-medium">Solid</span>
             </div>
 
-            {/* Preset Butang Pantas */}
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-1.5 pt-1">
               {OPACITY_PRESETS.map((preset) => (
                 <button
@@ -363,7 +363,9 @@ export default function BuilderForm({
                       ...data,
                       theme: { ...data.theme, cardOpacity: preset.value }
                     });
-                    onActiveSlideChange?.(0);
+                    if (activeSlideIndex === 'cover') {
+                      onActiveSlideChange?.(0);
+                    }
                   }}
                   className={`py-1.5 px-2 rounded-lg text-[11px] font-medium border transition-all ${
                     currentOpacity === preset.value
@@ -377,7 +379,7 @@ export default function BuilderForm({
             </div>
           </div>
 
-          {/* 2. LATAR BELAKANG MUKA DEPAN (WARNA VS GAMBAR) */}
+          {/* 2. LATAR BELAKANG MUKA DEPAN */}
           <div className="p-4 rounded-2xl bg-slate-900 border border-slate-800 space-y-3">
             <div className="flex items-center justify-between">
               <label className="text-xs font-bold text-amber-300 uppercase tracking-wider">
