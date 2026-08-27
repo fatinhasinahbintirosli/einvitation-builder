@@ -73,7 +73,7 @@ export function InvitationCard({
   const slides = maxSlides && maxSlides > 0 ? rawSlides.slice(0, maxSlides) : rawSlides;
   const totalSlides = slides.length;
 
-  // Auto-Tukar & Main Lagu
+  // Auto-Tukar & Main Lagu Semasa Dipilih
   useEffect(() => {
     if (audioRef.current && data?.cover?.audioUrl) {
       const audio = audioRef.current;
@@ -85,7 +85,7 @@ export function InvitationCard({
     }
   }, [data?.cover?.audioUrl, isPlaying]);
 
-  // Auto-Selak ke Helaian Aktif
+  // Auto-Selak ke Helaian / Cover Aktif
   useEffect(() => {
     if (activeSlideIndex === 'cover') {
       setIsOpen(false);
@@ -164,10 +164,14 @@ export function InvitationCard({
     touchStartY.current = null;
   };
 
+  // 1. PENGASINGAN LATAR MUKA DEPAN (COVER BACKGROUND)
   const isCoverImage = data?.theme?.coverBgType === 'image' && data?.theme?.coverBgUrl;
   const coverBgColor = data?.theme?.coverBgColor || data?.theme?.primaryColor || '#2d4a3e';
 
-  // Ketelusan Kotak Putih yang Dikira
+  // 2. PENGASINGAN LATAR HELAIAN DALAMAN (SLIDE BACKGROUND)
+  const slideWallpaperUrl = data?.theme?.slideBgUrl || data?.theme?.bgPatternUrl;
+
+  // 3. KETELUSAN KOTAK PUTIH
   const rawOpacity = typeof data?.theme?.cardOpacity === 'number' ? data.theme.cardOpacity : 92;
   const opacityVal = Math.min(100, Math.max(20, rawOpacity));
   const cardBgColor = `rgba(255, 255, 255, ${opacityVal / 100})`;
@@ -179,7 +183,7 @@ export function InvitationCard({
       onTouchEnd={handleTouchEnd}
       className="relative w-full max-w-[430px] h-[100dvh] sm:h-[840px] overflow-hidden shadow-2xl sm:rounded-[36px] bg-slate-950 flex flex-col justify-between items-center select-none"
       style={{
-        backgroundImage: data?.theme?.bgPatternUrl ? `url(${data.theme.bgPatternUrl})` : undefined,
+        backgroundImage: slideWallpaperUrl ? `url(${slideWallpaperUrl})` : undefined,
         backgroundColor: '#0f172a',
         backgroundSize: 'cover',
         backgroundPosition: 'center'
@@ -210,7 +214,7 @@ export function InvitationCard({
         <i className={`fa-solid text-sm ${isPlaying ? 'fa-compact-disc fa-spin text-amber-300' : 'fa-volume-xmark text-slate-400'}`} />
       </button>
 
-      {/* ================= 4. MUKA DEPAN ================= */}
+      {/* ================= 4. MUKA DEPAN (COVER INDEPENDENT) ================= */}
       <div 
         className={`absolute inset-0 z-50 flex flex-col items-center justify-center p-6 text-white transition-transform duration-[1000ms] ease-[cubic-bezier(0.16,1,0.3,1)] ${
           isOpen ? '-translate-y-full pointer-events-none' : 'translate-y-0 pointer-events-auto'
@@ -259,7 +263,7 @@ export function InvitationCard({
         </div>
       </div>
 
-      {/* ================= 5. HELAIAN KAD (KETELUSAN KONSISTEN & TANPA DELAY) ================= */}
+      {/* ================= 5. HELAIAN KAD (SLIDE WALLPAPER INDEPENDENT) ================= */}
       <div className="relative w-full h-full overflow-hidden flex flex-col justify-center items-center">
         {slides.map((slide, idx) => {
           const offset = idx - currentSlide;
@@ -277,7 +281,6 @@ export function InvitationCard({
                 zIndex: isCurrent ? 20 : 10
               }}
             >
-              {/* KAD PUTIH UTAMA (Ketelusan Statik & Resolusi Jelas) */}
               <div 
                 className="w-full max-w-[375px] h-[84%] max-h-[600px] rounded-[32px] p-6 sm:p-7 text-center shadow-2xl border border-white/50 flex flex-col justify-between items-center relative backdrop-blur-md"
                 style={{ 
@@ -286,7 +289,6 @@ export function InvitationCard({
                   transform: 'translateZ(0)'
                 }}
               >
-                {/* Hiasan Bucu Atas Kad */}
                 <div className="w-full flex justify-between items-center text-amber-700/70 text-xs px-1">
                   <span>❧</span>
                   <span className="text-[12px] font-bold uppercase tracking-[2.5px]" style={{ color: data?.theme?.goldColor || '#b59049', fontFamily: 'Cinzel, serif' }}>
@@ -295,10 +297,8 @@ export function InvitationCard({
                   <span>☙</span>
                 </div>
 
-                {/* Kandungan Helaian */}
                 <div className="my-auto w-full py-1 flex flex-col items-center justify-center">
-                  
-                  {/* 1. INTRO */}
+                  {/* INTRO */}
                   {slide.type === 'intro' && (
                     <div className="space-y-3.5 w-full flex flex-col items-center">
                       <p className="text-base sm:text-lg text-slate-800 font-arabic leading-loose font-medium">
@@ -326,7 +326,7 @@ export function InvitationCard({
                     </div>
                   )}
 
-                  {/* 2. LOCATION */}
+                  {/* LOCATION */}
                   {slide.type === 'location' && slide.locationDetails && (
                     <div className="space-y-4 max-w-[310px] w-full flex flex-col items-center">
                       <div className="w-14 h-14 rounded-full bg-amber-500/15 border border-amber-500/40 flex items-center justify-center text-amber-800 text-xl shadow-sm">
@@ -357,7 +357,7 @@ export function InvitationCard({
                     </div>
                   )}
 
-                  {/* 3. TENTATIVE */}
+                  {/* TENTATIVE */}
                   {slide.type === 'tentative' && (
                     <div className="w-full space-y-3.5 max-w-[300px]">
                       {slide.timeline?.map((item, tIdx) => (
@@ -371,7 +371,7 @@ export function InvitationCard({
                     </div>
                   )}
 
-                  {/* 4. IMAGE / QR CODE */}
+                  {/* IMAGE_QR */}
                   {slide.type === 'image_qr' && (
                     <div className="space-y-3.5 max-w-[300px] flex flex-col items-center">
                       {slide.imageUrl ? (
@@ -392,7 +392,7 @@ export function InvitationCard({
                     </div>
                   )}
 
-                  {/* 5. GUESTBOOK */}
+                  {/* GUESTBOOK */}
                   {slide.type === 'guestbook' && (
                     <div className="space-y-3.5 max-w-[300px] w-full text-center">
                       <div className="w-12 h-12 mx-auto rounded-full bg-amber-500/15 flex items-center justify-center text-amber-800 text-lg">
@@ -407,7 +407,7 @@ export function InvitationCard({
                     </div>
                   )}
 
-                  {/* 6. THANK YOU */}
+                  {/* THANK_YOU */}
                   {slide.type === 'thank_you' && (
                     <div className="space-y-3.5 max-w-[300px] mx-auto">
                       <div className="text-3xl text-amber-600">❧ ❦ ☙</div>
@@ -419,7 +419,7 @@ export function InvitationCard({
                   )}
                 </div>
 
-                {/* Butang Navigasi Bawah */}
+                {/* Butang Navigasi */}
                 <div className="w-full flex flex-col items-center gap-1 pt-1">
                   {idx < totalSlides - 1 ? (
                     <button 

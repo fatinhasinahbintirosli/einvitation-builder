@@ -29,11 +29,17 @@ export interface ThemeConfig {
   goldColor?: string;
   backgroundColor?: string;
   cardBackgroundColor?: string;
+  
+  // Wallpaper Helaian (Inner Slide Background)
+  slideBgUrl?: string;
   bgPatternUrl?: string;
+  cardOpacity?: number; // 20 hingga 100
+
+  // Wallpaper Muka Depan (Cover Background)
   coverBgType?: 'color' | 'image';
   coverBgColor?: string;
   coverBgUrl?: string;
-  cardOpacity?: number; // 20 hingga 100 (lalai: 95)
+
   doorStyle?: string;
   [key: string]: any;
 }
