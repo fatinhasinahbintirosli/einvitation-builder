@@ -1,376 +1,270 @@
 'use client';
 
-import React, { useState, useRef, useEffect } from 'react';
-import { CardData } from '@/types/invitation';
+import React, { useState } from 'react';
+import { CardData, SlideData } from '@/types/invitation';
+import { supabase } from '@/lib/supabaseClient';
 
 interface Props {
-  data: CardData;
-  isPaid?: boolean;
-  guestName?: string;
+  initialData: CardData;
+  onDataChange: (data: CardData) => void;
 }
 
-// Komponen Typing Effect Halus (Tanpa Simbol |)
-function TypewriterText({ 
-  text = '', 
-  speed = 50, 
-  delay = 200, 
-  className = '', 
-  style 
-}: { 
-  text?: string; 
-  speed?: number; 
-  delay?: number; 
-  className?: string; 
-  style?: React.CSSProperties 
-}) {
-  const [displayedText, setDisplayedText] = useState('');
+// Senarai Pilihan Wallpaper Cadangan Admin
+const PRESET_WALLPAPERS = [
+  {
+    id: 'songket_gold',
+    name: 'Songket Emas Warisan',
+    url: 'https://images.unsplash.com/photo-1607604276583-eef5d076aa5f?q=80&w=1080&auto=format&fit=crop',
+    previewColor: '#0f172a'
+  },
+  {
+    id: 'dark_floral',
+    name: 'Botanikal Bunga Klasik',
+    url: 'https://images.unsplash.com/photo-1518895949257-7621c3c786d7?q=80&w=1080&auto=format&fit=crop',
+    previewColor: '#1e1b4b'
+  },
+  {
+    id: 'royal_emerald',
+    name: 'Hijau Zamrud Mewah',
+    url: 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=1080&auto=format&fit=crop',
+    previewColor: '#064e3b'
+  },
+  {
+    id: 'cream_texture',
+    name: 'Tekstur Kertas Bersejarah',
+    url: 'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?q=80&w=1080&auto=format&fit=crop',
+    previewColor: '#451a03'
+  }
+];
 
-  useEffect(() => {
-    setDisplayedText('');
-    let index = 0;
-    let intervalId: NodeJS.Timeout;
+export default function BuilderForm({ initialData, onDataChange }: Props) {
+  const [formData, setFormData] = useState<CardData>(initialData);
+  const [slug, setSlug] = useState<string>('kad-' + Math.random().toString(36).substring(2, 9));
+  const [isSaving, setIsSaving] = useState(false);
+  const [generatedUrl, setGeneratedUrl] = useState<string | null>(null);
+  const [uploadError, setUploadError] = useState<string | null>(null);
 
-    const timeoutId = setTimeout(() => {
-      intervalId = setInterval(() => {
-        if (index < text.length) {
-          setDisplayedText(text.slice(0, index + 1));
-          index++;
-        } else {
-          clearInterval(intervalId);
+  const updateData = (newData: CardData) => {
+    setFormData(newData);
+    onDataChange(newData);
+  };
+
+  // Pengendali Muat Naik Wallpaper Sendiri
+  const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setUploadError(null);
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    if (file.size > 3 * 1024 * 1024) {
+      setUploadError('Saiz fail melebihi 3MB. Sila pilih gambar yang lebih kecil.');
+      return;
+    }
+
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      const base64Url = event.target?.result as string;
+      const updated = {
+        ...formData,
+        theme: {
+          ...formData.theme,
+          bgPatternUrl: base64Url
         }
-      }, speed);
-    }, delay);
-
-    return () => {
-      clearTimeout(timeoutId);
-      if (intervalId) clearInterval(intervalId);
+      };
+      updateData(updated);
     };
-  }, [text, speed, delay]);
+    reader.readAsDataURL(file);
+  };
 
-  return <span className={className} style={style}>{displayedText}</span>;
-}
+  // Pilih Wallpaper Preset
+  const handleSelectPreset = (url: string) => {
+    const updated = {
+      ...formData,
+      theme: {
+        ...formData.theme,
+        bgPatternUrl: url
+      }
+    };
+    updateData(updated);
+  };
 
-export default function InvitationCard({ 
-  data, 
-  isPaid = false, 
-  guestName = "Dato' / Datin / Tuan / Puan" 
-}: Props) {
-  const [isOpen, setIsOpen] = useState(false);
-  const [currentSlide, setCurrentSlide] = useState(0);
-  const [isPlaying, setIsPlaying] = useState(false);
-  
-  const audioRef = useRef<HTMLAudioElement | null>(null);
-  const touchStartY = useRef<number | null>(null);
-  const isTransitioning = useRef<boolean>(false);
+  // Simpan ke Supabase
+  const handleSaveInvitation = async () => {
+    setIsSaving(true);
+    try {
+      const { error } = await supabase
+        .from('invitations')
+        .upsert({
+          slug: slug.trim().toLowerCase(),
+          card_data: formData,
+          is_paid: false
+        });
 
-  const slides = data?.slides && data.slides.length > 0 ? data.slides : [
-    { id: '1', type: 'intro' as const, title: 'Jemputan', bodyText: 'Tiada maklumat helaian.' }
-  ];
-  const totalSlides = slides.length;
-
-  const toggleMusic = (e: React.MouseEvent) => {
-    e.stopPropagation();
-    if (!audioRef.current) return;
-    if (isPlaying) {
-      audioRef.current.pause();
-      setIsPlaying(false);
-    } else {
-      audioRef.current.play().then(() => setIsPlaying(true)).catch(() => {});
+      if (error) throw error;
+      const fullUrl = `${window.location.origin}/e/${slug.trim().toLowerCase()}`;
+      setGeneratedUrl(fullUrl);
+    } catch (err: any) {
+      alert('Ralat menyimpan kad: ' + (err.message || 'Sila cuba lagi.'));
+    } finally {
+      setIsSaving(false);
     }
-  };
-
-  const handleOpenCard = () => {
-    if (audioRef.current && !isPlaying) {
-      audioRef.current.play().then(() => setIsPlaying(true)).catch(() => {});
-    }
-    setIsOpen(true);
-    setCurrentSlide(0);
-  };
-
-  const handleCloseCard = () => {
-    setIsOpen(false);
-    setCurrentSlide(0);
-  };
-
-  const nextSlide = () => {
-    if (isTransitioning.current) return;
-    if (currentSlide < totalSlides - 1) {
-      isTransitioning.current = true;
-      setCurrentSlide(prev => prev + 1);
-      setTimeout(() => { isTransitioning.current = false; }, 1100);
-    }
-  };
-
-  const prevSlide = () => {
-    if (isTransitioning.current) return;
-    if (currentSlide > 0) {
-      isTransitioning.current = true;
-      setCurrentSlide(prev => prev - 1);
-      setTimeout(() => { isTransitioning.current = false; }, 1100);
-    }
-  };
-
-  // Navigasi Roda Tetikus (Mouse Wheel) Menegak
-  const handleWheel = (e: React.WheelEvent) => {
-    if (!isOpen || isTransitioning.current) return;
-    if (e.deltaY > 30) {
-      nextSlide();
-    } else if (e.deltaY < -30) {
-      prevSlide();
-    }
-  };
-
-  // Navigasi Leretan Skrin Sentuh (Touch Gestures)
-  const handleTouchStart = (e: React.TouchEvent) => {
-    touchStartY.current = e.touches[0].clientY;
-  };
-
-  const handleTouchEnd = (e: React.TouchEvent) => {
-    if (!isOpen || touchStartY.current === null || isTransitioning.current) return;
-    const diffY = touchStartY.current - e.changedTouches[0].clientY;
-
-    if (diffY > 40) {
-      nextSlide();
-    } else if (diffY < -40) {
-      prevSlide();
-    }
-    touchStartY.current = null;
   };
 
   return (
-    <div 
-      onWheel={handleWheel}
-      onTouchStart={handleTouchStart}
-      onTouchEnd={handleTouchEnd}
-      className="relative w-full max-w-[430px] h-[100dvh] sm:h-[840px] overflow-hidden shadow-2xl sm:rounded-[36px] bg-slate-950 flex flex-col justify-between items-center select-none"
-      style={{
-        backgroundImage: `url(${data.theme?.bgPatternUrl || ''})`,
-        backgroundSize: 'cover',
-        backgroundPosition: 'center'
-      }}
-    >
-      {/* 1. LAPISAN WATERMARK JIKA BELUM BAYAR */}
-      {!isPaid && (
-        <div className="absolute inset-0 z-[100] pointer-events-none flex flex-col items-center justify-around opacity-25">
-          {[...Array(6)].map((_, i) => (
-            <div key={i} className="text-3xl font-black tracking-widest text-red-500 uppercase -rotate-12 select-none">
-              PREVIEW ONLY • UNPAID
-            </div>
-          ))}
+    <div className="w-full max-w-xl bg-slate-900 border border-slate-800 rounded-3xl p-6 sm:p-8 text-slate-200 shadow-2xl space-y-6">
+      
+      {/* Tajuk Header */}
+      <div>
+        <h2 className="text-2xl font-bold text-white tracking-wide">Pereka Kad Jemputan Digital</h2>
+        <p className="text-xs text-slate-400 mt-1">Ubah suai tema, corak latar, dan teks jemputan anda secara langsung.</p>
+      </div>
+
+      {/* ================= 1. BAHAGIAN WALLPAPER & TEMA ================= */}
+      <div className="p-5 rounded-2xl bg-slate-950/70 border border-amber-500/20 space-y-4">
+        <div className="flex items-center justify-between">
+          <label className="text-sm font-bold text-amber-400 uppercase tracking-wider flex items-center gap-2">
+            <i className="fa-solid fa-image" /> Kertas Dinding (Wallpaper)
+          </label>
         </div>
-      )}
 
-      {/* 2. AUDIO ENGINE */}
-      {data.cover?.audioUrl && (
-        <audio ref={audioRef} loop src={data.cover.audioUrl} />
-      )}
+        {/* Kotak Panduan Saiz Wallpaper */}
+        <div className="flex items-start gap-3 p-3.5 rounded-xl bg-amber-500/10 border border-amber-500/30 text-amber-300">
+          <i className="fa-solid fa-circle-info text-base mt-0.5 shrink-0" />
+          <div className="text-xs leading-relaxed">
+            <span className="font-bold block text-amber-200 mb-0.5">Saiz Gambar Dicadangkan:</span>
+            <span className="font-semibold text-white">1080 × 1920 px</span> (Nisbah 9:16 skrin telefon). Format WebP / JPG bawah 2MB untuk kelajuan maksimum.
+          </div>
+        </div>
 
-      {/* 3. BUTANG MUZIK (BULATAN MINIMALIS ATAS KANAN) */}
-      <button
-        onClick={toggleMusic}
-        type="button"
-        className="absolute top-6 right-6 z-40 w-10 h-10 rounded-full flex items-center justify-center text-amber-200 border-2 border-amber-400/80 bg-slate-900/90 backdrop-blur shadow-2xl transition-transform active:scale-90"
-      >
-        <i className={`fa-solid text-sm ${isPlaying ? 'fa-compact-disc fa-spin text-amber-300' : 'fa-volume-xmark text-slate-400'}`} />
-      </button>
+        {/* Pilihan Wallpaper Cadangan Admin */}
+        <div>
+          <span className="text-xs font-semibold text-slate-300 block mb-2">Pilihan Corak Cadangan:</span>
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
+            {PRESET_WALLPAPERS.map((preset) => (
+              <button
+                key={preset.id}
+                type="button"
+                onClick={() => handleSelectPreset(preset.url)}
+                className={`relative h-20 rounded-xl overflow-hidden border-2 transition-all group ${
+                  formData.theme.bgPatternUrl === preset.url
+                    ? 'border-amber-400 ring-2 ring-amber-400/40 scale-[1.02]'
+                    : 'border-slate-700 hover:border-slate-500 opacity-80 hover:opacity-100'
+                }`}
+              >
+                <img src={preset.url} alt={preset.name} className="w-full h-full object-cover" />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent flex items-end p-1.5">
+                  <span className="text-[10px] text-white font-medium truncate w-full text-left">
+                    {preset.name}
+                  </span>
+                </div>
+              </button>
+            ))}
+          </div>
+        </div>
 
-      {/* ================= 4. MUKA DEPAN (SLIDE NAIK SECARA ELEGAN) ================= */}
-      <div 
-        className={`absolute inset-0 z-50 flex flex-col items-center justify-center p-6 text-white transition-all duration-[1200ms] ease-[cubic-bezier(0.16,1,0.3,1)] ${
-          isOpen ? '-translate-y-full opacity-0 pointer-events-none' : 'translate-y-0 opacity-100 pointer-events-auto'
-        }`}
-        style={{
-          backgroundColor: data.theme?.primaryColor || '#1e293b'
-        }}
-      >
-        <div className="text-amber-300 text-xl mb-3 animate-pulse">❧ ❦ ☙</div>
+        {/* Muat Naik Kertas Dinding Sendiri */}
+        <div>
+          <span className="text-xs font-semibold text-slate-300 block mb-2">Atau Muat Naik Gambar Sendiri:</span>
+          <label className="flex flex-col items-center justify-center border-2 border-dashed border-slate-700 hover:border-amber-400/60 rounded-xl p-4 cursor-pointer bg-slate-900/50 hover:bg-slate-900 transition-all">
+            <i className="fa-solid fa-cloud-arrow-up text-xl text-amber-400 mb-1" />
+            <span className="text-xs text-slate-300 font-medium">Klik untuk pilih gambar dari peranti</span>
+            <span className="text-[10px] text-slate-500 mt-0.5">PNG, JPG, WebP (Maksimum 3MB)</span>
+            <input 
+              type="file" 
+              accept="image/*" 
+              onChange={handleFileUpload} 
+              className="hidden" 
+            />
+          </label>
+          {uploadError && (
+            <p className="text-xs text-red-400 mt-1.5">{uploadError}</p>
+          )}
+        </div>
+      </div>
+
+      {/* ================= 2. BAHAGIAN MUKA DEPAN ================= */}
+      <div className="p-5 rounded-2xl bg-slate-950/70 border border-slate-800 space-y-3">
+        <label className="text-sm font-bold text-amber-400 uppercase tracking-wider block">
+          Maklumat Muka Depan (Cover)
+        </label>
         
-        <p className="tracking-[4px] uppercase text-xs text-slate-200 text-center" style={{ fontFamily: 'Cinzel, serif' }}>
-          {data.cover?.tagline}
-        </p>
+        <div>
+          <label className="text-xs text-slate-400 block mb-1">Tagline / Panggilan</label>
+          <input
+            type="text"
+            value={formData.cover.tagline}
+            onChange={(e) => updateData({ ...formData, cover: { ...formData.cover, tagline: e.target.value } })}
+            className="w-full px-3.5 py-2 rounded-xl bg-slate-900 border border-slate-700 text-sm focus:border-amber-400 outline-none"
+          />
+        </div>
 
-        <h1 className="text-4xl text-white my-4 text-center font-normal drop-shadow-md" style={{ fontFamily: 'Great Vibes, cursive' }}>
-          {data.cover?.mainTitle}
-        </h1>
+        <div>
+          <label className="text-xs text-slate-400 block mb-1">Tajuk Utama Majlis</label>
+          <input
+            type="text"
+            value={formData.cover.mainTitle}
+            onChange={(e) => updateData({ ...formData, cover: { ...formData.cover, mainTitle: e.target.value } })}
+            className="w-full px-3.5 py-2 rounded-xl bg-slate-900 border border-slate-700 text-sm focus:border-amber-400 outline-none"
+          />
+        </div>
 
-        <p className="text-xs tracking-widest text-amber-200 text-center" style={{ fontFamily: 'Cinzel, serif' }}>
-          {data.cover?.dateText}
-        </p>
+        <div>
+          <label className="text-xs text-slate-400 block mb-1">Tarikh Ringkas</label>
+          <input
+            type="text"
+            value={formData.cover.dateText}
+            onChange={(e) => updateData({ ...formData, cover: { ...formData.cover, dateText: e.target.value } })}
+            className="w-full px-3.5 py-2 rounded-xl bg-slate-900 border border-slate-700 text-sm focus:border-amber-400 outline-none"
+          />
+        </div>
+      </div>
 
-        <div className="mt-8 px-6 py-3 bg-white/10 backdrop-blur-md rounded-2xl border border-amber-300/30 text-center shadow-lg">
-          <span className="text-[10px] tracking-wider uppercase block text-slate-300">Kepada:</span>
-          <span className="font-semibold text-sm" style={{ fontFamily: 'Playfair Display, serif' }}>
-            {guestName}
-          </span>
+      {/* ================= 3. URL SLUG & BUTANG JANA ================= */}
+      <div className="p-5 rounded-2xl bg-slate-950/70 border border-slate-800 space-y-4">
+        <div>
+          <label className="text-xs text-slate-400 block mb-1">Pautan URL Kad (Slug)</label>
+          <div className="flex items-center rounded-xl bg-slate-900 border border-slate-700 px-3 py-2 text-sm">
+            <span className="text-slate-500 select-none">/e/</span>
+            <input
+              type="text"
+              value={slug}
+              onChange={(e) => setSlug(e.target.value.replace(/\s+/g, '-').toLowerCase())}
+              className="bg-transparent border-none outline-none text-amber-300 w-full ml-1"
+            />
+          </div>
         </div>
 
         <button
-          onClick={handleOpenCard}
+          onClick={handleSaveInvitation}
+          disabled={isSaving}
           type="button"
-          className="mt-10 px-8 py-3.5 rounded-full border-2 border-amber-300 bg-gradient-to-r from-amber-500 to-amber-600 text-slate-950 font-bold text-xs tracking-widest uppercase shadow-2xl hover:scale-105 active:scale-95 transition-all flex items-center gap-2 cursor-pointer"
-          style={{ fontFamily: 'Cinzel, serif' }}
+          className="w-full py-3.5 rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-slate-950 font-bold text-sm tracking-wider uppercase transition-all shadow-lg active:scale-98 disabled:opacity-50 cursor-pointer flex items-center justify-center gap-2"
         >
-          <i className="fa-regular fa-envelope-open text-sm" /> BUKA JEMPUTAN
+          {isSaving ? (
+            <>
+              <i className="fa-solid fa-spinner fa-spin" /> Menyimpan...
+            </>
+          ) : (
+            <>
+              <i className="fa-solid fa-paper-plane" /> Sahkan & Dapatkan Link Preview
+            </>
+          )}
         </button>
-      </div>
 
-      {/* ================= 5. KANDUNGAN HELAIAN (FLAT MINIMALIST LOOK) ================= */}
-      <div className="relative w-full h-full overflow-hidden flex flex-col justify-center items-center">
-        {slides.map((slide, idx) => {
-          const offset = idx - currentSlide;
-          const isCurrent = offset === 0;
-
-          return (
-            <div
-              key={slide.id || idx}
-              className="absolute inset-0 w-full h-full p-6 flex flex-col justify-center items-center transition-all duration-[1100ms] ease-[cubic-bezier(0.19,1,0.22,1)]"
-              style={{
-                transform: `translateY(${offset * 100}%) scale(${isCurrent ? 1 : 0.96})`,
-                opacity: isCurrent ? 1 : 0,
-                pointerEvents: isCurrent ? 'auto' : 'none',
-                zIndex: isCurrent ? 20 : 10
-              }}
+        {generatedUrl && (
+          <div className="p-4 rounded-xl bg-amber-500/10 border border-amber-500/30 text-center space-y-2">
+            <span className="text-xs text-amber-300 font-semibold block">Pautan Kad Anda Sedia Dikongsi:</span>
+            <a 
+              href={generatedUrl} 
+              target="_blank" 
+              rel="noreferrer" 
+              className="text-sm font-bold text-white underline break-all hover:text-amber-200"
             >
-              {/* Kad Putih Tengah (Sama Seperti Gambar 2) */}
-              <div 
-                className="w-full max-w-[345px] h-[78%] max-h-[540px] rounded-[28px] p-6 text-center shadow-2xl border border-amber-200/40 flex flex-col justify-between items-center bg-white/95 backdrop-blur-sm relative"
-                style={{ color: '#2c332e' }}
-              >
-                {/* Hiasan Bucu Atas Kad */}
-                <div className="w-full flex justify-between items-center text-amber-700/60 text-xs px-1">
-                  <span>❧</span>
-                  <span className="text-[11px] font-bold uppercase tracking-[2px]" style={{ color: data.theme?.goldColor || '#b59049', fontFamily: 'Cinzel, serif' }}>
-                    {slide.title || 'JEMPUTAN MAJLIS'}
-                  </span>
-                  <span>☙</span>
-                </div>
-
-                {/* Kandungan Helaian */}
-                <div className="my-auto w-full py-1 flex flex-col items-center justify-center">
-                  
-                  {/* Slaid: INTRO */}
-                  {slide.type === 'intro' && (
-                    <div className="space-y-3 w-full">
-                      <p className="text-sm text-slate-800 font-arabic leading-loose">
-                        بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ
-                      </p>
-
-                      <p className="text-xs text-slate-600 leading-relaxed max-w-[270px] mx-auto min-h-[46px]">
-                        {isCurrent ? (
-                          <TypewriterText text={slide.bodyText || ''} speed={50} delay={250} />
-                        ) : (
-                          slide.bodyText
-                        )}
-                      </p>
-
-                      {/* Bingkai Gambar Bulat Bergelang Emas */}
-                      {slide.imageUrl && (
-                        <div className="relative my-2 flex flex-col items-center">
-                          <div 
-                            className="w-32 h-40 rounded-full border-2 p-1 overflow-hidden shadow-md bg-white"
-                            style={{ borderColor: data.theme?.goldColor || '#c49a45' }}
-                          >
-                            <img src={slide.imageUrl} alt="Visual" className="w-full h-full object-cover rounded-full" />
-                          </div>
-                        </div>
-                      )}
-
-                      <h3 className="text-lg font-bold" style={{ color: data.theme?.primaryColor || '#3d5343', fontFamily: 'Playfair Display, serif' }}>
-                        {isCurrent ? (
-                          <TypewriterText text={slide.subtitle || ''} speed={60} delay={800} />
-                        ) : (
-                          slide.subtitle
-                        )}
-                      </h3>
-                    </div>
-                  )}
-
-                  {/* Slaid: TENTATIVE */}
-                  {slide.type === 'tentative' && (
-                    <div className="w-full space-y-3.5 max-w-[270px]">
-                      {slide.timeline?.map((item, tIdx) => (
-                        <div key={tIdx} className="flex justify-between items-center border-b border-dashed border-amber-900/20 pb-2 text-xs">
-                          <span className="font-bold text-amber-800 shrink-0">{item.time}</span>
-                          <span className="text-slate-700 text-right">
-                            {isCurrent ? (
-                              <TypewriterText text={item.activity} speed={45} delay={tIdx * 300 + 150} />
-                            ) : (
-                              item.activity
-                            )}
-                          </span>
-                        </div>
-                      ))}
-                    </div>
-                  )}
-
-                  {/* Slaid: LOCATION */}
-                  {slide.type === 'location' && slide.locationDetails && (
-                    <div className="space-y-3 max-w-[270px]">
-                      <h3 className="text-base font-bold" style={{ color: data.theme?.primaryColor || '#3d5343' }}>
-                        {slide.locationDetails.venueName}
-                      </h3>
-                      <p className="text-xs text-slate-600 leading-relaxed whitespace-pre-line min-h-[44px]">
-                        {isCurrent ? (
-                          <TypewriterText text={slide.locationDetails.address} speed={45} delay={250} />
-                        ) : (
-                          slide.locationDetails.address
-                        )}
-                      </p>
-                      <div className="flex justify-center gap-3 pt-3">
-                        <a href={slide.locationDetails.gmapsUrl} target="_blank" rel="noreferrer" className="px-4 py-2 rounded-full text-[11px] font-semibold text-white bg-slate-800 hover:bg-slate-700 flex items-center gap-1.5 shadow active:scale-95 transition-transform">
-                          <i className="fa-solid fa-map-pin text-red-400" /> Google Maps
-                        </a>
-                        <a href={slide.locationDetails.wazeUrl} target="_blank" rel="noreferrer" className="px-4 py-2 rounded-full text-[11px] font-semibold text-white bg-cyan-700 hover:bg-cyan-600 flex items-center gap-1.5 shadow active:scale-95 transition-transform">
-                          <i className="fa-brands fa-waze" /> Waze
-                        </a>
-                      </div>
-                    </div>
-                  )}
-
-                  {/* Slaid: THANK YOU */}
-                  {slide.type === 'thank_you' && (
-                    <div className="space-y-3">
-                      <div className="text-3xl text-amber-600">❧ ❦ ☙</div>
-                      <p className="text-xs leading-relaxed text-slate-700 max-w-[270px] mx-auto min-h-[44px]">
-                        {isCurrent ? (
-                          <TypewriterText text={slide.bodyText || 'Sekalung penghargaan dan terima kasih atas kehadiran dan doa tulus ikhlas anda.'} speed={50} delay={250} />
-                        ) : (
-                          slide.bodyText
-                        )}
-                      </p>
-                      <div className="text-amber-600 text-xl">𖥸</div>
-                    </div>
-                  )}
-                </div>
-
-                {/* Butang Navigasi Bawah */}
-                <div className="w-full flex flex-col items-center gap-1">
-                  {idx < totalSlides - 1 ? (
-                    <button 
-                      onClick={nextSlide} 
-                      type="button"
-                      className="text-amber-800/80 hover:text-amber-900 text-[10px] tracking-[3px] uppercase font-bold flex flex-col items-center gap-1 transition-transform active:scale-95 cursor-pointer"
-                      style={{ fontFamily: 'Cinzel, serif' }}
-                    >
-                      <i className="fa-solid fa-chevron-down text-[10px] animate-bounce" />
-                      SELAK
-                    </button>
-                  ) : (
-                    <button 
-                      onClick={handleCloseCard} 
-                      type="button"
-                      className="px-5 py-1.5 rounded-full bg-slate-900 text-white font-semibold text-xs flex items-center gap-1.5 shadow active:scale-95 cursor-pointer"
-                    >
-                      <i className="fa-solid fa-lock text-[10px]" /> TUTUP
-                    </button>
-                  )}
-                </div>
-
-              </div>
-            </div>
-          );
-        })}
+              {generatedUrl}
+            </a>
+          </div>
+        )}
       </div>
+
     </div>
   );
 }
