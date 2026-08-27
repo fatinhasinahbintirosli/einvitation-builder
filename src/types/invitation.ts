@@ -3,37 +3,42 @@ export interface TimelineItem {
   activity: string;
 }
 
-export interface SlideItem {
-  id: string;
-  type: 'intro' | 'date_countdown' | 'tentative' | 'location' | 'thank_you';
+export interface LocationDetails {
+  venueName: string;
+  address: string;
+  gmapsUrl: string;
+  wazeUrl: string;
+}
+
+export type SlideType = 'intro' | 'location' | 'tentative' | 'image_qr' | 'guestbook' | 'thank_you';
+
+export interface SlideData {
+  id?: string;
+  type: SlideType;
   title?: string;
   subtitle?: string;
   bodyText?: string;
   imageUrl?: string;
-  eventDate?: string;
-  locationDetails?: {
-    venueName: string;
-    address: string;
-    gmapsUrl: string;
-    wazeUrl: string;
-  };
   timeline?: TimelineItem[];
+  locationDetails?: LocationDetails;
+}
+
+export interface ThemeConfig {
+  primaryColor?: string;
+  goldColor?: string;
+  cardBackgroundColor?: string;
+  bgPatternUrl?: string;
+}
+
+export interface CoverData {
+  tagline?: string;
+  mainTitle?: string;
+  dateText?: string;
+  audioUrl?: string;
 }
 
 export interface CardData {
-  theme: {
-    doorStyle: 'sliding' | 'curtain';
-    backgroundColor: string;
-    cardBackgroundColor: string;
-    primaryColor: string;
-    goldColor: string;
-    bgPatternUrl: string;
-  };
-  cover: {
-    tagline: string;
-    mainTitle: string;
-    dateText: string;
-    audioUrl: string;
-  };
-  slides: SlideItem[];
+  theme: ThemeConfig;
+  cover: CoverData;
+  slides: SlideData[];
 }

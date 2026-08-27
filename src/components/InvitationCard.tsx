@@ -9,7 +9,7 @@ interface Props {
   guestName?: string;
 }
 
-// Komponen Typing Effect Halus (Tanpa Simbol |)
+// Komponen Typing Effect Tanpa Simbol '|'
 function TypewriterText({ 
   text = '', 
   speed = 45, 
@@ -64,10 +64,10 @@ export function InvitationCard({
   const isTransitioning = useRef<boolean>(false);
 
   const rawSlides = data?.slides && data.slides.length > 0 ? data.slides : [
-    { id: '1', type: 'intro', title: 'Jemputan', bodyText: 'Tiada maklumat helaian.' }
+    { id: '1', type: 'intro' as const, title: 'Jemputan', bodyText: 'Tiada maklumat helaian.' }
   ];
 
-  // Logik Freemium: 2 Helaian sahaja jika belum berbayar
+  // Logik Freemium: Hadkan kepada 2 helaian jika belum dibayar
   const slides = isPaid ? rawSlides : rawSlides.slice(0, 2);
   const totalSlides = slides.length;
 
@@ -123,7 +123,7 @@ export function InvitationCard({
     }
   };
 
-  // Navigasi Leretan Skrin Sentuh (Touch Gestures)
+  // Navigasi Sentuhan Telefon (Touch Gestures)
   const handleTouchStart = (e: React.TouchEvent) => {
     touchStartY.current = e.touches[0].clientY;
   };
@@ -168,7 +168,7 @@ export function InvitationCard({
         <audio ref={audioRef} loop src={data.cover.audioUrl} />
       )}
 
-      {/* 3. BUTANG MUZIK (BULATAN MINIMALIS ATAS KANAN) */}
+      {/* 3. BUTANG MUZIK */}
       <button
         onClick={toggleMusic}
         type="button"
@@ -177,7 +177,7 @@ export function InvitationCard({
         <i className={`fa-solid text-sm ${isPlaying ? 'fa-compact-disc fa-spin text-amber-300' : 'fa-volume-xmark text-slate-400'}`} />
       </button>
 
-      {/* ================= 4. MUKA DEPAN (SLIDE NAIK ELEGAN) ================= */}
+      {/* ================= 4. MUKA DEPAN ================= */}
       <div 
         className={`absolute inset-0 z-50 flex flex-col items-center justify-center p-6 text-white transition-all duration-[1200ms] ease-[cubic-bezier(0.16,1,0.3,1)] ${
           isOpen ? '-translate-y-full opacity-0 pointer-events-none' : 'translate-y-0 opacity-100 pointer-events-auto'
@@ -217,7 +217,7 @@ export function InvitationCard({
         </button>
       </div>
 
-      {/* ================= 5. HELAIAN KAD ================= */}
+      {/* ================= 5. HELAIAN KAD DINAMIK ================= */}
       <div className="relative w-full h-full overflow-hidden flex flex-col justify-center items-center">
         {slides.map((slide, idx) => {
           const offset = idx - currentSlide;
@@ -243,139 +243,137 @@ export function InvitationCard({
                 <div className="w-full flex justify-between items-center text-amber-700/60 text-xs px-1">
                   <span>❧</span>
                   <span className="text-[11px] font-bold uppercase tracking-[2px]" style={{ color: data?.theme?.goldColor || '#b59049', fontFamily: 'Cinzel, serif' }}>
-                    {slide.title || (slide.type === 'location' ? 'LOKASI MAJLIS' : 'JEMPUTAN MAJLIS')}
+                    {slide.title || 'JEMPUTAN MAJLIS'}
                   </span>
                   <span>☙</span>
                 </div>
 
-                {/* Kandungan Helaian */}
+                {/* Kandungan Dinamik Mengikut Jenis Dropdown */}
                 <div className="my-auto w-full py-1 flex flex-col items-center justify-center">
                   
-                  {/* JENIS 1: INTRO */}
+                  {/* 1. INTRO / UCAPAN */}
                   {slide.type === 'intro' && (
                     <div className="space-y-3 w-full">
                       <p className="text-sm text-slate-800 font-arabic leading-loose">
                         بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ
                       </p>
-
                       <p className="text-xs text-slate-600 leading-relaxed max-w-[270px] mx-auto min-h-[46px]">
-                        {isCurrent ? (
-                          <TypewriterText text={slide.bodyText || ''} speed={50} delay={250} />
-                        ) : (
-                          slide.bodyText
-                        )}
+                        {isCurrent ? <TypewriterText text={slide.bodyText || ''} speed={50} delay={250} /> : slide.bodyText}
                       </p>
-
                       {slide.imageUrl && (
                         <div className="relative my-2 flex flex-col items-center">
-                          <div 
-                            className="w-32 h-40 rounded-full border-2 p-1 overflow-hidden shadow-md bg-white"
-                            style={{ borderColor: data?.theme?.goldColor || '#c49a45' }}
-                          >
+                          <div className="w-32 h-40 rounded-full border-2 p-1 overflow-hidden shadow-md bg-white" style={{ borderColor: data?.theme?.goldColor || '#c49a45' }}>
                             <img src={slide.imageUrl} alt="Visual" className="w-full h-full object-cover rounded-full" />
                           </div>
                         </div>
                       )}
-
                       <h3 className="text-lg font-bold" style={{ color: data?.theme?.primaryColor || '#3d5343', fontFamily: 'Playfair Display, serif' }}>
-                        {isCurrent ? (
-                          <TypewriterText text={slide.subtitle || ''} speed={60} delay={800} />
-                        ) : (
-                          slide.subtitle
-                        )}
+                        {isCurrent ? <TypewriterText text={slide.subtitle || ''} speed={60} delay={800} /> : slide.subtitle}
                       </h3>
                     </div>
                   )}
 
-                  {/* JENIS 2: LOCATION (HELAIAN LOKASI) */}
+                  {/* 2. LOCATION (LOKASI & PETA) */}
                   {slide.type === 'location' && slide.locationDetails && (
-                    <div className="space-y-4 max-w-[280px] w-full flex flex-col items-center">
-                      <div className="w-12 h-12 rounded-full bg-amber-500/10 border border-amber-500/30 flex items-center justify-center text-amber-700 text-lg">
+                    <div className="space-y-3.5 max-w-[280px] w-full flex flex-col items-center">
+                      <div className="w-12 h-12 rounded-full bg-amber-500/10 border border-amber-500/30 flex items-center justify-center text-amber-700 text-lg shadow-sm">
                         <i className="fa-solid fa-map-location-dot" />
                       </div>
-
                       <div className="space-y-1">
                         <h3 className="text-base font-bold" style={{ color: data?.theme?.primaryColor || '#3d5343' }}>
                           {slide.locationDetails.venueName}
                         </h3>
                         <p className="text-xs text-slate-600 leading-relaxed whitespace-pre-line min-h-[44px]">
-                          {isCurrent ? (
-                            <TypewriterText text={slide.locationDetails.address} speed={40} delay={250} />
-                          ) : (
-                            slide.locationDetails.address
-                          )}
+                          {isCurrent ? <TypewriterText text={slide.locationDetails.address} speed={40} delay={250} /> : slide.locationDetails.address}
                         </p>
                       </div>
-
-                      {/* Butang Navigasi Peta (Google Maps & Waze) */}
-                      <div className="flex justify-center gap-3 pt-2 w-full">
+                      <div className="flex justify-center gap-2.5 pt-2 w-full">
                         {slide.locationDetails.gmapsUrl && (
-                          <a 
-                            href={slide.locationDetails.gmapsUrl} 
-                            target="_blank" 
-                            rel="noreferrer" 
-                            onClick={(e) => e.stopPropagation()}
-                            className="flex-1 py-2.5 px-3 rounded-xl text-xs font-semibold text-white bg-slate-900 hover:bg-slate-800 flex items-center justify-center gap-2 shadow-md active:scale-95 transition-transform"
-                          >
-                            <i className="fa-solid fa-location-arrow text-red-400 text-sm" /> Google Maps
+                          <a href={slide.locationDetails.gmapsUrl} target="_blank" rel="noreferrer" onClick={(e) => e.stopPropagation()} className="flex-1 py-2 px-3 rounded-xl text-xs font-semibold text-white bg-slate-900 flex items-center justify-center gap-1.5 shadow active:scale-95">
+                            <i className="fa-solid fa-location-arrow text-red-400 text-xs" /> Maps
                           </a>
                         )}
                         {slide.locationDetails.wazeUrl && (
-                          <a 
-                            href={slide.locationDetails.wazeUrl} 
-                            target="_blank" 
-                            rel="noreferrer" 
-                            onClick={(e) => e.stopPropagation()}
-                            className="flex-1 py-2.5 px-3 rounded-xl text-xs font-semibold text-white bg-cyan-700 hover:bg-cyan-600 flex items-center justify-center gap-2 shadow-md active:scale-95 transition-transform"
-                          >
-                            <i className="fa-brands fa-waze text-white text-sm" /> Waze
+                          <a href={slide.locationDetails.wazeUrl} target="_blank" rel="noreferrer" onClick={(e) => e.stopPropagation()} className="flex-1 py-2 px-3 rounded-xl text-xs font-semibold text-white bg-cyan-700 flex items-center justify-center gap-1.5 shadow active:scale-95">
+                            <i className="fa-brands fa-waze text-white text-xs" /> Waze
                           </a>
                         )}
                       </div>
                     </div>
                   )}
 
-                  {/* JENIS 3: TENTATIVE */}
+                  {/* 3. TENTATIVE (SUSUNAN MAJLIS) */}
                   {slide.type === 'tentative' && (
-                    <div className="w-full space-y-3.5 max-w-[270px]">
+                    <div className="w-full space-y-3 max-w-[270px]">
                       {slide.timeline?.map((item, tIdx) => (
                         <div key={tIdx} className="flex justify-between items-center border-b border-dashed border-amber-900/20 pb-2 text-xs">
                           <span className="font-bold text-amber-800 shrink-0">{item.time}</span>
                           <span className="text-slate-700 text-right">
-                            {isCurrent ? (
-                              <TypewriterText text={item.activity} speed={45} delay={tIdx * 300 + 150} />
-                            ) : (
-                              item.activity
-                            )}
+                            {isCurrent ? <TypewriterText text={item.activity} speed={45} delay={tIdx * 300 + 150} /> : item.activity}
                           </span>
                         </div>
                       ))}
                     </div>
                   )}
 
-                  {/* JENIS 4: THANK YOU */}
+                  {/* 4. IMAGE / QR CODE (DUITNOW / GALERI) */}
+                  {slide.type === 'image_qr' && (
+                    <div className="space-y-3 max-w-[270px] flex flex-col items-center">
+                      {slide.imageUrl ? (
+                        <div className="w-40 h-40 p-2 rounded-2xl bg-white border-2 border-amber-400/60 shadow-md flex items-center justify-center">
+                          <img src={slide.imageUrl} alt="QR / Visual" className="w-full h-full object-contain rounded-xl" />
+                        </div>
+                      ) : (
+                        <div className="w-36 h-36 rounded-2xl bg-slate-100 border border-dashed border-slate-300 flex items-center justify-center text-slate-400 text-xs">
+                          <i className="fa-solid fa-qrcode text-3xl" />
+                        </div>
+                      )}
+                      <h4 className="text-sm font-bold text-slate-800" style={{ color: data?.theme?.primaryColor || '#3d5343' }}>
+                        {slide.subtitle || 'Kod QR Hadiah / Salam Kausar'}
+                      </h4>
+                      <p className="text-[11px] text-slate-600 leading-relaxed">
+                        {slide.bodyText || 'Imbas kod QR di atas untuk ingatan tulus ikhlas anda.'}
+                      </p>
+                    </div>
+                  )}
+
+                  {/* 5. GUESTBOOK (UCAPAN TETAMU) */}
+                  {slide.type === 'guestbook' && (
+                    <div className="space-y-3 max-w-[270px] w-full text-center">
+                      <div className="w-10 h-10 mx-auto rounded-full bg-amber-500/10 flex items-center justify-center text-amber-700">
+                        <i className="fa-solid fa-book-open-reader" />
+                      </div>
+                      <h4 className="text-sm font-bold" style={{ color: data?.theme?.primaryColor || '#3d5343' }}>
+                        {slide.subtitle || 'Buku Ucapan & Doa'}
+                      </h4>
+                      <p className="text-xs text-slate-600 leading-relaxed">
+                        {slide.bodyText || 'Titipkan ucapan dan doa selamat buat kami sekeluarga.'}
+                      </p>
+                      <div className="p-3 bg-amber-50/80 rounded-xl border border-amber-200/60 text-[11px] text-amber-900 italic">
+                        "Semoga ikatan diberkati Allah SWT dan kekal hingga ke syurga."
+                      </div>
+                    </div>
+                  )}
+
+                  {/* 6. THANK YOU */}
                   {slide.type === 'thank_you' && (
                     <div className="space-y-3">
                       <div className="text-3xl text-amber-600">❧ ❦ ☙</div>
                       <p className="text-xs leading-relaxed text-slate-700 max-w-[270px] mx-auto min-h-[44px]">
-                        {isCurrent ? (
-                          <TypewriterText text={slide.bodyText || 'Sekalung penghargaan dan terima kasih atas kehadiran dan doa tulus ikhlas anda.'} speed={50} delay={250} />
-                        ) : (
-                          slide.bodyText
-                        )}
+                        {isCurrent ? <TypewriterText text={slide.bodyText || 'Sekalung penghargaan dan terima kasih atas kehadiran anda.'} speed={50} delay={250} /> : slide.bodyText}
                       </p>
                       <div className="text-amber-600 text-xl">𖥸</div>
                     </div>
                   )}
 
-                  {/* NOTIS KUNCI FREEMIUM UNTUK PENGGUNA PERCUMA DI HELAIAN KE-2 */}
+                  {/* NOTIS KUNCI FREEMIUM UNTUK PENGGUNA PERCUMA */}
                   {!isPaid && idx === 1 && (
                     <div className="mt-2 w-full p-2.5 rounded-xl bg-amber-500/15 border border-amber-500/30 text-center">
                       <p className="text-[10px] text-amber-900 font-bold uppercase tracking-wider">
-                        🔒 Helaian Tentatif & RSVP Terkunci
+                        🔒 Helaian Seterusnya Terkunci (Versi Percuma)
                       </p>
                       <p className="text-[9px] text-slate-600 mt-0.5">
-                        Tingkatkan ke versi berbayar untuk membuka 4 helaian penuh tanpa watermark.
+                        Tingkatkan ke versi Premium untuk membuka semua helaian tanpa watermark.
                       </p>
                     </div>
                   )}
