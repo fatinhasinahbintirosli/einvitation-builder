@@ -30,6 +30,10 @@ export interface ThemeConfig {
   backgroundColor?: string;
   cardBackgroundColor?: string;
   bgPatternUrl?: string;
+  coverBgType?: 'color' | 'image';
+  coverBgColor?: string;
+  coverBgUrl?: string;
+  cardOpacity?: number; // 20 hingga 100 (lalai: 95)
   doorStyle?: string;
   [key: string]: any;
 }

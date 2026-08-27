@@ -10,6 +10,7 @@ const initialData: CardData = {
   theme: {
     coverBgType: 'color',
     coverBgColor: '#2d4a3e',
+    cardOpacity: 92, // Nilai ketelusan lalai (92%)
     backgroundColor: '#1f2621',
     cardBackgroundColor: 'rgba(255, 255, 255, 0.95)',
     primaryColor: '#2d4a3e',
@@ -66,8 +67,6 @@ export default function BuilderPage() {
   const [slug, setSlug] = useState<string>(() => `kad-${Math.random().toString(36).substring(2, 9)}`);
   const [isSaving, setIsSaving] = useState(false);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
-  
-  // State untuk auto-scroll / auto-selak helaian yang sedang diedit
   const [activeSlideIndex, setActiveSlideIndex] = useState<number | 'cover'>('cover');
 
   const handleSave = async () => {
@@ -108,12 +107,12 @@ export default function BuilderPage() {
           E-INVITATION BUILDER STUDIO
         </h1>
         <p className="text-xs sm:text-sm text-slate-400 mt-1.5">
-          Ubah suai teks, tema, dan susunan helaian di panel kiri. Pratonton langsung bergerak secara automatik di panel kanan.
+          Ubah suai teks, tema, susunan helaian, dan ketelusan kad. Pratonton langsung bergerak secara automatik.
         </p>
       </header>
 
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 w-full items-start">
-        {/* Bahagian Kiri: Borang Pengubah Suai */}
+        {/* Bahagian Kiri: Borang Builder */}
         <div className="lg:col-span-6 w-full">
           <BuilderForm
             data={cardData}
@@ -128,7 +127,7 @@ export default function BuilderPage() {
           />
         </div>
 
-        {/* Bahagian Kanan: Live Preview Kad Dinamik */}
+        {/* Bahagian Kanan: Live Preview Kad */}
         <div className="lg:col-span-6 flex flex-col items-center justify-center sticky top-6">
           <div className="text-center mb-2">
             <span className="text-[11px] font-bold uppercase tracking-[2px] text-amber-400/80 bg-amber-500/10 px-3 py-1 rounded-full border border-amber-500/20">

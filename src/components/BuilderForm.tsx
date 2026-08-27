@@ -70,6 +70,13 @@ const MUSIC_PRESETS = [
   }
 ];
 
+const OPACITY_PRESETS = [
+  { label: '100% Solid', value: 100 },
+  { label: '90% Jelas', value: 90 },
+  { label: '75% Kaca', value: 75 },
+  { label: '55% Lutsinar', value: 55 },
+];
+
 export default function BuilderForm({ 
   data, 
   onChange, 
@@ -86,6 +93,7 @@ export default function BuilderForm({
   const [isCheckingOut, setIsCheckingOut] = useState(false);
 
   const bgType = data.theme?.coverBgType || 'color';
+  const currentOpacity = data.theme?.cardOpacity !== undefined ? data.theme.cardOpacity : 92;
 
   const updateData = (newData: CardData) => {
     onChange(newData);
@@ -272,7 +280,7 @@ export default function BuilderForm({
       
       <div>
         <h2 className="text-2xl font-bold text-white tracking-wide">Pereka Kad Jemputan Digital</h2>
-        <p className="text-xs text-slate-400 mt-1">Ubah suai muka depan, susunan helaian, dan pilihan lagu majlis.</p>
+        <p className="text-xs text-slate-400 mt-1">Ubah suai muka depan, susunan helaian, ketelusan kad, dan lagu majlis.</p>
       </div>
 
       {/* Navigasi Tab */}
@@ -284,7 +292,7 @@ export default function BuilderForm({
             activeTab === 'cover' ? 'bg-amber-500 text-slate-950 font-bold shadow' : 'text-slate-400 hover:text-white'
           }`}
         >
-          1. Muka Depan & Wallpaper
+          1. Muka Depan & Tema
         </button>
         <button
           type="button"
@@ -306,13 +314,71 @@ export default function BuilderForm({
         </button>
       </div>
 
-      {/* ================= TAB 1: MUKA DEPAN & WALLPAPER ================= */}
+      {/* ================= TAB 1: MUKA DEPAN, WALLPAPER & TRANSPARENCY ================= */}
       {activeTab === 'cover' && (
         <div 
           onClick={() => onActiveSlideChange?.('cover')}
           className="p-5 rounded-2xl bg-slate-950/70 border border-slate-800 space-y-4"
         >
-          <div className="p-4 rounded-2xl bg-slate-900 border border-amber-500/20 space-y-3">
+          {/* 1. KETELUSAN KOTAK KAD (CARD TRANSPARENCY / OPACITY SLIDER) */}
+          <div className="p-4 rounded-2xl bg-slate-900 border border-amber-500/25 space-y-3">
+            <div className="flex items-center justify-between">
+              <label className="text-xs font-bold text-amber-300 uppercase tracking-wider flex items-center gap-1.5">
+                <i className="fa-solid fa-sliders" /> Ketelusan Kotak Kad (Transparency)
+              </label>
+              <span className="text-xs font-bold font-mono px-2 py-0.5 rounded-lg bg-amber-500/20 text-amber-300 border border-amber-500/30">
+                {currentOpacity}%
+              </span>
+            </div>
+
+            {/* Slider Ketelusan */}
+            <div className="flex items-center gap-3">
+              <span className="text-[10px] text-slate-500 font-medium">Lutsinar</span>
+              <input
+                type="range"
+                min="20"
+                max="100"
+                step="5"
+                value={currentOpacity}
+                onChange={(e) => {
+                  updateData({
+                    ...data,
+                    theme: { ...data.theme, cardOpacity: Number(e.target.value) }
+                  });
+                  onActiveSlideChange?.(0); // Selak ke helaian pertama untuk lihat kesan
+                }}
+                className="w-full accent-amber-500 cursor-pointer h-2 bg-slate-950 rounded-lg"
+              />
+              <span className="text-[10px] text-slate-400 font-medium">Solid</span>
+            </div>
+
+            {/* Preset Butang Pantas */}
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-1.5 pt-1">
+              {OPACITY_PRESETS.map((preset) => (
+                <button
+                  key={preset.value}
+                  type="button"
+                  onClick={() => {
+                    updateData({
+                      ...data,
+                      theme: { ...data.theme, cardOpacity: preset.value }
+                    });
+                    onActiveSlideChange?.(0);
+                  }}
+                  className={`py-1.5 px-2 rounded-lg text-[11px] font-medium border transition-all ${
+                    currentOpacity === preset.value
+                      ? 'bg-amber-500 text-slate-950 font-bold border-amber-400'
+                      : 'bg-slate-950/80 text-slate-300 border-slate-700 hover:border-slate-500'
+                  }`}
+                >
+                  {preset.label}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* 2. LATAR BELAKANG MUKA DEPAN (WARNA VS GAMBAR) */}
+          <div className="p-4 rounded-2xl bg-slate-900 border border-slate-800 space-y-3">
             <div className="flex items-center justify-between">
               <label className="text-xs font-bold text-amber-300 uppercase tracking-wider">
                 Latar Belakang Muka Depan
@@ -438,6 +504,7 @@ export default function BuilderForm({
             )}
           </div>
           
+          {/* TEKS MUKA DEPAN */}
           <div>
             <label className="text-xs text-slate-400 block mb-1">Tagline / Panggilan Atas</label>
             <input
