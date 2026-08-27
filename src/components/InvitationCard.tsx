@@ -9,11 +9,11 @@ interface Props {
   guestName?: string;
 }
 
-// Komponen Typing Effect Khas (Tanpa Simbol |)
+// Komponen Typing Effect Halus (Tanpa Simbol |)
 function TypewriterText({ 
   text = '', 
-  speed = 30, 
-  delay = 100, 
+  speed = 50, 
+  delay = 250, 
   className = '', 
   style 
 }: { 
@@ -97,7 +97,7 @@ export default function InvitationCard({
     if (currentSlide < totalSlides - 1) {
       isTransitioning.current = true;
       setCurrentSlide(prev => prev + 1);
-      setTimeout(() => { isTransitioning.current = false; }, 700);
+      setTimeout(() => { isTransitioning.current = false; }, 1100);
     }
   };
 
@@ -106,7 +106,7 @@ export default function InvitationCard({
     if (currentSlide > 0) {
       isTransitioning.current = true;
       setCurrentSlide(prev => prev - 1);
-      setTimeout(() => { isTransitioning.current = false; }, 700);
+      setTimeout(() => { isTransitioning.current = false; }, 1100);
     }
   };
 
@@ -114,9 +114,9 @@ export default function InvitationCard({
   const handleWheel = (e: React.WheelEvent) => {
     if (!isOpen || isTransitioning.current) return;
     
-    if (e.deltaY > 35) {
+    if (e.deltaY > 30) {
       nextSlide();
-    } else if (e.deltaY < -35) {
+    } else if (e.deltaY < -30) {
       prevSlide();
     }
   };
@@ -132,9 +132,9 @@ export default function InvitationCard({
     const diffY = touchStartY.current - e.changedTouches[0].clientY;
 
     if (diffY > 40) {
-      nextSlide(); // Leret ke atas -> Slaid seterusnya
+      nextSlide();
     } else if (diffY < -40) {
-      prevSlide(); // Leret ke bawah -> Slaid sebelumnya
+      prevSlide();
     }
     touchStartY.current = null;
   };
@@ -201,7 +201,7 @@ export default function InvitationCard({
               onClick={() => {
                 if (!isTransitioning.current) setCurrentSlide(i);
               }}
-              className={`w-2 rounded-full transition-all duration-700 ease-out ${
+              className={`w-2 rounded-full transition-all duration-1000 ease-[cubic-bezier(0.19,1,0.22,1)] ${
                 currentSlide === i ? 'bg-amber-400 h-6' : 'bg-white/30 h-2 hover:bg-white/60'
               }`}
             />
@@ -209,9 +209,9 @@ export default function InvitationCard({
         </div>
       )}
 
-      {/* ================= 6. MUKA DEPAN (SLIDE NAIK SECARA LEMBUT) ================= */}
+      {/* ================= 6. MUKA DEPAN (SLIDE NAIK ELEGAN) ================= */}
       <div 
-        className={`absolute inset-0 z-50 flex flex-col items-center justify-center p-6 text-white transition-all duration-1000 ease-[cubic-bezier(0.16,1,0.3,1)] ${
+        className={`absolute inset-0 z-50 flex flex-col items-center justify-center p-6 text-white transition-all duration-[1200ms] ease-[cubic-bezier(0.16,1,0.3,1)] ${
           isOpen ? '-translate-y-full opacity-0 pointer-events-none' : 'translate-y-0 opacity-100 pointer-events-auto'
         }`}
         style={{
@@ -249,7 +249,7 @@ export default function InvitationCard({
         </button>
       </div>
 
-      {/* ================= 7. ENJIN HELAIAN MENEGAK ULTRA-LANCAR ================= */}
+      {/* ================= 7. ENJIN HELAIAN MENEGAK 50% LEBIH SMOOTH ================= */}
       <div className="relative w-full h-full overflow-hidden">
         {slides.map((slide, idx) => {
           const offset = idx - currentSlide;
@@ -258,9 +258,9 @@ export default function InvitationCard({
           return (
             <div
               key={slide.id || idx}
-              className="absolute inset-0 w-full h-full p-6 flex flex-col justify-center items-center transition-all duration-700 ease-[cubic-bezier(0.22,1,0.36,1)]"
+              className="absolute inset-0 w-full h-full p-6 flex flex-col justify-center items-center transition-all duration-[1100ms] ease-[cubic-bezier(0.19,1,0.22,1)]"
               style={{
-                transform: `translateY(${offset * 100}%) scale(${isCurrent ? 1 : 0.94})`,
+                transform: `translateY(${offset * 100}%) scale(${isCurrent ? 1 : 0.95})`,
                 opacity: isCurrent ? 1 : 0,
                 pointerEvents: isCurrent ? 'auto' : 'none',
                 zIndex: isCurrent ? 20 : 10
@@ -289,15 +289,15 @@ export default function InvitationCard({
                   <div className="w-10 h-0.5 mx-auto mt-1 rounded-full" style={{ backgroundColor: data.theme?.goldColor || '#b59049' }} />
                 </div>
 
-                {/* Bahagian Kandungan Slaid Dengan Typing Effect */}
+                {/* Bahagian Kandungan Slaid (Typing Lembut & Santai) */}
                 <div className="my-auto w-full py-2 flex flex-col items-center justify-center z-10">
                   
                   {/* Slaid: INTRO */}
                   {slide.type === 'intro' && (
                     <div className="space-y-3">
-                      <p className="text-xs text-slate-600 leading-relaxed max-w-[280px] mx-auto min-h-[48px]">
+                      <p className="text-xs text-slate-600 leading-relaxed max-w-[280px] mx-auto min-h-[52px]">
                         {isCurrent ? (
-                          <TypewriterText text={slide.bodyText || ''} speed={25} delay={150} />
+                          <TypewriterText text={slide.bodyText || ''} speed={55} delay={300} />
                         ) : (
                           slide.bodyText
                         )}
@@ -311,7 +311,7 @@ export default function InvitationCard({
 
                       <h3 className="text-lg font-bold" style={{ color: data.theme?.primaryColor || '#3d5343', fontFamily: 'Playfair Display, serif' }}>
                         {isCurrent ? (
-                          <TypewriterText text={slide.subtitle || ''} speed={35} delay={600} />
+                          <TypewriterText text={slide.subtitle || ''} speed={65} delay={900} />
                         ) : (
                           slide.subtitle
                         )}
@@ -327,7 +327,7 @@ export default function InvitationCard({
                           <span className="font-bold text-amber-800 shrink-0">{item.time}</span>
                           <span className="text-slate-700 text-right">
                             {isCurrent ? (
-                              <TypewriterText text={item.activity} speed={25} delay={tIdx * 200 + 100} />
+                              <TypewriterText text={item.activity} speed={50} delay={tIdx * 350 + 200} />
                             ) : (
                               item.activity
                             )}
@@ -343,9 +343,9 @@ export default function InvitationCard({
                       <h3 className="text-base font-bold" style={{ color: data.theme?.primaryColor || '#3d5343' }}>
                         {slide.locationDetails.venueName}
                       </h3>
-                      <p className="text-xs text-slate-600 leading-relaxed whitespace-pre-line min-h-[40px]">
+                      <p className="text-xs text-slate-600 leading-relaxed whitespace-pre-line min-h-[44px]">
                         {isCurrent ? (
-                          <TypewriterText text={slide.locationDetails.address} speed={20} delay={150} />
+                          <TypewriterText text={slide.locationDetails.address} speed={45} delay={300} />
                         ) : (
                           slide.locationDetails.address
                         )}
@@ -365,9 +365,9 @@ export default function InvitationCard({
                   {slide.type === 'thank_you' && (
                     <div className="space-y-3">
                       <div className="text-3xl text-amber-600">❧ ❦ ☙</div>
-                      <p className="text-xs leading-relaxed text-slate-700 max-w-[280px] mx-auto min-h-[40px]">
+                      <p className="text-xs leading-relaxed text-slate-700 max-w-[280px] mx-auto min-h-[44px]">
                         {isCurrent ? (
-                          <TypewriterText text={slide.bodyText || 'Sekalung penghargaan dan terima kasih atas kehadiran dan doa tulus ikhlas anda.'} speed={25} delay={150} />
+                          <TypewriterText text={slide.bodyText || 'Sekalung penghargaan dan terima kasih atas kehadiran dan doa tulus ikhlas anda.'} speed={55} delay={300} />
                         ) : (
                           slide.bodyText
                         )}
