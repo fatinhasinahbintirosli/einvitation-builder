@@ -54,7 +54,6 @@ export default function BuilderForm({
     onChange(newData);
   };
 
-  // Muat Naik Wallpaper Sendiri
   const handleWallpaperUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     setUploadError(null);
     const file = e.target.files?.[0];
@@ -79,7 +78,6 @@ export default function BuilderForm({
     reader.readAsDataURL(file);
   };
 
-  // Muat Naik Gambar Helaian (Foto / QR Code)
   const handleSlideImageUpload = (slideIndex: number, e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
@@ -97,7 +95,6 @@ export default function BuilderForm({
     reader.readAsDataURL(file);
   };
 
-  // Kemas kini helaian
   const updateSlide = (index: number, updatedFields: Partial<SlideItem>) => {
     const updatedSlides = [...data.slides];
     updatedSlides[index] = {
@@ -107,7 +104,6 @@ export default function BuilderForm({
     updateData({ ...data, slides: updatedSlides });
   };
 
-  // Tambah Helaian Baharu
   const addNewSlide = () => {
     const newSlide: SlideItem = {
       id: Math.random().toString(36).substring(2, 9),
@@ -123,7 +119,6 @@ export default function BuilderForm({
     updateData({ ...data, slides: [...data.slides, newSlide] });
   };
 
-  // Padam Helaian
   const removeSlide = (index: number) => {
     if (data.slides.length <= 1) {
       alert('Kad perlu mempunyai sekurang-kurangnya 1 helaian.');
@@ -133,7 +128,6 @@ export default function BuilderForm({
     updateData({ ...data, slides: updatedSlides });
   };
 
-  // Tukar Jenis Helaian daripada Dropdown
   const handleTypeChange = (index: number, newType: SlideType) => {
     const currentSlide = data.slides[index];
     let updated: Partial<SlideItem> = { type: newType };
@@ -169,7 +163,6 @@ export default function BuilderForm({
     updateSlide(index, updated);
   };
 
-  // Tambah baris tentatif
   const addTimelineItem = (slideIndex: number) => {
     const slide = data.slides[slideIndex];
     const currentTimeline = slide.timeline || [];
@@ -177,14 +170,12 @@ export default function BuilderForm({
     updateSlide(slideIndex, { timeline: newTimeline });
   };
 
-  // Padam baris tentatif
   const removeTimelineItem = (slideIndex: number, itemIndex: number) => {
     const slide = data.slides[slideIndex];
     const newTimeline = (slide.timeline || []).filter((_, idx) => idx !== itemIndex);
     updateSlide(slideIndex, { timeline: newTimeline });
   };
 
-  // Kemas kini baris tentatif
   const updateTimelineItem = (slideIndex: number, itemIndex: number, field: 'time' | 'activity', value: string) => {
     const slide = data.slides[slideIndex];
     const newTimeline = [...(slide.timeline || [])];
@@ -335,20 +326,18 @@ export default function BuilderForm({
         </div>
       )}
 
-      {/* ================= TAB 3: HELAIAN KAD DENGAN DROPDOWN MODULAR ================= */}
+      {/* ================= TAB 3: HELAIAN KAD ================= */}
       {activeTab === 'slides' && (
         <div className="space-y-4 max-h-[520px] overflow-y-auto pr-1">
           {data.slides.map((slide, idx) => (
             <div key={slide.id || idx} className="p-4 rounded-2xl bg-slate-950/80 border border-slate-800 space-y-3.5">
               
-              {/* Header Bar Helaian & Dropdown Pilihan Fungsi */}
               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-800 pb-3">
                 <div className="flex items-center gap-2">
                   <span className="w-5 h-5 rounded-full bg-amber-500/20 text-amber-400 text-[10px] font-bold flex items-center justify-center">
                     {idx + 1}
                   </span>
                   
-                  {/* DROPDOWN MENU PILIHAN FUNGSI HELAIAN */}
                   <select
                     value={slide.type}
                     onChange={(e) => handleTypeChange(idx, e.target.value as SlideType)}
@@ -382,7 +371,7 @@ export default function BuilderForm({
                 </div>
               </div>
 
-              {/* 1. INTRO / UCAPAN */}
+              {/* 1. INTRO */}
               {slide.type === 'intro' && (
                 <div className="space-y-3">
                   <div>
@@ -418,7 +407,7 @@ export default function BuilderForm({
                 </div>
               )}
 
-              {/* 2. LOCATION (LOKASI & PETA) */}
+              {/* 2. LOCATION */}
               {slide.type === 'location' && (
                 <div className="space-y-3">
                   <div>
@@ -472,7 +461,7 @@ export default function BuilderForm({
                 </div>
               )}
 
-              {/* 3. TENTATIVE (SUSUNAN MAJLIS) */}
+              {/* 3. TENTATIVE */}
               {slide.type === 'tentative' && (
                 <div className="space-y-2.5">
                   <label className="text-[11px] text-slate-400 block">Jadual Atur Cara Majlis:</label>
@@ -511,7 +500,7 @@ export default function BuilderForm({
                 </div>
               )}
 
-              {/* 4. IMAGE / QR CODE (DUITNOW / GALERI) */}
+              {/* 4. IMAGE / QR CODE */}
               {slide.type === 'image_qr' && (
                 <div className="space-y-3">
                   <div>
@@ -589,7 +578,6 @@ export default function BuilderForm({
             </div>
           ))}
 
-          {/* Butang Tambah Helaian Baharu */}
           <button
             type="button"
             onClick={addNewSlide}
@@ -600,7 +588,7 @@ export default function BuilderForm({
         </div>
       )}
 
-      {/* ================= BAHAGIAN SIMPAN / JANA DUAL LINK ================= */}
+      {/* ================= BAHAGIAN SIMPAN / JANA DUA LINK ================= */}
       {onSave && (
         <div className="p-4 rounded-2xl bg-slate-950/80 border border-slate-800 space-y-3 pt-3">
           {setSlug && slug !== undefined && (
@@ -630,47 +618,63 @@ export default function BuilderForm({
               </>
             ) : (
               <>
-                <i className="fa-solid fa-paper-plane" /> Sahkan & Dapatkan Link Preview
+                <i className="fa-solid fa-paper-plane" /> Sahkan & Jana Pautan Kad
               </>
             )}
           </button>
 
-          {/* DUAL LINK SECTION: PERCUMA VS PREMIUM */}
+          {/* DUAL LINK SECTION: PERCUMA VS PREMIUM PREVIEW */}
           {generatedUrl && (
-            <div className="p-4 rounded-2xl bg-slate-900 border border-amber-500/30 space-y-3">
+            <div className="p-4 rounded-2xl bg-slate-900 border border-amber-500/30 space-y-3.5">
               <div className="text-center">
                 <span className="text-xs font-bold text-white uppercase tracking-wider block">
-                  🎉 Kad Anda Telah Berjaya Dijana!
+                  🎉 Pautan Kad Anda Berjaya Dijana!
                 </span>
               </div>
 
-              {/* 1. Versi Percuma */}
-              <div className="p-3 rounded-xl bg-slate-950 border border-slate-700 space-y-1">
+              {/* 1. LINK PERCUMA (2 Slaid, Tanpa Watermark) */}
+              <div className="p-3 rounded-xl bg-slate-950 border border-emerald-500/30 space-y-1.5">
                 <div className="flex justify-between items-center text-[11px]">
-                  <span className="text-slate-400">1. Pautan Percuma (2 Helaian + Watermark):</span>
-                  <span className="text-[10px] px-2 py-0.5 rounded bg-slate-800 text-slate-300">TRIAL</span>
+                  <span className="text-emerald-400 font-bold">1. Pautan Percuma (2 Helaian, Tanpa Watermark)</span>
+                  <span className="text-[9px] px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-300 font-bold">FREE</span>
                 </div>
                 <a 
                   href={generatedUrl} 
                   target="_blank" 
                   rel="noreferrer" 
-                  className="text-xs font-bold text-amber-400 underline break-all block"
+                  className="text-xs font-bold text-slate-200 underline break-all block hover:text-white"
                 >
                   {generatedUrl}
                 </a>
               </div>
 
-              {/* 2. Buka Kunci Versi Penuh */}
-              <div className="p-3 rounded-xl bg-gradient-to-r from-amber-500/20 to-amber-700/20 border border-amber-400/50 flex flex-col sm:flex-row items-center justify-between gap-3">
+              {/* 2. LINK PREMIUM PREVIEW (Semua Slaid, Ada Watermark) */}
+              <div className="p-3 rounded-xl bg-slate-950 border border-amber-500/40 space-y-1.5">
+                <div className="flex justify-between items-center text-[11px]">
+                  <span className="text-amber-400 font-bold">2. Pautan Premium Preview (Semua Helaian, Ada Watermark)</span>
+                  <span className="text-[9px] px-2 py-0.5 rounded bg-amber-500/20 text-amber-300 font-bold">PREVIEW</span>
+                </div>
+                <a 
+                  href={`${generatedUrl}?v=premium`} 
+                  target="_blank" 
+                  rel="noreferrer" 
+                  className="text-xs font-bold text-amber-300 underline break-all block hover:text-amber-200"
+                >
+                  {`${generatedUrl}?v=premium`}
+                </a>
+              </div>
+
+              {/* CTA Buka Kunci Versi Penuh Bersih Tanpa Watermark */}
+              <div className="pt-1 flex flex-col sm:flex-row items-center justify-between gap-2.5">
                 <div className="text-left">
-                  <span className="text-xs font-bold text-amber-300 block">Buka Kunci Versi Penuh (Premium)</span>
-                  <span className="text-[10px] text-slate-300 block">Buang watermark & aktifkan semua {data.slides.length} helaian.</span>
+                  <span className="text-xs font-bold text-amber-200 block">Ingin Buang Watermark Untuk Semua Helaian?</span>
+                  <span className="text-[10px] text-slate-400 block">Dapatkan versi rasmi tanpa sebarang watermark.</span>
                 </div>
                 <a
-                  href={`https://wa.me/60123456789?text=Hai%20Admin,%20saya%20nak%20buka%20kunci%20premium%20untuk%20kad%20saya:%20${encodeURIComponent(generatedUrl)}`}
+                  href={`https://wa.me/60123456789?text=Hai%20Admin,%20saya%20ingin%20buka%20kunci%20premium%20untuk%20kad:%20${encodeURIComponent(generatedUrl)}`}
                   target="_blank"
                   rel="noreferrer"
-                  className="px-4 py-2 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold text-xs uppercase tracking-wider shadow whitespace-nowrap"
+                  className="w-full sm:w-auto px-4 py-2 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold text-xs uppercase tracking-wider text-center shadow whitespace-nowrap"
                 >
                   Buka Kunci (RM 15)
                 </a>

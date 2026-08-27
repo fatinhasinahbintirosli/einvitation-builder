@@ -5,11 +5,12 @@ import { CardData } from '@/types/invitation';
 
 interface Props {
   data: CardData;
-  isPaid?: boolean;
+  showWatermark?: boolean;
+  maxSlides?: number;
   guestName?: string;
 }
 
-// Komponen Typing Effect Tanpa Simbol '|'
+// Komponen Typing Effect Halus (Tanpa Simbol |)
 function TypewriterText({ 
   text = '', 
   speed = 45, 
@@ -52,7 +53,8 @@ function TypewriterText({
 
 export function InvitationCard({ 
   data, 
-  isPaid = false, 
+  showWatermark = false, 
+  maxSlides, 
   guestName = "Dato' / Datin / Tuan / Puan" 
 }: Props) {
   const [isOpen, setIsOpen] = useState(false);
@@ -64,11 +66,11 @@ export function InvitationCard({
   const isTransitioning = useRef<boolean>(false);
 
   const rawSlides = data?.slides && data.slides.length > 0 ? data.slides : [
-    { id: '1', type: 'intro' as const, title: 'Jemputan', bodyText: 'Tiada maklumat helaian.' }
+    { id: '1', type: 'intro', title: 'Jemputan', bodyText: 'Tiada maklumat helaian.' }
   ];
 
-  // Logik Freemium: Hadkan kepada 2 helaian jika belum dibayar
-  const slides = isPaid ? rawSlides : rawSlides.slice(0, 2);
+  // Hadkan helaian jika maxSlides ditetapkan
+  const slides = maxSlides && maxSlides > 0 ? rawSlides.slice(0, maxSlides) : rawSlides;
   const totalSlides = slides.length;
 
   const toggleMusic = (e: React.MouseEvent) => {
@@ -152,8 +154,8 @@ export function InvitationCard({
         backgroundPosition: 'center'
       }}
     >
-      {/* 1. LAPISAN WATERMARK JIKA BELUM BAYAR */}
-      {!isPaid && (
+      {/* 1. LAPISAN WATERMARK (HANYA MUNCUL JIKA showWatermark = true) */}
+      {showWatermark && (
         <div className="absolute inset-0 z-[100] pointer-events-none flex flex-col items-center justify-around opacity-25">
           {[...Array(6)].map((_, i) => (
             <div key={i} className="text-3xl font-black tracking-widest text-red-500 uppercase -rotate-12 select-none">
@@ -217,7 +219,7 @@ export function InvitationCard({
         </button>
       </div>
 
-      {/* ================= 5. HELAIAN KAD DINAMIK ================= */}
+      {/* ================= 5. HELAIAN KAD ================= */}
       <div className="relative w-full h-full overflow-hidden flex flex-col justify-center items-center">
         {slides.map((slide, idx) => {
           const offset = idx - currentSlide;
@@ -248,7 +250,7 @@ export function InvitationCard({
                   <span>☙</span>
                 </div>
 
-                {/* Kandungan Dinamik Mengikut Jenis Dropdown */}
+                {/* Kandungan Dinamik Helaian */}
                 <div className="my-auto w-full py-1 flex flex-col items-center justify-center">
                   
                   {/* 1. INTRO / UCAPAN */}
@@ -273,7 +275,7 @@ export function InvitationCard({
                     </div>
                   )}
 
-                  {/* 2. LOCATION (LOKASI & PETA) */}
+                  {/* 2. LOCATION */}
                   {slide.type === 'location' && slide.locationDetails && (
                     <div className="space-y-3.5 max-w-[280px] w-full flex flex-col items-center">
                       <div className="w-12 h-12 rounded-full bg-amber-500/10 border border-amber-500/30 flex items-center justify-center text-amber-700 text-lg shadow-sm">
@@ -302,7 +304,7 @@ export function InvitationCard({
                     </div>
                   )}
 
-                  {/* 3. TENTATIVE (SUSUNAN MAJLIS) */}
+                  {/* 3. TENTATIVE */}
                   {slide.type === 'tentative' && (
                     <div className="w-full space-y-3 max-w-[270px]">
                       {slide.timeline?.map((item, tIdx) => (
@@ -316,7 +318,7 @@ export function InvitationCard({
                     </div>
                   )}
 
-                  {/* 4. IMAGE / QR CODE (DUITNOW / GALERI) */}
+                  {/* 4. IMAGE / QR CODE */}
                   {slide.type === 'image_qr' && (
                     <div className="space-y-3 max-w-[270px] flex flex-col items-center">
                       {slide.imageUrl ? (
@@ -337,7 +339,7 @@ export function InvitationCard({
                     </div>
                   )}
 
-                  {/* 5. GUESTBOOK (UCAPAN TETAMU) */}
+                  {/* 5. GUESTBOOK */}
                   {slide.type === 'guestbook' && (
                     <div className="space-y-3 max-w-[270px] w-full text-center">
                       <div className="w-10 h-10 mx-auto rounded-full bg-amber-500/10 flex items-center justify-center text-amber-700">
@@ -350,7 +352,7 @@ export function InvitationCard({
                         {slide.bodyText || 'Titipkan ucapan dan doa selamat buat kami sekeluarga.'}
                       </p>
                       <div className="p-3 bg-amber-50/80 rounded-xl border border-amber-200/60 text-[11px] text-amber-900 italic">
-                        "Semoga ikatan diberkati Allah SWT dan kekal hingga ke syurga."
+                        "Semoga majlis diberkati Allah SWT dan kekal hingga ke syurga."
                       </div>
                     </div>
                   )}
@@ -363,18 +365,6 @@ export function InvitationCard({
                         {isCurrent ? <TypewriterText text={slide.bodyText || 'Sekalung penghargaan dan terima kasih atas kehadiran anda.'} speed={50} delay={250} /> : slide.bodyText}
                       </p>
                       <div className="text-amber-600 text-xl">𖥸</div>
-                    </div>
-                  )}
-
-                  {/* NOTIS KUNCI FREEMIUM UNTUK PENGGUNA PERCUMA */}
-                  {!isPaid && idx === 1 && (
-                    <div className="mt-2 w-full p-2.5 rounded-xl bg-amber-500/15 border border-amber-500/30 text-center">
-                      <p className="text-[10px] text-amber-900 font-bold uppercase tracking-wider">
-                        🔒 Helaian Seterusnya Terkunci (Versi Percuma)
-                      </p>
-                      <p className="text-[9px] text-slate-600 mt-0.5">
-                        Tingkatkan ke versi Premium untuk membuka semua helaian tanpa watermark.
-                      </p>
                     </div>
                   )}
                 </div>

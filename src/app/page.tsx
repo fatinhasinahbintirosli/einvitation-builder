@@ -13,7 +13,7 @@ const initialData: CardData = {
     cardBackgroundColor: 'rgba(255, 255, 255, 0.95)',
     primaryColor: '#3d5343',
     goldColor: '#b59049',
-    bgPatternUrl: 'https://images.unsplash.com/photo-1579783900882-c0d3dad7b119?q=80&w=800&auto=format&fit=crop'
+    bgPatternUrl: 'https://images.unsplash.com/photo-1607604276583-eef5d076aa5f?q=80&w=1080&auto=format&fit=crop'
   },
   cover: {
     tagline: 'Walimatul Aqiqah & Kesyukuran',
@@ -32,6 +32,17 @@ const initialData: CardData = {
     },
     {
       id: '2',
+      type: 'location',
+      title: 'LOKASI MAJLIS',
+      locationDetails: {
+        venueName: 'Kediaman',
+        address: 'KM12 Kampung Senin, Layang-Layang Kanan, 32800 Parit, Perak',
+        gmapsUrl: 'http://googleusercontent.com/maps.google.com/4',
+        wazeUrl: 'https://waze.com/ul?ll=4.3935298,100.8969494&navigate=yes'
+      }
+    },
+    {
+      id: '3',
       type: 'tentative',
       title: 'SUSUNAN MAJLIS',
       timeline: [
@@ -39,17 +50,6 @@ const initialData: CardData = {
         { time: '12:00 PM', activity: 'Tahnik, Cukur Jambul & Doa Selamat' },
         { time: '04:00 PM', activity: 'Sesi Bergambar & Bersurai' }
       ]
-    },
-    {
-      id: '3',
-      type: 'location',
-      title: 'LOKASI MAJLIS',
-      locationDetails: {
-        venueName: 'Kediaman',
-        address: 'KM12 Kampung Senin, Layang-Layang Kanan, 32800 Parit, Perak',
-        gmapsUrl: 'https://maps.app.goo.gl/ijC3EX1oFmbRKdod9',
-        wazeUrl: 'https://waze.com/ul?ll=4.3935298,100.8969494&navigate=yes'
-      }
     },
     {
       id: '4',
@@ -62,64 +62,79 @@ const initialData: CardData = {
 
 export default function BuilderPage() {
   const [cardData, setCardData] = useState<CardData>(initialData);
+  const [slug, setSlug] = useState<string>(() => `kad-${Math.random().toString(36).substring(2, 9)}`);
   const [isSaving, setIsSaving] = useState(false);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
 
   const handleSave = async () => {
     setIsSaving(true);
-    const slug = `kad-${Math.random().toString(36).substring(2, 9)}`;
+    const cleanSlug = slug.trim().toLowerCase();
 
-    const { error } = await supabase.from('invitations').insert([
-      {
-        slug: slug,
-        creator_email: 'user@example.com',
-        is_paid: false,
-        card_data: cardData
+    try {
+      const { error } = await supabase.from('invitations').upsert(
+        [
+          {
+            slug: cleanSlug,
+            creator_email: 'user@example.com',
+            is_paid: false,
+            card_data: cardData
+          }
+        ],
+        { onConflict: 'slug' }
+      );
+
+      if (error) {
+        throw error;
       }
-    ]);
 
-    setIsSaving(false);
-    if (error) {
-      alert('Ralat menyimpan kad: ' + error.message);
-    } else {
-      setPreviewUrl(`${window.location.origin}/e/${slug}`);
+      const fullUrl = `${window.location.origin}/e/${cleanSlug}`;
+      setPreviewUrl(fullUrl);
+    } catch (err: any) {
+      alert('Ralat semasa menyimpan kad: ' + (err.message || 'Sila cuba lagi.'));
+    } finally {
+      setIsSaving(false);
     }
   };
 
   return (
-    <main className="min-h-screen p-4 md:p-8 max-w-7xl mx-auto flex flex-col items-center">
+    <main className="min-h-screen p-4 md:p-8 max-w-7xl mx-auto flex flex-col items-center bg-slate-950 text-slate-100">
+      
+      {/* Header Utama */}
       <header className="text-center mb-8">
-        <h1 className="text-3xl font-bold text-amber-400 tracking-wider" style={{ fontFamily: 'Cinzel, serif' }}>
+        <h1 className="text-3xl sm:text-4xl font-bold text-amber-400 tracking-wider" style={{ fontFamily: 'Cinzel, serif' }}>
           E-INVITATION BUILDER STUDIO
         </h1>
-        <p className="text-xs text-slate-400 mt-1">
-          Ubah suai teks, tema, dan helaian di kiri. Pratonton langsung bergerak di kanan.
+        <p className="text-xs sm:text-sm text-slate-400 mt-1.5">
+          Ubah suai teks, tema, dan susunan helaian di panel kiri. Pratonton langsung bergerak di panel kanan.
         </p>
       </header>
 
-      {previewUrl && (
-        <div className="w-full bg-amber-500/20 border border-amber-500/50 p-4 rounded-xl mb-6 text-center text-xs space-y-2">
-          <p className="font-bold text-amber-300">Pautan Pratonton Anda Telah Dijana (Dengan Watermark):</p>
-          <a href={previewUrl} target="_blank" rel="noreferrer" className="underline text-white block">
-            {previewUrl}
-          </a>
-        </div>
-      )}
-
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 w-full items-start">
-        {/* Bahagian Kiri: Borang Builder */}
+        {/* Bahagian Kiri: Borang Pengubah Suai (Builder Form) */}
         <div className="lg:col-span-6 w-full">
           <BuilderForm
             data={cardData}
             onChange={setCardData}
             onSave={handleSave}
             isSaving={isSaving}
+            slug={slug}
+            setSlug={setSlug}
+            generatedUrl={previewUrl}
           />
         </div>
 
-        {/* Bahagian Kanan: Live Preview Kad */}
-        <div className="lg:col-span-6 flex justify-center sticky top-6">
-          <InvitationCard data={cardData} isPaid={false} />
+        {/* Bahagian Kanan: Live Preview Kad (Semua Helaian Sedia Ditunjuk, Tanpa Watermark) */}
+        <div className="lg:col-span-6 flex flex-col items-center justify-center sticky top-6">
+          <div className="text-center mb-2">
+            <span className="text-[11px] font-bold uppercase tracking-[2px] text-amber-400/80 bg-amber-500/10 px-3 py-1 rounded-full border border-amber-500/20">
+              Live Preview Studio
+            </span>
+          </div>
+          
+          <InvitationCard 
+            data={cardData} 
+            showWatermark={false} 
+          />
         </div>
       </div>
     </main>
