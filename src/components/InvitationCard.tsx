@@ -9,7 +9,7 @@ interface Props {
   guestName?: string;
 }
 
-// Komponen Typing Effect Halus Tanpa Kursor '|'
+// Komponen Typing Effect Halus (Tanpa Simbol |)
 function TypewriterText({ 
   text = '', 
   speed = 50, 
@@ -63,11 +63,12 @@ export function InvitationCard({
   const touchStartY = useRef<number | null>(null);
   const isTransitioning = useRef<boolean>(false);
 
-  // Sekatan Freemium: Versi percuma dihadkan kepada 2 helaian sahaja
-  const allSlides = data?.slides && data.slides.length > 0 ? data.slides : [
-    { id: '1', type: 'intro' as const, title: 'Jemputan', bodyText: 'Tiada maklumat helaian.' }
+  const rawSlides = data?.slides && data.slides.length > 0 ? data.slides : [
+    { id: '1', type: 'intro', title: 'Jemputan', bodyText: 'Tiada maklumat helaian.' }
   ];
-  const slides = isPaid ? allSlides : allSlides.slice(0, 2);
+
+  // Logik Freemium: Hadkan kepada 2 slaid pertama jika belum dibayar
+  const slides = isPaid ? rawSlides : rawSlides.slice(0, 2);
   const totalSlides = slides.length;
 
   const toggleMusic = (e: React.MouseEvent) => {
@@ -122,7 +123,7 @@ export function InvitationCard({
     }
   };
 
-  // Navigasi Sentuhan Telefon (Touch Gestures)
+  // Navigasi Leretan Skrin Sentuh (Touch Gestures)
   const handleTouchStart = (e: React.TouchEvent) => {
     touchStartY.current = e.touches[0].clientY;
   };
@@ -167,7 +168,7 @@ export function InvitationCard({
         <audio ref={audioRef} loop src={data.cover.audioUrl} />
       )}
 
-      {/* 3. BUTANG MUZIK BULAT */}
+      {/* 3. BUTANG MUZIK (BULATAN MINIMALIS ATAS KANAN) */}
       <button
         onClick={toggleMusic}
         type="button"
@@ -216,7 +217,7 @@ export function InvitationCard({
         </button>
       </div>
 
-      {/* ================= 5. KANDUNGAN HELAIAN ================= */}
+      {/* ================= 5. HELAIAN KAD ================= */}
       <div className="relative w-full h-full overflow-hidden flex flex-col justify-center items-center">
         {slides.map((slide, idx) => {
           const offset = idx - currentSlide;
@@ -235,7 +236,7 @@ export function InvitationCard({
             >
               {/* Kad Putih Tengah */}
               <div 
-                className="w-full max-w-[345px] h-[80%] max-h-[550px] rounded-[28px] p-6 text-center shadow-2xl border border-amber-200/40 flex flex-col justify-between items-center bg-white/95 backdrop-blur-sm relative"
+                className="w-full max-w-[345px] h-[78%] max-h-[540px] rounded-[28px] p-6 text-center shadow-2xl border border-amber-200/40 flex flex-col justify-between items-center bg-white/95 backdrop-blur-sm relative"
                 style={{ color: '#2c332e' }}
               >
                 {/* Hiasan Bucu Atas Kad */}
@@ -250,7 +251,7 @@ export function InvitationCard({
                 {/* Kandungan Helaian */}
                 <div className="my-auto w-full py-1 flex flex-col items-center justify-center">
                   
-                  {/* Slaid 1: INTRO */}
+                  {/* Slaid: INTRO */}
                   {slide.type === 'intro' && (
                     <div className="space-y-3 w-full">
                       <p className="text-sm text-slate-800 font-arabic leading-loose">
@@ -265,6 +266,7 @@ export function InvitationCard({
                         )}
                       </p>
 
+                      {/* Bingkai Gambar Bulat Bergelang Emas */}
                       {slide.imageUrl && (
                         <div className="relative my-2 flex flex-col items-center">
                           <div 
@@ -286,7 +288,7 @@ export function InvitationCard({
                     </div>
                   )}
 
-                  {/* Slaid 2: TENTATIF */}
+                  {/* Slaid: TENTATIVE */}
                   {slide.type === 'tentative' && (
                     <div className="w-full space-y-3.5 max-w-[270px]">
                       {slide.timeline?.map((item, tIdx) => (
@@ -304,7 +306,7 @@ export function InvitationCard({
                     </div>
                   )}
 
-                  {/* Slaid 3: LOKASI */}
+                  {/* Slaid: LOCATION */}
                   {slide.type === 'location' && slide.locationDetails && (
                     <div className="space-y-3 max-w-[270px]">
                       <h3 className="text-base font-bold" style={{ color: data?.theme?.primaryColor || '#3d5343' }}>
@@ -328,7 +330,7 @@ export function InvitationCard({
                     </div>
                   )}
 
-                  {/* Slaid 4: TERIMA KASIH */}
+                  {/* Slaid: THANK YOU */}
                   {slide.type === 'thank_you' && (
                     <div className="space-y-3">
                       <div className="text-3xl text-amber-600">❧ ❦ ☙</div>
@@ -342,19 +344,19 @@ export function InvitationCard({
                       <div className="text-amber-600 text-xl">𖥸</div>
                     </div>
                   )}
-                </div>
 
-                {/* Notis Kunci Versi Percuma pada Helaian Terakhir */}
-                {!isPaid && idx === 1 && (
-                  <div className="w-full mb-2 p-2.5 rounded-2xl bg-amber-500/10 border border-amber-500/30 text-center">
-                    <span className="text-[10px] text-amber-800 font-bold block">
-                      🔒 Helaian Lokasi & Tentatif Terkunci
-                    </span>
-                    <span className="text-[9px] text-slate-500 block">
-                      Tingkatkan ke versi penuh untuk buka semua ciri jemputan.
-                    </span>
-                  </div>
-                )}
+                  {/* NOTIS KUNCI FREEMIUM UNTUK PENGGUNA PERCUMA */}
+                  {!isPaid && idx === 1 && (
+                    <div className="mt-2 w-full p-2.5 rounded-xl bg-amber-500/15 border border-amber-500/30 text-center">
+                      <p className="text-[10px] text-amber-900 font-bold uppercase tracking-wider">
+                        🔒 Helaian Peta & Tentatif Terkunci
+                      </p>
+                      <p className="text-[9px] text-slate-600 mt-0.5">
+                        Tingkatkan ke versi berbayar untuk membuka 4 helaian penuh.
+                      </p>
+                    </div>
+                  )}
+                </div>
 
                 {/* Butang Navigasi Bawah */}
                 <div className="w-full flex flex-col items-center gap-1">
