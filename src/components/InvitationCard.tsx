@@ -10,7 +10,7 @@ interface Props {
   guestName?: string;
 }
 
-// Komponen Typing Effect Halus (Tanpa Simbol |)
+// Komponen Typing Effect
 function TypewriterText({ 
   text = '', 
   speed = 45, 
@@ -69,7 +69,6 @@ export function InvitationCard({
     { id: '1', type: 'intro', title: 'Jemputan', bodyText: 'Tiada maklumat helaian.' }
   ];
 
-  // Hadkan helaian jika maxSlides ditetapkan
   const slides = maxSlides && maxSlides > 0 ? rawSlides.slice(0, maxSlides) : rawSlides;
   const totalSlides = slides.length;
 
@@ -115,7 +114,6 @@ export function InvitationCard({
     }
   };
 
-  // Navigasi Roda Tetikus (Mouse Wheel) Menegak
   const handleWheel = (e: React.WheelEvent) => {
     if (!isOpen || isTransitioning.current) return;
     if (e.deltaY > 30) {
@@ -125,7 +123,6 @@ export function InvitationCard({
     }
   };
 
-  // Navigasi Sentuhan Telefon (Touch Gestures)
   const handleTouchStart = (e: React.TouchEvent) => {
     touchStartY.current = e.touches[0].clientY;
   };
@@ -142,6 +139,10 @@ export function InvitationCard({
     touchStartY.current = null;
   };
 
+  // Penentuan Latar Muka Depan (Warna vs Gambar)
+  const isCoverImage = data?.theme?.coverBgType === 'image' && data?.theme?.coverBgUrl;
+  const coverBgColor = data?.theme?.coverBgColor || data?.theme?.primaryColor || '#2d4a3e';
+
   return (
     <div 
       onWheel={handleWheel}
@@ -149,12 +150,13 @@ export function InvitationCard({
       onTouchEnd={handleTouchEnd}
       className="relative w-full max-w-[430px] h-[100dvh] sm:h-[840px] overflow-hidden shadow-2xl sm:rounded-[36px] bg-slate-950 flex flex-col justify-between items-center select-none"
       style={{
-        backgroundImage: `url(${data?.theme?.bgPatternUrl || ''})`,
+        backgroundImage: data?.theme?.bgPatternUrl ? `url(${data.theme.bgPatternUrl})` : undefined,
+        backgroundColor: '#0f172a',
         backgroundSize: 'cover',
         backgroundPosition: 'center'
       }}
     >
-      {/* 1. LAPISAN WATERMARK (HANYA MUNCUL JIKA showWatermark = true) */}
+      {/* 1. WATERMARK UNTUK PREVIEW */}
       {showWatermark && (
         <div className="absolute inset-0 z-[100] pointer-events-none flex flex-col items-center justify-around opacity-25">
           {[...Array(6)].map((_, i) => (
@@ -185,38 +187,48 @@ export function InvitationCard({
           isOpen ? '-translate-y-full opacity-0 pointer-events-none' : 'translate-y-0 opacity-100 pointer-events-auto'
         }`}
         style={{
-          backgroundColor: data?.theme?.primaryColor || '#1e293b'
+          backgroundColor: isCoverImage ? undefined : coverBgColor,
+          backgroundImage: isCoverImage ? `url(${data?.theme?.coverBgUrl})` : undefined,
+          backgroundSize: 'cover',
+          backgroundPosition: 'center'
         }}
       >
-        <div className="text-amber-300 text-xl mb-3 animate-pulse">❧ ❦ ☙</div>
-        
-        <p className="tracking-[4px] uppercase text-xs text-slate-200 text-center" style={{ fontFamily: 'Cinzel, serif' }}>
-          {data?.cover?.tagline}
-        </p>
+        {/* Lapisan Tint Gelap Jika Cover Menggunakan Gambar */}
+        {isCoverImage && (
+          <div className="absolute inset-0 bg-black/40 backdrop-blur-[1px] pointer-events-none" />
+        )}
 
-        <h1 className="text-4xl text-white my-4 text-center font-normal drop-shadow-md" style={{ fontFamily: 'Great Vibes, cursive' }}>
-          {data?.cover?.mainTitle}
-        </h1>
+        <div className="relative z-10 flex flex-col items-center text-center">
+          <div className="text-amber-300 text-xl mb-3 animate-pulse">❧ ❦ ☙</div>
+          
+          <p className="tracking-[4px] uppercase text-xs text-slate-200 text-center" style={{ fontFamily: 'Cinzel, serif' }}>
+            {data?.cover?.tagline}
+          </p>
 
-        <p className="text-xs tracking-widest text-amber-200 text-center" style={{ fontFamily: 'Cinzel, serif' }}>
-          {data?.cover?.dateText}
-        </p>
+          <h1 className="text-4xl text-white my-4 text-center font-normal drop-shadow-md" style={{ fontFamily: 'Great Vibes, cursive' }}>
+            {data?.cover?.mainTitle}
+          </h1>
 
-        <div className="mt-8 px-6 py-3 bg-white/10 backdrop-blur-md rounded-2xl border border-amber-300/30 text-center shadow-lg">
-          <span className="text-[10px] tracking-wider uppercase block text-slate-300">Kepada:</span>
-          <span className="font-semibold text-sm" style={{ fontFamily: 'Playfair Display, serif' }}>
-            {guestName}
-          </span>
+          <p className="text-xs tracking-widest text-amber-200 text-center" style={{ fontFamily: 'Cinzel, serif' }}>
+            {data?.cover?.dateText}
+          </p>
+
+          <div className="mt-8 px-6 py-3 bg-white/10 backdrop-blur-md rounded-2xl border border-amber-300/30 text-center shadow-lg">
+            <span className="text-[10px] tracking-wider uppercase block text-slate-300">Kepada:</span>
+            <span className="font-semibold text-sm" style={{ fontFamily: 'Playfair Display, serif' }}>
+              {guestName}
+            </span>
+          </div>
+
+          <button
+            onClick={handleOpenCard}
+            type="button"
+            className="mt-10 px-8 py-3.5 rounded-full border-2 border-amber-300 bg-gradient-to-r from-amber-500 to-amber-600 text-slate-950 font-bold text-xs tracking-widest uppercase shadow-2xl hover:scale-105 active:scale-95 transition-all flex items-center gap-2 cursor-pointer"
+            style={{ fontFamily: 'Cinzel, serif' }}
+          >
+            <i className="fa-regular fa-envelope-open text-sm" /> BUKA JEMPUTAN
+          </button>
         </div>
-
-        <button
-          onClick={handleOpenCard}
-          type="button"
-          className="mt-10 px-8 py-3.5 rounded-full border-2 border-amber-300 bg-gradient-to-r from-amber-500 to-amber-600 text-slate-950 font-bold text-xs tracking-widest uppercase shadow-2xl hover:scale-105 active:scale-95 transition-all flex items-center gap-2 cursor-pointer"
-          style={{ fontFamily: 'Cinzel, serif' }}
-        >
-          <i className="fa-regular fa-envelope-open text-sm" /> BUKA JEMPUTAN
-        </button>
       </div>
 
       {/* ================= 5. HELAIAN KAD ================= */}
@@ -236,12 +248,10 @@ export function InvitationCard({
                 zIndex: isCurrent ? 20 : 10
               }}
             >
-              {/* Kad Putih Tengah */}
               <div 
                 className="w-full max-w-[345px] h-[78%] max-h-[540px] rounded-[28px] p-6 text-center shadow-2xl border border-amber-200/40 flex flex-col justify-between items-center bg-white/95 backdrop-blur-sm relative"
                 style={{ color: '#2c332e' }}
               >
-                {/* Hiasan Bucu Atas Kad */}
                 <div className="w-full flex justify-between items-center text-amber-700/60 text-xs px-1">
                   <span>❧</span>
                   <span className="text-[11px] font-bold uppercase tracking-[2px]" style={{ color: data?.theme?.goldColor || '#b59049', fontFamily: 'Cinzel, serif' }}>
@@ -250,10 +260,8 @@ export function InvitationCard({
                   <span>☙</span>
                 </div>
 
-                {/* Kandungan Dinamik Helaian */}
                 <div className="my-auto w-full py-1 flex flex-col items-center justify-center">
-                  
-                  {/* 1. INTRO / UCAPAN */}
+                  {/* INTRO */}
                   {slide.type === 'intro' && (
                     <div className="space-y-3 w-full">
                       <p className="text-sm text-slate-800 font-arabic leading-loose">
@@ -275,7 +283,7 @@ export function InvitationCard({
                     </div>
                   )}
 
-                  {/* 2. LOCATION */}
+                  {/* LOCATION */}
                   {slide.type === 'location' && slide.locationDetails && (
                     <div className="space-y-3.5 max-w-[280px] w-full flex flex-col items-center">
                       <div className="w-12 h-12 rounded-full bg-amber-500/10 border border-amber-500/30 flex items-center justify-center text-amber-700 text-lg shadow-sm">
@@ -304,7 +312,7 @@ export function InvitationCard({
                     </div>
                   )}
 
-                  {/* 3. TENTATIVE */}
+                  {/* TENTATIVE */}
                   {slide.type === 'tentative' && (
                     <div className="w-full space-y-3 max-w-[270px]">
                       {slide.timeline?.map((item, tIdx) => (
@@ -318,12 +326,12 @@ export function InvitationCard({
                     </div>
                   )}
 
-                  {/* 4. IMAGE / QR CODE */}
+                  {/* IMAGE_QR */}
                   {slide.type === 'image_qr' && (
                     <div className="space-y-3 max-w-[270px] flex flex-col items-center">
                       {slide.imageUrl ? (
                         <div className="w-40 h-40 p-2 rounded-2xl bg-white border-2 border-amber-400/60 shadow-md flex items-center justify-center">
-                          <img src={slide.imageUrl} alt="QR / Visual" className="w-full h-full object-contain rounded-xl" />
+                          <img src={slide.imageUrl} alt="QR" className="w-full h-full object-contain rounded-xl" />
                         </div>
                       ) : (
                         <div className="w-36 h-36 rounded-2xl bg-slate-100 border border-dashed border-slate-300 flex items-center justify-center text-slate-400 text-xs">
@@ -331,7 +339,7 @@ export function InvitationCard({
                         </div>
                       )}
                       <h4 className="text-sm font-bold text-slate-800" style={{ color: data?.theme?.primaryColor || '#3d5343' }}>
-                        {slide.subtitle || 'Kod QR Hadiah / Salam Kausar'}
+                        {slide.subtitle || 'Kod QR Hadiah'}
                       </h4>
                       <p className="text-[11px] text-slate-600 leading-relaxed">
                         {slide.bodyText || 'Imbas kod QR di atas untuk ingatan tulus ikhlas anda.'}
@@ -339,7 +347,7 @@ export function InvitationCard({
                     </div>
                   )}
 
-                  {/* 5. GUESTBOOK */}
+                  {/* GUESTBOOK */}
                   {slide.type === 'guestbook' && (
                     <div className="space-y-3 max-w-[270px] w-full text-center">
                       <div className="w-10 h-10 mx-auto rounded-full bg-amber-500/10 flex items-center justify-center text-amber-700">
@@ -351,13 +359,10 @@ export function InvitationCard({
                       <p className="text-xs text-slate-600 leading-relaxed">
                         {slide.bodyText || 'Titipkan ucapan dan doa selamat buat kami sekeluarga.'}
                       </p>
-                      <div className="p-3 bg-amber-50/80 rounded-xl border border-amber-200/60 text-[11px] text-amber-900 italic">
-                        "Semoga majlis diberkati Allah SWT dan kekal hingga ke syurga."
-                      </div>
                     </div>
                   )}
 
-                  {/* 6. THANK YOU */}
+                  {/* THANK_YOU */}
                   {slide.type === 'thank_you' && (
                     <div className="space-y-3">
                       <div className="text-3xl text-amber-600">❧ ❦ ☙</div>
@@ -369,7 +374,7 @@ export function InvitationCard({
                   )}
                 </div>
 
-                {/* Butang Navigasi Bawah */}
+                {/* Butang Navigasi */}
                 <div className="w-full flex flex-col items-center gap-1">
                   {idx < totalSlides - 1 ? (
                     <button 

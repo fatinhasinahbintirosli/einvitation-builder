@@ -15,6 +15,19 @@ interface Props {
   generatedUrl?: string | null;
 }
 
+// Senarai Warna Tema Muka Depan
+const COLOR_PRESETS = [
+  { name: 'Hijau Zamrud', hex: '#2d4a3e' },
+  { name: 'Biru Gelap', hex: '#172554' },
+  { name: 'Maroon Diraja', hex: '#451a24' },
+  { name: 'Coklat Tanah', hex: '#3e2723' },
+  { name: 'Champagne Emas', hex: '#63513d' },
+  { name: 'Hitam Elegan', hex: '#18181b' },
+  { name: 'Dusty Rose', hex: '#5c3a4d' },
+  { name: 'Teal Klasik', hex: '#134e4a' },
+];
+
+// Senarai Gambar Kertas Dinding (Wallpaper)
 const PRESET_WALLPAPERS = [
   {
     id: 'songket_gold',
@@ -38,6 +51,26 @@ const PRESET_WALLPAPERS = [
   }
 ];
 
+// Senarai Lagu Majlis Sedia Ada
+const MUSIC_PRESETS = [
+  {
+    name: 'Melodi Piano Lembut (Lalai)',
+    url: 'https://cdn.pixabay.com/download/audio/2022/05/27/audio_1808fbf07a.mp3?filename=soft-piano-112349.mp3',
+  },
+  {
+    name: 'Gitar Akustik Kasih',
+    url: 'https://cdn.pixabay.com/download/audio/2022/01/18/audio_d0a13f69d2.mp3?filename=romantic-acoustic-guitar-15286.mp3',
+  },
+  {
+    name: 'Ketenangan Jiwa & Doa (Ambient)',
+    url: 'https://cdn.pixabay.com/download/audio/2021/08/04/audio_12b0c7443c.mp3?filename=peaceful-garden-healing-light-ambient-music-7789.mp3',
+  },
+  {
+    name: 'Sentuhan Nostalgia Klasik',
+    url: 'https://cdn.pixabay.com/download/audio/2022/11/06/audio_03d98d414a.mp3?filename=piano-moment-125010.mp3',
+  }
+];
+
 export default function BuilderForm({ 
   data, 
   onChange, 
@@ -47,15 +80,17 @@ export default function BuilderForm({
   setSlug,
   generatedUrl
 }: Props) {
-  const [activeTab, setActiveTab] = useState<'theme' | 'cover' | 'slides'>('theme');
+  const [activeTab, setActiveTab] = useState<'cover' | 'slides' | 'music'>('cover');
   const [uploadError, setUploadError] = useState<string | null>(null);
   const [isCheckingOut, setIsCheckingOut] = useState(false);
+
+  // Tab pemilihan jenis latar cover (color / image)
+  const bgType = data.theme?.coverBgType || 'color';
 
   const updateData = (newData: CardData) => {
     onChange(newData);
   };
 
-  // Panggilan Checkout Stripe
   const handleStripeCheckout = async () => {
     if (!slug) return;
     setIsCheckingOut(true);
@@ -90,7 +125,7 @@ export default function BuilderForm({
     if (!file) return;
 
     if (file.size > 3 * 1024 * 1024) {
-      setUploadError('Saiz gambar melebihi 3MB. Sila pilih gambar yang lebih kecil.');
+      setUploadError('Saiz gambar melebihi 3MB. Sila pilih gambar lebih kecil.');
       return;
     }
 
@@ -101,6 +136,8 @@ export default function BuilderForm({
         ...data,
         theme: {
           ...data.theme,
+          coverBgType: 'image',
+          coverBgUrl: base64Url,
           bgPatternUrl: base64Url
         }
       });
@@ -218,20 +255,11 @@ export default function BuilderForm({
       
       <div>
         <h2 className="text-2xl font-bold text-white tracking-wide">Pereka Kad Jemputan Digital</h2>
-        <p className="text-xs text-slate-400 mt-1">Sesuaikan tema, muzik latar, muka depan, dan pilih fungsi setiap helaian.</p>
+        <p className="text-xs text-slate-400 mt-1">Ubah suai muka depan, susunan helaian, dan pilihan lagu majlis.</p>
       </div>
 
       {/* Navigasi Tab */}
       <div className="flex rounded-xl bg-slate-950 p-1 border border-slate-800 text-xs font-semibold">
-        <button
-          type="button"
-          onClick={() => setActiveTab('theme')}
-          className={`flex-1 py-2.5 rounded-lg transition-all ${
-            activeTab === 'theme' ? 'bg-amber-500 text-slate-950 font-bold shadow' : 'text-slate-400 hover:text-white'
-          }`}
-        >
-          1. Tema & Wallpaper
-        </button>
         <button
           type="button"
           onClick={() => setActiveTab('cover')}
@@ -239,7 +267,7 @@ export default function BuilderForm({
             activeTab === 'cover' ? 'bg-amber-500 text-slate-950 font-bold shadow' : 'text-slate-400 hover:text-white'
           }`}
         >
-          2. Muka Depan
+          1. Muka Depan & Wallpaper
         </button>
         <button
           type="button"
@@ -248,82 +276,146 @@ export default function BuilderForm({
             activeTab === 'slides' ? 'bg-amber-500 text-slate-950 font-bold shadow' : 'text-slate-400 hover:text-white'
           }`}
         >
-          3. Pilihan Helaian ({data.slides?.length || 0})
+          2. Pilihan Helaian ({data.slides?.length || 0})
+        </button>
+        <button
+          type="button"
+          onClick={() => setActiveTab('music')}
+          className={`flex-1 py-2.5 rounded-lg transition-all ${
+            activeTab === 'music' ? 'bg-amber-500 text-slate-950 font-bold shadow' : 'text-slate-400 hover:text-white'
+          }`}
+        >
+          3. Lagu & Muzik Latar
         </button>
       </div>
 
-      {/* ================= TAB 1: TEMA, WALLPAPER & MUZIK ================= */}
-      {activeTab === 'theme' && (
-        <div className="space-y-4">
-          <div className="p-4 rounded-2xl bg-slate-950/70 border border-amber-500/20 space-y-4">
-            <label className="text-xs font-bold text-amber-400 uppercase tracking-wider flex items-center gap-2">
-              <i className="fa-solid fa-image" /> Kertas Dinding (Wallpaper)
-            </label>
-
-            <div className="flex items-start gap-3 p-3 rounded-xl bg-amber-500/10 border border-amber-500/30 text-amber-300">
-              <i className="fa-solid fa-circle-info text-base mt-0.5 shrink-0" />
-              <div className="text-xs leading-relaxed">
-                <span className="font-bold block text-amber-200">Saiz Gambar Dicadangkan:</span>
-                <span className="font-semibold text-white">1080 × 1920 px</span> (Nisbah 9:16). Format WebP/JPG bawah 2MB.
-              </div>
-            </div>
-
-            <div>
-              <span className="text-xs text-slate-400 block mb-2 font-medium">Pilihan Corak Sedia Ada:</span>
-              <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
-                {PRESET_WALLPAPERS.map((preset) => (
-                  <button
-                    key={preset.id}
-                    type="button"
-                    onClick={() => updateData({ ...data, theme: { ...data.theme, bgPatternUrl: preset.url } })}
-                    className={`relative h-20 rounded-xl overflow-hidden border-2 transition-all ${
-                      data.theme?.bgPatternUrl === preset.url
-                        ? 'border-amber-400 ring-2 ring-amber-400/40 scale-[1.02]'
-                        : 'border-slate-700 opacity-80 hover:opacity-100'
-                    }`}
-                  >
-                    <img src={preset.url} alt={preset.name} className="w-full h-full object-cover" />
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent flex items-end p-1.5">
-                      <span className="text-[10px] text-white truncate w-full text-left font-medium">{preset.name}</span>
-                    </div>
-                  </button>
-                ))}
-              </div>
-            </div>
-
-            <div>
-              <span className="text-xs text-slate-400 block mb-2 font-medium">Atau Muat Naik Gambar Sendiri:</span>
-              <label className="flex flex-col items-center justify-center border-2 border-dashed border-slate-700 hover:border-amber-400/60 rounded-xl p-4 cursor-pointer bg-slate-900/50 transition-all">
-                <i className="fa-solid fa-cloud-arrow-up text-xl text-amber-400 mb-1" />
-                <span className="text-xs text-slate-300 font-medium">Pilih fail gambar dari peranti</span>
-                <input type="file" accept="image/*" onChange={handleWallpaperUpload} className="hidden" />
-              </label>
-              {uploadError && <p className="text-xs text-red-400 mt-1">{uploadError}</p>}
-            </div>
-          </div>
-
-          <div className="p-4 rounded-2xl bg-slate-950/70 border border-slate-800 space-y-2">
-            <label className="text-xs font-bold text-amber-400 uppercase tracking-wider block">
-              Pautan Lagu / Audio Latar (MP3 Direct URL)
-            </label>
-            <input
-              type="text"
-              placeholder="https://.../lagu.mp3"
-              value={data.cover?.audioUrl || ''}
-              onChange={(e) => updateData({ ...data, cover: { ...data.cover, audioUrl: e.target.value } })}
-              className="w-full px-3.5 py-2.5 rounded-xl bg-slate-900 border border-slate-700 text-xs focus:border-amber-400 outline-none"
-            />
-          </div>
-        </div>
-      )}
-
-      {/* ================= TAB 2: MUKA DEPAN ================= */}
+      {/* ================= TAB 1: MUKA DEPAN & WALLPAPER ================= */}
       {activeTab === 'cover' && (
         <div className="p-5 rounded-2xl bg-slate-950/70 border border-slate-800 space-y-4">
-          <label className="text-xs font-bold text-amber-400 uppercase tracking-wider block">
-            Maklumat Muka Depan Kad (Cover)
-          </label>
           
+          {/* PEMILIHAN LATAR BELAKANG (COLOR VS IMAGE) */}
+          <div className="p-4 rounded-2xl bg-slate-900 border border-amber-500/20 space-y-3">
+            <div className="flex items-center justify-between">
+              <label className="text-xs font-bold text-amber-300 uppercase tracking-wider">
+                Latar Belakang Muka Depan
+              </label>
+              <div className="flex rounded-lg bg-slate-950 p-0.5 border border-slate-800 text-[11px]">
+                <button
+                  type="button"
+                  onClick={() => updateData({
+                    ...data,
+                    theme: { ...data.theme, coverBgType: 'color' }
+                  })}
+                  className={`px-3 py-1 rounded-md transition-all ${
+                    bgType === 'color' ? 'bg-amber-500 text-slate-950 font-bold shadow' : 'text-slate-400 hover:text-white'
+                  }`}
+                >
+                  <i className="fa-solid fa-palette mr-1" /> Warna
+                </button>
+                <button
+                  type="button"
+                  onClick={() => updateData({
+                    ...data,
+                    theme: { ...data.theme, coverBgType: 'image' }
+                  })}
+                  className={`px-3 py-1 rounded-md transition-all ${
+                    bgType === 'image' ? 'bg-amber-500 text-slate-950 font-bold shadow' : 'text-slate-400 hover:text-white'
+                  }`}
+                >
+                  <i className="fa-solid fa-image mr-1" /> Gambar
+                </button>
+              </div>
+            </div>
+
+            {/* MOD 1: PILIHAN WARNA */}
+            {bgType === 'color' && (
+              <div className="space-y-3 pt-1">
+                <span className="text-[11px] text-slate-400 block font-medium">Pilih warna tema muka depan:</span>
+                <div className="grid grid-cols-4 sm:grid-cols-8 gap-2">
+                  {COLOR_PRESETS.map((color) => (
+                    <button
+                      key={color.hex}
+                      type="button"
+                      onClick={() => updateData({
+                        ...data,
+                        theme: { ...data.theme, coverBgColor: color.hex, primaryColor: color.hex }
+                      })}
+                      className={`h-10 rounded-xl border-2 transition-transform flex items-center justify-center ${
+                        (data.theme?.coverBgColor || data.theme?.primaryColor) === color.hex
+                          ? 'border-amber-400 scale-105 shadow-md'
+                          : 'border-slate-700 hover:scale-100'
+                      }`}
+                      style={{ backgroundColor: color.hex }}
+                      title={color.name}
+                    >
+                      {(data.theme?.coverBgColor || data.theme?.primaryColor) === color.hex && (
+                        <i className="fa-solid fa-check text-white text-xs" />
+                      )}
+                    </button>
+                  ))}
+                </div>
+
+                <div className="flex items-center gap-2 pt-1">
+                  <label className="text-[11px] text-slate-400">Atau pilih kod warna tersendiri (Hex):</label>
+                  <input
+                    type="color"
+                    value={data.theme?.coverBgColor || data.theme?.primaryColor || '#2d4a3e'}
+                    onChange={(e) => updateData({
+                      ...data,
+                      theme: { ...data.theme, coverBgColor: e.target.value, primaryColor: e.target.value }
+                    })}
+                    className="w-8 h-8 rounded-lg bg-transparent cursor-pointer border border-slate-700"
+                  />
+                  <span className="text-xs text-amber-300 font-mono font-bold">
+                    {data.theme?.coverBgColor || data.theme?.primaryColor || '#2d4a3e'}
+                  </span>
+                </div>
+              </div>
+            )}
+
+            {/* MOD 2: PILIHAN GAMBAR / WALLPAPER */}
+            {bgType === 'image' && (
+              <div className="space-y-3 pt-1">
+                {/* Upload Fail Gambar */}
+                <label className="flex flex-col items-center justify-center border-2 border-dashed border-slate-700 hover:border-amber-400/60 rounded-xl p-3 cursor-pointer bg-slate-950/60 transition-all">
+                  <i className="fa-solid fa-cloud-arrow-up text-lg text-amber-400 mb-1" />
+                  <span className="text-xs text-slate-300 font-medium">Muat Naik Gambar Latar Belakang</span>
+                  <span className="text-[10px] text-slate-500 mt-0.5">Format JPG/PNG (9:16 disyorkan)</span>
+                  <input type="file" accept="image/*" onChange={handleWallpaperUpload} className="hidden" />
+                </label>
+                {uploadError && <p className="text-xs text-red-400 mt-1">{uploadError}</p>}
+
+                {/* Preset Gambar */}
+                <div>
+                  <span className="text-[11px] text-slate-400 block mb-1.5 font-medium">Atau pilih corak tema sedia ada:</span>
+                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
+                    {PRESET_WALLPAPERS.map((preset) => (
+                      <button
+                        key={preset.id}
+                        type="button"
+                        onClick={() => updateData({
+                          ...data,
+                          theme: { ...data.theme, coverBgUrl: preset.url, bgPatternUrl: preset.url }
+                        })}
+                        className={`relative h-14 rounded-lg overflow-hidden border transition-all ${
+                          data.theme?.coverBgUrl === preset.url
+                            ? 'border-amber-400 ring-2 ring-amber-400/40 scale-[1.02]'
+                            : 'border-slate-700 opacity-75 hover:opacity-100'
+                        }`}
+                      >
+                        <img src={preset.url} alt={preset.name} className="w-full h-full object-cover" />
+                        <div className="absolute inset-0 bg-black/60 flex items-center justify-center p-1">
+                          <span className="text-[9px] text-white text-center font-medium leading-tight">{preset.name}</span>
+                        </div>
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            )}
+          </div>
+          
+          {/* TEKS MUKA DEPAN */}
           <div>
             <label className="text-xs text-slate-400 block mb-1">Tagline / Panggilan Atas</label>
             <input
@@ -356,7 +448,7 @@ export default function BuilderForm({
         </div>
       )}
 
-      {/* ================= TAB 3: HELAIAN KAD ================= */}
+      {/* ================= TAB 2: HELAIAN KAD ================= */}
       {activeTab === 'slides' && (
         <div className="space-y-4 max-h-[520px] overflow-y-auto pr-1">
           {data.slides.map((slide, idx) => (
@@ -401,7 +493,7 @@ export default function BuilderForm({
                 </div>
               </div>
 
-              {/* 1. INTRO */}
+              {/* INTRO */}
               {slide.type === 'intro' && (
                 <div className="space-y-3">
                   <div>
@@ -437,7 +529,7 @@ export default function BuilderForm({
                 </div>
               )}
 
-              {/* 2. LOCATION */}
+              {/* LOCATION */}
               {slide.type === 'location' && (
                 <div className="space-y-3">
                   <div>
@@ -491,7 +583,7 @@ export default function BuilderForm({
                 </div>
               )}
 
-              {/* 3. TENTATIVE */}
+              {/* TENTATIVE */}
               {slide.type === 'tentative' && (
                 <div className="space-y-2.5">
                   <label className="text-[11px] text-slate-400 block">Jadual Atur Cara Majlis:</label>
@@ -530,7 +622,7 @@ export default function BuilderForm({
                 </div>
               )}
 
-              {/* 4. IMAGE / QR CODE */}
+              {/* IMAGE_QR */}
               {slide.type === 'image_qr' && (
                 <div className="space-y-3">
                   <div>
@@ -568,7 +660,7 @@ export default function BuilderForm({
                 </div>
               )}
 
-              {/* 5. GUESTBOOK */}
+              {/* GUESTBOOK */}
               {slide.type === 'guestbook' && (
                 <div className="space-y-3">
                   <div>
@@ -592,7 +684,7 @@ export default function BuilderForm({
                 </div>
               )}
 
-              {/* 6. THANK YOU */}
+              {/* THANK_YOU */}
               {slide.type === 'thank_you' && (
                 <div>
                   <label className="text-[11px] text-slate-400 block mb-1">Teks Ucapan Penghargaan</label>
@@ -618,7 +710,61 @@ export default function BuilderForm({
         </div>
       )}
 
-      {/* ================= BAHAGIAN SIMPAN & STRIPE CHECKOUT ================= */}
+      {/* ================= TAB 3: LAGU & MUZIK LATAR ================= */}
+      {activeTab === 'music' && (
+        <div className="p-5 rounded-2xl bg-slate-950/70 border border-slate-800 space-y-4">
+          <label className="text-xs font-bold text-amber-400 uppercase tracking-wider block">
+            Pilihan Lagu & Audio Latar
+          </label>
+
+          {/* Senarai Lagu Preset */}
+          <div className="space-y-2">
+            <span className="text-[11px] text-slate-400 block font-medium">Pilih lagu daripada koleksi sedia ada:</span>
+            <div className="space-y-2">
+              {MUSIC_PRESETS.map((track) => (
+                <div 
+                  key={track.url}
+                  onClick={() => updateData({ ...data, cover: { ...data.cover, audioUrl: track.url } })}
+                  className={`p-3 rounded-xl border flex items-center justify-between cursor-pointer transition-all ${
+                    data.cover?.audioUrl === track.url
+                      ? 'bg-amber-500/15 border-amber-400/60 shadow-md'
+                      : 'bg-slate-900 border-slate-800 hover:border-slate-700'
+                  }`}
+                >
+                  <div className="flex items-center gap-3">
+                    <div className={`w-8 h-8 rounded-full flex items-center justify-center text-xs ${
+                      data.cover?.audioUrl === track.url ? 'bg-amber-500 text-slate-950 font-bold' : 'bg-slate-800 text-slate-400'
+                    }`}>
+                      <i className="fa-solid fa-music" />
+                    </div>
+                    <span className="text-xs font-medium text-slate-200">{track.name}</span>
+                  </div>
+
+                  {data.cover?.audioUrl === track.url && (
+                    <span className="text-[10px] font-bold text-amber-300 uppercase px-2 py-0.5 rounded bg-amber-500/20 border border-amber-500/30">
+                      Dipilih
+                    </span>
+                  )}
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Input Manual URL Audio */}
+          <div className="pt-2 border-t border-slate-800 space-y-1.5">
+            <label className="text-[11px] text-slate-400 block font-medium">Atau masukkan pautan URL MP3 anda sendiri:</label>
+            <input
+              type="text"
+              placeholder="https://.../lagu-pilihan.mp3"
+              value={data.cover?.audioUrl || ''}
+              onChange={(e) => updateData({ ...data, cover: { ...data.cover, audioUrl: e.target.value } })}
+              className="w-full px-3.5 py-2.5 rounded-xl bg-slate-900 border border-slate-700 text-xs focus:border-amber-400 outline-none"
+            />
+          </div>
+        </div>
+      )}
+
+      {/* ================= BAHAGIAN SIMPAN & CHECKOUT ================= */}
       {onSave && (
         <div className="p-4 rounded-2xl bg-slate-950/80 border border-slate-800 space-y-3 pt-3">
           {setSlug && slug !== undefined && (
@@ -694,7 +840,7 @@ export default function BuilderForm({
                 </a>
               </div>
 
-              {/* BUTANG CHECKOUT SEBENAR STRIPE */}
+              {/* BUTANG CHECKOUT STRIPE */}
               <div className="pt-2 flex flex-col sm:flex-row items-center justify-between gap-2.5">
                 <div className="text-left">
                   <span className="text-xs font-bold text-amber-200 block">Buka Kunci Rasmi Tanpa Watermark</span>
