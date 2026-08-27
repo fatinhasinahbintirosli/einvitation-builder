@@ -47,7 +47,7 @@ export default function BuilderForm({
   setSlug,
   generatedUrl
 }: Props) {
-  const [activeTab, setActiveTab] = useState<'theme' | 'cover' | 'slides'>('cover');
+  const [activeTab, setActiveTab] = useState<'theme' | 'cover' | 'slides'>('theme');
   const [uploadError, setUploadError] = useState<string | null>(null);
   const [isCheckingOut, setIsCheckingOut] = useState(false);
 
@@ -84,7 +84,6 @@ export default function BuilderForm({
     }
   };
 
-  // Pengendali Muat Naik Kertas Dinding (Wallpaper)
   const handleWallpaperUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     setUploadError(null);
     const file = e.target.files?.[0];
@@ -109,7 +108,6 @@ export default function BuilderForm({
     reader.readAsDataURL(file);
   };
 
-  // Muat Naik Gambar Bulat / QR Code
   const handleSlideImageUpload = (slideIndex: number, e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
@@ -144,7 +142,7 @@ export default function BuilderForm({
       locationDetails: {
         venueName: 'Dewan Gemilang Perdana',
         address: 'No. 123, Jalan Raja Chulan, Kuala Lumpur',
-        gmapsUrl: 'https://maps.google.com',
+        gmapsUrl: 'http://googleusercontent.com/maps.google.com/4',
         wazeUrl: 'https://waze.com'
       }
     };
@@ -169,7 +167,7 @@ export default function BuilderForm({
       updated.locationDetails = {
         venueName: 'Nama Dewan / Tempat',
         address: 'Alamat Penuh Majlis',
-        gmapsUrl: 'https://maps.google.com',
+        gmapsUrl: 'http://googleusercontent.com/maps.google.com/4',
         wazeUrl: 'https://waze.com'
       };
     } else if (newType === 'tentative' && !currentSlide.timeline) {
@@ -227,12 +225,21 @@ export default function BuilderForm({
       <div className="flex rounded-xl bg-slate-950 p-1 border border-slate-800 text-xs font-semibold">
         <button
           type="button"
+          onClick={() => setActiveTab('theme')}
+          className={`flex-1 py-2.5 rounded-lg transition-all ${
+            activeTab === 'theme' ? 'bg-amber-500 text-slate-950 font-bold shadow' : 'text-slate-400 hover:text-white'
+          }`}
+        >
+          1. Tema & Wallpaper
+        </button>
+        <button
+          type="button"
           onClick={() => setActiveTab('cover')}
           className={`flex-1 py-2.5 rounded-lg transition-all ${
             activeTab === 'cover' ? 'bg-amber-500 text-slate-950 font-bold shadow' : 'text-slate-400 hover:text-white'
           }`}
         >
-          1. Muka Depan & Wallpaper
+          2. Muka Depan
         </button>
         <button
           type="button"
@@ -241,90 +248,81 @@ export default function BuilderForm({
             activeTab === 'slides' ? 'bg-amber-500 text-slate-950 font-bold shadow' : 'text-slate-400 hover:text-white'
           }`}
         >
-          2. Pilihan Helaian ({data.slides?.length || 0})
-        </button>
-        <button
-          type="button"
-          onClick={() => setActiveTab('theme')}
-          className={`flex-1 py-2.5 rounded-lg transition-all ${
-            activeTab === 'theme' ? 'bg-amber-500 text-slate-950 font-bold shadow' : 'text-slate-400 hover:text-white'
-          }`}
-        >
-          3. Muzik & Tema
+          3. Pilihan Helaian ({data.slides?.length || 0})
         </button>
       </div>
 
-      {/* ================= TAB 1: MUKA DEPAN & WALLPAPER ================= */}
-      {activeTab === 'cover' && (
-        <div className="p-5 rounded-2xl bg-slate-950/70 border border-slate-800 space-y-4">
-          <label className="text-xs font-bold text-amber-400 uppercase tracking-wider block">
-            Maklumat Muka Depan & Kertas Dinding
-          </label>
+      {/* ================= TAB 1: TEMA, WALLPAPER & MUZIK ================= */}
+      {activeTab === 'theme' && (
+        <div className="space-y-4">
+          <div className="p-4 rounded-2xl bg-slate-950/70 border border-amber-500/20 space-y-4">
+            <label className="text-xs font-bold text-amber-400 uppercase tracking-wider flex items-center gap-2">
+              <i className="fa-solid fa-image" /> Kertas Dinding (Wallpaper)
+            </label>
 
-          {/* RUANGAN UPLOAD WALLPAPER DI MUKA DEPAN */}
-          <div className="p-4 rounded-2xl bg-slate-900 border border-amber-500/20 space-y-3">
-            <div className="flex items-center justify-between">
-              <label className="text-xs font-bold text-amber-300 uppercase tracking-wider flex items-center gap-1.5">
-                <i className="fa-solid fa-image" /> Kertas Dinding Kad (Wallpaper)
-              </label>
-              {data.theme?.bgPatternUrl && (
-                <span className="text-[10px] text-emerald-400 font-semibold bg-emerald-500/10 px-2 py-0.5 rounded-md border border-emerald-500/30">
-                  Aktif
-                </span>
-              )}
-            </div>
-
-            {/* Pratonton Wallpaper Semasa */}
-            {data.theme?.bgPatternUrl && (
-              <div className="relative w-full h-24 rounded-xl overflow-hidden border border-amber-400/40 shadow-inner">
-                <img 
-                  src={data.theme.bgPatternUrl} 
-                  alt="Wallpaper Semasa" 
-                  className="w-full h-full object-cover" 
-                />
-                <div className="absolute inset-0 bg-black/30 flex items-center justify-center">
-                  <span className="text-[10px] text-white font-medium bg-black/70 px-2.5 py-1 rounded-full border border-white/20">
-                    Kertas Dinding Semasa
-                  </span>
-                </div>
+            <div className="flex items-start gap-3 p-3 rounded-xl bg-amber-500/10 border border-amber-500/30 text-amber-300">
+              <i className="fa-solid fa-circle-info text-base mt-0.5 shrink-0" />
+              <div className="text-xs leading-relaxed">
+                <span className="font-bold block text-amber-200">Saiz Gambar Dicadangkan:</span>
+                <span className="font-semibold text-white">1080 × 1920 px</span> (Nisbah 9:16). Format WebP/JPG bawah 2MB.
               </div>
-            )}
-
-            {/* Butang Muat Naik Wallpaper */}
-            <div>
-              <label className="flex flex-col items-center justify-center border-2 border-dashed border-slate-700 hover:border-amber-400/60 rounded-xl p-3 cursor-pointer bg-slate-950/60 transition-all">
-                <i className="fa-solid fa-cloud-arrow-up text-lg text-amber-400 mb-1" />
-                <span className="text-xs text-slate-300 font-medium">Muat Naik Gambar Wallpaper Sendiri</span>
-                <span className="text-[10px] text-slate-500 mt-0.5">Format JPG, PNG, WebP (Nisbah 9:16 disyorkan)</span>
-                <input type="file" accept="image/*" onChange={handleWallpaperUpload} className="hidden" />
-              </label>
-              {uploadError && <p className="text-xs text-red-400 mt-1">{uploadError}</p>}
             </div>
 
-            {/* Pilihan Corak Preset Pantas */}
-            <div className="pt-1">
-              <span className="text-[11px] text-slate-400 block mb-1.5 font-medium">Atau pilih corak tema sedia ada:</span>
+            <div>
+              <span className="text-xs text-slate-400 block mb-2 font-medium">Pilihan Corak Sedia Ada:</span>
               <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
                 {PRESET_WALLPAPERS.map((preset) => (
                   <button
                     key={preset.id}
                     type="button"
                     onClick={() => updateData({ ...data, theme: { ...data.theme, bgPatternUrl: preset.url } })}
-                    className={`relative h-14 rounded-lg overflow-hidden border transition-all ${
+                    className={`relative h-20 rounded-xl overflow-hidden border-2 transition-all ${
                       data.theme?.bgPatternUrl === preset.url
                         ? 'border-amber-400 ring-2 ring-amber-400/40 scale-[1.02]'
-                        : 'border-slate-700 opacity-75 hover:opacity-100'
+                        : 'border-slate-700 opacity-80 hover:opacity-100'
                     }`}
                   >
                     <img src={preset.url} alt={preset.name} className="w-full h-full object-cover" />
-                    <div className="absolute inset-0 bg-black/60 flex items-center justify-center p-1">
-                      <span className="text-[9px] text-white text-center font-medium leading-tight">{preset.name}</span>
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent flex items-end p-1.5">
+                      <span className="text-[10px] text-white truncate w-full text-left font-medium">{preset.name}</span>
                     </div>
                   </button>
                 ))}
               </div>
             </div>
+
+            <div>
+              <span className="text-xs text-slate-400 block mb-2 font-medium">Atau Muat Naik Gambar Sendiri:</span>
+              <label className="flex flex-col items-center justify-center border-2 border-dashed border-slate-700 hover:border-amber-400/60 rounded-xl p-4 cursor-pointer bg-slate-900/50 transition-all">
+                <i className="fa-solid fa-cloud-arrow-up text-xl text-amber-400 mb-1" />
+                <span className="text-xs text-slate-300 font-medium">Pilih fail gambar dari peranti</span>
+                <input type="file" accept="image/*" onChange={handleWallpaperUpload} className="hidden" />
+              </label>
+              {uploadError && <p className="text-xs text-red-400 mt-1">{uploadError}</p>}
+            </div>
           </div>
+
+          <div className="p-4 rounded-2xl bg-slate-950/70 border border-slate-800 space-y-2">
+            <label className="text-xs font-bold text-amber-400 uppercase tracking-wider block">
+              Pautan Lagu / Audio Latar (MP3 Direct URL)
+            </label>
+            <input
+              type="text"
+              placeholder="https://.../lagu.mp3"
+              value={data.cover?.audioUrl || ''}
+              onChange={(e) => updateData({ ...data, cover: { ...data.cover, audioUrl: e.target.value } })}
+              className="w-full px-3.5 py-2.5 rounded-xl bg-slate-900 border border-slate-700 text-xs focus:border-amber-400 outline-none"
+            />
+          </div>
+        </div>
+      )}
+
+      {/* ================= TAB 2: MUKA DEPAN ================= */}
+      {activeTab === 'cover' && (
+        <div className="p-5 rounded-2xl bg-slate-950/70 border border-slate-800 space-y-4">
+          <label className="text-xs font-bold text-amber-400 uppercase tracking-wider block">
+            Maklumat Muka Depan Kad (Cover)
+          </label>
           
           <div>
             <label className="text-xs text-slate-400 block mb-1">Tagline / Panggilan Atas</label>
@@ -358,7 +356,7 @@ export default function BuilderForm({
         </div>
       )}
 
-      {/* ================= TAB 2: HELAIAN KAD ================= */}
+      {/* ================= TAB 3: HELAIAN KAD ================= */}
       {activeTab === 'slides' && (
         <div className="space-y-4 max-h-[520px] overflow-y-auto pr-1">
           {data.slides.map((slide, idx) => (
@@ -473,7 +471,7 @@ export default function BuilderForm({
                         onChange={(e) => updateSlide(idx, {
                           locationDetails: { ...(slide.locationDetails || { venueName: '', address: '', gmapsUrl: '', wazeUrl: '' }), gmapsUrl: e.target.value }
                         })}
-                        placeholder="https://maps.google.com/..."
+                        placeholder="http://googleusercontent.com/maps.google.com/4..."
                         className="w-full px-3 py-2 rounded-lg bg-slate-900 border border-slate-700 text-xs outline-none focus:border-amber-400"
                       />
                     </div>
@@ -617,24 +615,6 @@ export default function BuilderForm({
           >
             <i className="fa-solid fa-plus" /> Tambah Helaian Baharu
           </button>
-        </div>
-      )}
-
-      {/* ================= TAB 3: MUZIK & TEMA ================= */}
-      {activeTab === 'theme' && (
-        <div className="space-y-4">
-          <div className="p-4 rounded-2xl bg-slate-950/70 border border-slate-800 space-y-2">
-            <label className="text-xs font-bold text-amber-400 uppercase tracking-wider block">
-              Pautan Lagu / Audio Latar (MP3 Direct URL)
-            </label>
-            <input
-              type="text"
-              placeholder="https://.../lagu.mp3"
-              value={data.cover?.audioUrl || ''}
-              onChange={(e) => updateData({ ...data, cover: { ...data.cover, audioUrl: e.target.value } })}
-              className="w-full px-3.5 py-2.5 rounded-xl bg-slate-900 border border-slate-700 text-xs focus:border-amber-400 outline-none"
-            />
-          </div>
         </div>
       )}
 
