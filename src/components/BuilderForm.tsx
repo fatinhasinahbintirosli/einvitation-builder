@@ -4,6 +4,7 @@ import React, { useState } from 'react';
 import { CardData } from '@/types/invitation';
 
 type SlideItem = CardData['slides'][number];
+type ValidSlideType = NonNullable<SlideItem['type']>;
 
 interface Props {
   data: CardData;
@@ -15,13 +16,34 @@ interface Props {
   generatedUrl?: string | null;
 }
 
-const MODULE_OPTIONS = [
+const MODULE_OPTIONS: { value: ValidSlideType; label: string; free: boolean }[] = [
   { value: 'location', label: '📍 Lokasi Majlis & Navigasi Peta', free: true },
+  { value: 'date_countdown', label: '⏳ Tarikh & Kira Detik (Countdown)', free: false },
   { value: 'tentative', label: '🕒 Susunan Acara / Tentatif', free: false },
-  { value: 'guestbook', label: '✍️ Buku Ucapan & RSVP Tetamu', free: false },
-  { value: 'gallery', label: '🖼️ Galeri Gambar Memori', free: false },
-  { value: 'gift', label: '🎁 Salam Kaus / DuitNow QR Pay', free: false },
   { value: 'thank_you', label: '🌸 Ucapan Penghargaan & Doa', free: false },
+];
+
+const PRESET_WALLPAPERS = [
+  {
+    id: 'songket_gold',
+    name: 'Songket Emas Warisan',
+    url: 'https://images.unsplash.com/photo-1607604276583-eef5d076aa5f?q=80&w=1080&auto=format&fit=crop',
+  },
+  {
+    id: 'dark_floral',
+    name: 'Botanikal Bunga Klasik',
+    url: 'https://images.unsplash.com/photo-1518895949257-7621c3c786d7?q=80&w=1080&auto=format&fit=crop',
+  },
+  {
+    id: 'royal_emerald',
+    name: 'Hijau Zamrud Mewah',
+    url: 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=1080&auto=format&fit=crop',
+  },
+  {
+    id: 'cream_texture',
+    name: 'Tekstur Krim Elegan',
+    url: 'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?q=80&w=1080&auto=format&fit=crop',
+  }
 ];
 
 export default function BuilderForm({ 
@@ -34,6 +56,7 @@ export default function BuilderForm({
   generatedUrl
 }: Props) {
   const [activeTab, setActiveTab] = useState<'theme' | 'cover' | 'slides'>('slides');
+  const [uploadError, setUploadError] = useState<string | null>(null);
 
   const updateData = (newData: CardData) => {
     onChange(newData);
@@ -48,13 +71,11 @@ export default function BuilderForm({
     updateData({ ...data, slides: updatedSlides });
   };
 
-  const handleModuleChange = (slideIndex: number, newType: string) => {
+  const handleModuleChange = (slideIndex: number, newType: ValidSlideType) => {
     let defaultTitle = 'JEMPUTAN';
     if (newType === 'location') defaultTitle = 'LOKASI MAJLIS';
+    if (newType === 'date_countdown') defaultTitle = 'KIRA DETIK MAJLIS';
     if (newType === 'tentative') defaultTitle = 'ATUR CARA MAJLIS';
-    if (newType === 'guestbook') defaultTitle = 'BUKU UCAPAN & DOA';
-    if (newType === 'gallery') defaultTitle = 'MEMORI INDAH';
-    if (newType === 'gift') defaultTitle = 'SALAM KAUS';
     if (newType === 'thank_you') defaultTitle = 'SEKALUNG PENGHARGAAN';
 
     updateSlide(slideIndex, {
@@ -84,12 +105,53 @@ export default function BuilderForm({
     updateData({ ...data, slides: updated });
   };
 
+  const handleWallpaperUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setUploadError(null);
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    if (file.size > 3 * 1024 * 1024) {
+      setUploadError('Saiz gambar melebihi 3MB. Sila pilih gambar yang lebih kecil.');
+      return;
+    }
+
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      const base64Url = event.target?.result as string;
+      updateData({
+        ...data,
+        theme: {
+          ...data.theme,
+          bgPatternUrl: base64Url
+        }
+      });
+    };
+    reader.readAsDataURL(file);
+  };
+
+  const handleSlideImageUpload = (slideIndex: number, e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      const base64Url = event.target?.result as string;
+      const updatedSlides = [...data.slides];
+      updatedSlides[slideIndex] = {
+        ...updatedSlides[slideIndex],
+        imageUrl: base64Url
+      };
+      updateData({ ...data, slides: updatedSlides });
+    };
+    reader.readAsDataURL(file);
+  };
+
   return (
     <div className="w-full bg-slate-900 border border-slate-800 rounded-3xl p-5 sm:p-7 text-slate-200 shadow-2xl space-y-5">
       
       <div>
         <h2 className="text-2xl font-bold text-white tracking-wide">Pereka Kad Jemputan Digital</h2>
-        <p className="text-xs text-slate-400 mt-1">Pilih modul khusus bagi setiap helaian mengikut kehendak majlis anda.</p>
+        <p className="text-xs text-slate-400 mt-1">Sesuaikan tema, kertas dinding, dan modul setiap helaian kad.</p>
       </div>
 
       {/* Tab Navigasi */}
@@ -123,6 +185,110 @@ export default function BuilderForm({
         </button>
       </div>
 
+      {/* ================= TAB 1: TEMA & WALLPAPER ================= */}
+      {activeTab === 'theme' && (
+        <div className="space-y-4">
+          <div className="p-4 rounded-2xl bg-slate-950/70 border border-amber-500/20 space-y-4">
+            <label className="text-xs font-bold text-amber-400 uppercase tracking-wider flex items-center gap-2">
+              <i className="fa-solid fa-image" /> Kertas Dinding (Wallpaper)
+            </label>
+
+            <div className="flex items-start gap-3 p-3 rounded-xl bg-amber-500/10 border border-amber-500/30 text-amber-300">
+              <i className="fa-solid fa-circle-info text-base mt-0.5 shrink-0" />
+              <div className="text-xs leading-relaxed">
+                <span className="font-bold block text-amber-200">Saiz Gambar Dicadangkan:</span>
+                <span className="font-semibold text-white">1080 × 1920 px</span> (Nisbah 9:16). Format WebP/JPG bawah 2MB.
+              </div>
+            </div>
+
+            <div>
+              <span className="text-xs text-slate-400 block mb-2 font-medium">Pilihan Corak Sedia Ada:</span>
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
+                {PRESET_WALLPAPERS.map((preset) => (
+                  <button
+                    key={preset.id}
+                    type="button"
+                    onClick={() => updateData({ ...data, theme: { ...data.theme, bgPatternUrl: preset.url } })}
+                    className={`relative h-20 rounded-xl overflow-hidden border-2 transition-all ${
+                      data.theme?.bgPatternUrl === preset.url
+                        ? 'border-amber-400 ring-2 ring-amber-400/40 scale-[1.02]'
+                        : 'border-slate-700 opacity-80 hover:opacity-100'
+                    }`}
+                  >
+                    <img src={preset.url} alt={preset.name} className="w-full h-full object-cover" />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent flex items-end p-1.5">
+                      <span className="text-[10px] text-white truncate w-full text-left font-medium">{preset.name}</span>
+                    </div>
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            <div>
+              <span className="text-xs text-slate-400 block mb-2 font-medium">Atau Muat Naik Gambar Sendiri:</span>
+              <label className="flex flex-col items-center justify-center border-2 border-dashed border-slate-700 hover:border-amber-400/60 rounded-xl p-4 cursor-pointer bg-slate-900/50 transition-all">
+                <i className="fa-solid fa-cloud-arrow-up text-xl text-amber-400 mb-1" />
+                <span className="text-xs text-slate-300 font-medium">Pilih fail gambar dari peranti</span>
+                <input type="file" accept="image/*" onChange={handleWallpaperUpload} className="hidden" />
+              </label>
+              {uploadError && <p className="text-xs text-red-400 mt-1">{uploadError}</p>}
+            </div>
+          </div>
+
+          <div className="p-4 rounded-2xl bg-slate-950/70 border border-slate-800 space-y-2">
+            <label className="text-xs font-bold text-amber-400 uppercase tracking-wider block">
+              Pautan Lagu Latar (MP3 Direct URL)
+            </label>
+            <input
+              type="text"
+              placeholder="https://.../lagu.mp3"
+              value={data.cover?.audioUrl || ''}
+              onChange={(e) => updateData({ ...data, cover: { ...data.cover, audioUrl: e.target.value } })}
+              className="w-full px-3.5 py-2.5 rounded-xl bg-slate-900 border border-slate-700 text-xs focus:border-amber-400 outline-none"
+            />
+          </div>
+        </div>
+      )}
+
+      {/* ================= TAB 2: MUKA DEPAN ================= */}
+      {activeTab === 'cover' && (
+        <div className="p-5 rounded-2xl bg-slate-950/70 border border-slate-800 space-y-4">
+          <label className="text-xs font-bold text-amber-400 uppercase tracking-wider block">
+            Maklumat Muka Depan Kad (Cover)
+          </label>
+          
+          <div>
+            <label className="text-xs text-slate-400 block mb-1">Tagline / Panggilan Atas</label>
+            <input
+              type="text"
+              value={data.cover?.tagline || ''}
+              onChange={(e) => updateData({ ...data, cover: { ...data.cover, tagline: e.target.value } })}
+              className="w-full px-3.5 py-2.5 rounded-xl bg-slate-900 border border-slate-700 text-xs focus:border-amber-400 outline-none"
+            />
+          </div>
+
+          <div>
+            <label className="text-xs text-slate-400 block mb-1">Tajuk / Nama Utama Majlis</label>
+            <input
+              type="text"
+              value={data.cover?.mainTitle || ''}
+              onChange={(e) => updateData({ ...data, cover: { ...data.cover, mainTitle: e.target.value } })}
+              className="w-full px-3.5 py-2.5 rounded-xl bg-slate-900 border border-slate-700 text-xs focus:border-amber-400 outline-none"
+            />
+          </div>
+
+          <div>
+            <label className="text-xs text-slate-400 block mb-1">Tarikh Ringkas</label>
+            <input
+              type="text"
+              value={data.cover?.dateText || ''}
+              onChange={(e) => updateData({ ...data, cover: { ...data.cover, dateText: e.target.value } })}
+              className="w-full px-3.5 py-2.5 rounded-xl bg-slate-900 border border-slate-700 text-xs focus:border-amber-400 outline-none"
+            />
+          </div>
+        </div>
+      )}
+
       {/* ================= TAB 3: HELAIAN KAD DENGAN DROPDOWN ================= */}
       {activeTab === 'slides' && (
         <div className="space-y-4 max-h-[520px] overflow-y-auto pr-1">
@@ -136,23 +302,22 @@ export default function BuilderForm({
                   Helaian {idx + 1}
                 </span>
 
-                {/* DROPDOWN PEMILIHAN MODUL */}
                 {idx === 0 ? (
                   <span className="text-xs text-slate-400 font-semibold bg-slate-900 px-3 py-1 rounded-lg border border-slate-800">
-                    📜 Muka Utama (Intro / Nama Pengantin)
+                    📜 Muka Utama (Intro)
                   </span>
                 ) : (
                   <div className="flex items-center gap-2">
                     <select
                       value={slide.type}
-                      onChange={(e) => handleModuleChange(idx, e.target.value)}
+                      onChange={(e) => handleModuleChange(idx, e.target.value as ValidSlideType)}
                       className="bg-slate-900 border border-amber-500/40 text-amber-300 text-xs font-medium rounded-lg px-3 py-1.5 outline-none focus:ring-1 focus:ring-amber-400 cursor-pointer"
                     >
                       {MODULE_OPTIONS.map((opt) => (
                         <option 
                           key={opt.value} 
                           value={opt.value}
-                          disabled={idx === 1 && !opt.free} // Hadkan Slaid 2 kepada module percuma sahaja (Location)
+                          disabled={idx === 1 && !opt.free}
                         >
                           {opt.label} {idx === 1 && !opt.free ? '🔒 (Pro Sahaja)' : ''}
                         </option>
@@ -172,7 +337,7 @@ export default function BuilderForm({
                 )}
               </div>
 
-              {/* INPUT BORANG MENGIKUT MODUL YANG DIPILIH */}
+              {/* INPUT BORANG MENGIKUT MODUL */}
               {slide.type === 'intro' && (
                 <div className="space-y-3">
                   <div>
@@ -192,6 +357,18 @@ export default function BuilderForm({
                       onChange={(e) => updateSlide(idx, { subtitle: e.target.value })}
                       className="w-full px-3 py-2 rounded-xl bg-slate-900 border border-slate-700 text-xs outline-none focus:border-amber-400"
                     />
+                  </div>
+                  <div>
+                    <label className="text-[11px] text-slate-400 block mb-1">Gambar Bulat Tengah</label>
+                    <div className="flex items-center gap-3">
+                      {slide.imageUrl && (
+                        <img src={slide.imageUrl} alt="Preview" className="w-10 h-10 rounded-full object-cover border border-amber-400" />
+                      )}
+                      <label className="px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs cursor-pointer border border-slate-700">
+                        Pilih Gambar Baharu
+                        <input type="file" accept="image/*" onChange={(e) => handleSlideImageUpload(idx, e)} className="hidden" />
+                      </label>
+                    </div>
                   </div>
                 </div>
               )}
@@ -228,7 +405,7 @@ export default function BuilderForm({
                       onChange={(e) => updateSlide(idx, {
                         locationDetails: { ...(slide.locationDetails || { venueName: '', address: '', gmapsUrl: '', wazeUrl: '' }), gmapsUrl: e.target.value }
                       })}
-                      className="w-full px-3 py-2 rounded-lg bg-slate-900 border border-slate-700 text-xs outline-none"
+                      className="w-full px-3 py-2 rounded-lg bg-slate-900 border border-slate-700 text-xs outline-none focus:border-amber-400"
                     />
                     <input
                       type="text"
@@ -237,7 +414,7 @@ export default function BuilderForm({
                       onChange={(e) => updateSlide(idx, {
                         locationDetails: { ...(slide.locationDetails || { venueName: '', address: '', gmapsUrl: '', wazeUrl: '' }), wazeUrl: e.target.value }
                       })}
-                      className="w-full px-3 py-2 rounded-lg bg-slate-900 border border-slate-700 text-xs outline-none"
+                      className="w-full px-3 py-2 rounded-lg bg-slate-900 border border-slate-700 text-xs outline-none focus:border-amber-400"
                     />
                   </div>
                 </div>
@@ -245,7 +422,7 @@ export default function BuilderForm({
 
               {slide.type === 'tentative' && (
                 <div className="space-y-2">
-                  <label className="text-[11px] text-slate-400 block">Jadual Majlis:</label>
+                  <label className="text-[11px] text-slate-400 block">Jadual Atur Cara Majlis:</label>
                   {(slide.timeline || []).map((tItem, tIdx) => (
                     <div key={tIdx} className="flex gap-2">
                       <input
@@ -280,7 +457,7 @@ export default function BuilderForm({
                     rows={2}
                     value={slide.bodyText || ''}
                     onChange={(e) => updateSlide(idx, { bodyText: e.target.value })}
-                    className="w-full px-3 py-2 rounded-xl bg-slate-900 border border-slate-700 text-xs outline-none"
+                    className="w-full px-3 py-2 rounded-xl bg-slate-900 border border-slate-700 text-xs outline-none focus:border-amber-400"
                   />
                 </div>
               )}
@@ -323,7 +500,6 @@ export default function BuilderForm({
 
         {generatedUrl && (
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2">
-            {/* 1. Pautan Percuma */}
             <div className="p-4 rounded-2xl bg-slate-950 border border-slate-800 space-y-2 text-left">
               <span className="text-[10px] uppercase tracking-wider font-bold text-slate-400 block">
                 Pilihan 1: Versi Percuma
@@ -339,7 +515,6 @@ export default function BuilderForm({
               </a>
             </div>
 
-            {/* 2. Pakej Premium */}
             <div className="p-4 rounded-2xl bg-amber-500/10 border border-amber-500/40 space-y-2 text-left">
               <span className="text-[10px] uppercase tracking-wider font-bold text-amber-400 block">
                 Pilihan 2: Versi Penuh (Pro)
