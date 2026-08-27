@@ -3,7 +3,6 @@
 import React, { useState } from 'react';
 import { CardData } from '@/types/invitation';
 
-// Jenis Data Tempatan (Mengelakkan Ralat Import)
 type SlideItem = CardData['slides'][number];
 
 interface Props {
@@ -55,14 +54,13 @@ export default function BuilderForm({
     onChange(newData);
   };
 
-  // Muat Naik Wallpaper Sendiri
   const handleWallpaperUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     setUploadError(null);
     const file = e.target.files?.[0];
     if (!file) return;
 
     if (file.size > 3 * 1024 * 1024) {
-      setUploadError('Saiz gambar melebihi 3MB. Sila pilih gambar lebih kecil.');
+      setUploadError('Saiz gambar melebihi 3MB. Sila pilih gambar yang lebih kecil.');
       return;
     }
 
@@ -80,7 +78,6 @@ export default function BuilderForm({
     reader.readAsDataURL(file);
   };
 
-  // Muat Naik Gambar Bulat
   const handleSlideImageUpload = (slideIndex: number, e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
@@ -98,7 +95,6 @@ export default function BuilderForm({
     reader.readAsDataURL(file);
   };
 
-  // Kemas kini helaian
   const updateSlide = (index: number, updatedFields: Partial<SlideItem>) => {
     const updatedSlides = [...data.slides];
     updatedSlides[index] = {
@@ -108,22 +104,19 @@ export default function BuilderForm({
     updateData({ ...data, slides: updatedSlides });
   };
 
-  // Tambah baris tentatif
   const addTimelineItem = (slideIndex: number) => {
     const slide = data.slides[slideIndex];
     const currentTimeline = slide.timeline || [];
-    const newTimeline = [...currentTimeline, { time: '00:00 PM', activity: 'Aktiviti Baru' }];
+    const newTimeline = [...currentTimeline, { time: '12:00 PM', activity: 'Aktiviti Baru' }];
     updateSlide(slideIndex, { timeline: newTimeline });
   };
 
-  // Padam baris tentatif
   const removeTimelineItem = (slideIndex: number, itemIndex: number) => {
     const slide = data.slides[slideIndex];
     const newTimeline = (slide.timeline || []).filter((_, idx) => idx !== itemIndex);
     updateSlide(slideIndex, { timeline: newTimeline });
   };
 
-  // Kemas kini baris tentatif
   const updateTimelineItem = (slideIndex: number, itemIndex: number, field: 'time' | 'activity', value: string) => {
     const slide = data.slides[slideIndex];
     const newTimeline = [...(slide.timeline || [])];
@@ -139,7 +132,7 @@ export default function BuilderForm({
       
       <div>
         <h2 className="text-2xl font-bold text-white tracking-wide">Pereka Kad Jemputan Digital</h2>
-        <p className="text-xs text-slate-400 mt-1">Sesuaikan tema, muzik, muka depan, dan kandungan helaian kad.</p>
+        <p className="text-xs text-slate-400 mt-1">Sesuaikan tema, muzik latar, muka depan, dan maklumat helaian kad.</p>
       </div>
 
       {/* Navigasi Tab */}
@@ -147,7 +140,7 @@ export default function BuilderForm({
         <button
           type="button"
           onClick={() => setActiveTab('theme')}
-          className={`flex-1 py-2 rounded-lg transition-all ${
+          className={`flex-1 py-2.5 rounded-lg transition-all ${
             activeTab === 'theme' ? 'bg-amber-500 text-slate-950 font-bold shadow' : 'text-slate-400 hover:text-white'
           }`}
         >
@@ -156,7 +149,7 @@ export default function BuilderForm({
         <button
           type="button"
           onClick={() => setActiveTab('cover')}
-          className={`flex-1 py-2 rounded-lg transition-all ${
+          className={`flex-1 py-2.5 rounded-lg transition-all ${
             activeTab === 'cover' ? 'bg-amber-500 text-slate-950 font-bold shadow' : 'text-slate-400 hover:text-white'
           }`}
         >
@@ -165,7 +158,7 @@ export default function BuilderForm({
         <button
           type="button"
           onClick={() => setActiveTab('slides')}
-          className={`flex-1 py-2 rounded-lg transition-all ${
+          className={`flex-1 py-2.5 rounded-lg transition-all ${
             activeTab === 'slides' ? 'bg-amber-500 text-slate-950 font-bold shadow' : 'text-slate-400 hover:text-white'
           }`}
         >
@@ -181,18 +174,16 @@ export default function BuilderForm({
               <i className="fa-solid fa-image" /> Kertas Dinding (Wallpaper)
             </label>
 
-            {/* Panduan Saiz */}
             <div className="flex items-start gap-3 p-3 rounded-xl bg-amber-500/10 border border-amber-500/30 text-amber-300">
               <i className="fa-solid fa-circle-info text-base mt-0.5 shrink-0" />
               <div className="text-xs leading-relaxed">
                 <span className="font-bold block text-amber-200">Saiz Gambar Dicadangkan:</span>
-                <span className="font-semibold text-white">1080 × 1920 px</span> (Nisbah 9:16). Format WebP/JPG bawah 2MB.
+                <span className="font-semibold text-white">1080 × 1920 px</span> (Nisbah 9:16 skrin telefon). Format WebP/JPG bawah 2MB.
               </div>
             </div>
 
-            {/* Pilihan Cadangan */}
             <div>
-              <span className="text-xs text-slate-400 block mb-2 font-medium">Corak Cadangan Sedia Ada:</span>
+              <span className="text-xs text-slate-400 block mb-2 font-medium">Pilihan Corak Sedia Ada:</span>
               <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
                 {PRESET_WALLPAPERS.map((preset) => (
                   <button
@@ -214,29 +205,27 @@ export default function BuilderForm({
               </div>
             </div>
 
-            {/* Muat Naik Wallpaper */}
             <div>
               <span className="text-xs text-slate-400 block mb-2 font-medium">Atau Muat Naik Gambar Sendiri:</span>
               <label className="flex flex-col items-center justify-center border-2 border-dashed border-slate-700 hover:border-amber-400/60 rounded-xl p-4 cursor-pointer bg-slate-900/50 transition-all">
                 <i className="fa-solid fa-cloud-arrow-up text-xl text-amber-400 mb-1" />
-                <span className="text-xs text-slate-300 font-medium">Pilih gambar wallpaper dari peranti</span>
+                <span className="text-xs text-slate-300 font-medium">Pilih fail gambar dari peranti</span>
                 <input type="file" accept="image/*" onChange={handleWallpaperUpload} className="hidden" />
               </label>
               {uploadError && <p className="text-xs text-red-400 mt-1">{uploadError}</p>}
             </div>
           </div>
 
-          {/* Muzik Latar */}
           <div className="p-4 rounded-2xl bg-slate-950/70 border border-slate-800 space-y-2">
             <label className="text-xs font-bold text-amber-400 uppercase tracking-wider block">
-              Pautan Lagu / Audio (MP3 URL)
+              Pautan Lagu / Audio Latar (MP3 Direct URL)
             </label>
             <input
               type="text"
               placeholder="https://.../lagu.mp3"
               value={data.cover?.audioUrl || ''}
               onChange={(e) => updateData({ ...data, cover: { ...data.cover, audioUrl: e.target.value } })}
-              className="w-full px-3.5 py-2 rounded-xl bg-slate-900 border border-slate-700 text-xs focus:border-amber-400 outline-none"
+              className="w-full px-3.5 py-2.5 rounded-xl bg-slate-900 border border-slate-700 text-xs focus:border-amber-400 outline-none"
             />
           </div>
         </div>
@@ -244,28 +233,28 @@ export default function BuilderForm({
 
       {/* ================= TAB 2: MUKA DEPAN ================= */}
       {activeTab === 'cover' && (
-        <div className="p-5 rounded-2xl bg-slate-950/70 border border-slate-800 space-y-3.5">
+        <div className="p-5 rounded-2xl bg-slate-950/70 border border-slate-800 space-y-4">
           <label className="text-xs font-bold text-amber-400 uppercase tracking-wider block">
-            Maklumat Muka Depan Kad
+            Maklumat Muka Depan Kad (Cover)
           </label>
           
           <div>
-            <label className="text-xs text-slate-400 block mb-1">Panggilan / Tagline Atas</label>
+            <label className="text-xs text-slate-400 block mb-1">Tagline / Panggilan Atas</label>
             <input
               type="text"
               value={data.cover?.tagline || ''}
               onChange={(e) => updateData({ ...data, cover: { ...data.cover, tagline: e.target.value } })}
-              className="w-full px-3.5 py-2 rounded-xl bg-slate-900 border border-slate-700 text-xs focus:border-amber-400 outline-none"
+              className="w-full px-3.5 py-2.5 rounded-xl bg-slate-900 border border-slate-700 text-xs focus:border-amber-400 outline-none"
             />
           </div>
 
           <div>
-            <label className="text-xs text-slate-400 block mb-1">Tajuk / Nama Utama</label>
+            <label className="text-xs text-slate-400 block mb-1">Tajuk / Nama Utama Majlis</label>
             <input
               type="text"
               value={data.cover?.mainTitle || ''}
               onChange={(e) => updateData({ ...data, cover: { ...data.cover, mainTitle: e.target.value } })}
-              className="w-full px-3.5 py-2 rounded-xl bg-slate-900 border border-slate-700 text-xs focus:border-amber-400 outline-none"
+              className="w-full px-3.5 py-2.5 rounded-xl bg-slate-900 border border-slate-700 text-xs focus:border-amber-400 outline-none"
             />
           </div>
 
@@ -275,21 +264,37 @@ export default function BuilderForm({
               type="text"
               value={data.cover?.dateText || ''}
               onChange={(e) => updateData({ ...data, cover: { ...data.cover, dateText: e.target.value } })}
-              className="w-full px-3.5 py-2 rounded-xl bg-slate-900 border border-slate-700 text-xs focus:border-amber-400 outline-none"
+              className="w-full px-3.5 py-2.5 rounded-xl bg-slate-900 border border-slate-700 text-xs focus:border-amber-400 outline-none"
             />
           </div>
         </div>
       )}
 
-      {/* ================= TAB 3: HELAIAN KAD ================= */}
+      {/* ================= TAB 3: HELAIAN KAD (SLIDE 1 & 2 PERCUMA, 3 & 4 BERBAYAR) ================= */}
       {activeTab === 'slides' && (
-        <div className="space-y-4 max-h-[480px] overflow-y-auto pr-1">
+        <div className="space-y-4 max-h-[500px] overflow-y-auto pr-1">
           {data.slides.map((slide, idx) => (
-            <div key={slide.id || idx} className="p-4 rounded-2xl bg-slate-950/80 border border-slate-800 space-y-3">
+            <div 
+              key={slide.id || idx} 
+              className={`p-4 rounded-2xl border space-y-3.5 ${
+                idx >= 2 ? 'bg-slate-950/90 border-amber-500/30' : 'bg-slate-950/70 border-slate-800'
+              }`}
+            >
               <div className="flex justify-between items-center border-b border-slate-800 pb-2">
-                <span className="text-xs font-bold text-amber-400 uppercase tracking-wider">
-                  Helaian {idx + 1}: {slide.type.toUpperCase()}
-                </span>
+                <div className="flex items-center gap-2">
+                  <span className="text-xs font-bold text-amber-400 uppercase tracking-wider">
+                    Helaian {idx + 1}: {slide.type === 'location' ? 'LOKASI MAJLIS' : slide.type.toUpperCase()}
+                  </span>
+                  {idx >= 2 ? (
+                    <span className="text-[9px] px-2 py-0.5 rounded-full bg-amber-500/20 text-amber-300 border border-amber-500/40 font-bold">
+                      PRO / BERBAYAR
+                    </span>
+                  ) : (
+                    <span className="text-[9px] px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 font-bold">
+                      PERCUMA
+                    </span>
+                  )}
+                </div>
                 <input
                   type="text"
                   value={slide.title || ''}
@@ -301,24 +306,24 @@ export default function BuilderForm({
 
               {/* HELAIAN 1: INTRO */}
               {slide.type === 'intro' && (
-                <div className="space-y-2.5">
+                <div className="space-y-3">
                   <div>
                     <label className="text-[11px] text-slate-400 block mb-1">Teks Ucapan Jemputan</label>
                     <textarea
                       rows={2}
                       value={slide.bodyText || ''}
                       onChange={(e) => updateSlide(idx, { bodyText: e.target.value })}
-                      className="w-full px-3 py-1.5 rounded-xl bg-slate-900 border border-slate-700 text-xs outline-none focus:border-amber-400"
+                      className="w-full px-3 py-2 rounded-xl bg-slate-900 border border-slate-700 text-xs outline-none focus:border-amber-400"
                     />
                   </div>
 
                   <div>
-                    <label className="text-[11px] text-slate-400 block mb-1">Nama Penuh (Subtitle)</label>
+                    <label className="text-[11px] text-slate-400 block mb-1">Nama Penuh Yang Diraikan</label>
                     <input
                       type="text"
                       value={slide.subtitle || ''}
                       onChange={(e) => updateSlide(idx, { subtitle: e.target.value })}
-                      className="w-full px-3 py-1.5 rounded-xl bg-slate-900 border border-slate-700 text-xs outline-none focus:border-amber-400"
+                      className="w-full px-3 py-2 rounded-xl bg-slate-900 border border-slate-700 text-xs outline-none focus:border-amber-400"
                     />
                   </div>
 
@@ -337,10 +342,66 @@ export default function BuilderForm({
                 </div>
               )}
 
-              {/* HELAIAN 2: TENTATIF */}
+              {/* HELAIAN 2: LOKASI MAJLIS */}
+              {slide.type === 'location' && (
+                <div className="space-y-3">
+                  <div>
+                    <label className="text-[11px] text-slate-400 block mb-1">Nama Tempat / Dewan</label>
+                    <input
+                      type="text"
+                      value={slide.locationDetails?.venueName || ''}
+                      onChange={(e) => updateSlide(idx, {
+                        locationDetails: { ...(slide.locationDetails || { venueName: '', address: '', gmapsUrl: '', wazeUrl: '' }), venueName: e.target.value }
+                      })}
+                      className="w-full px-3 py-2 rounded-xl bg-slate-900 border border-slate-700 text-xs outline-none focus:border-amber-400"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="text-[11px] text-slate-400 block mb-1">Alamat Penuh</label>
+                    <textarea
+                      rows={2}
+                      value={slide.locationDetails?.address || ''}
+                      onChange={(e) => updateSlide(idx, {
+                        locationDetails: { ...(slide.locationDetails || { venueName: '', address: '', gmapsUrl: '', wazeUrl: '' }), address: e.target.value }
+                      })}
+                      className="w-full px-3 py-2 rounded-xl bg-slate-900 border border-slate-700 text-xs outline-none focus:border-amber-400"
+                    />
+                  </div>
+
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                    <div>
+                      <label className="text-[10px] text-slate-400 block mb-0.5">Pautan Google Maps</label>
+                      <input
+                        type="text"
+                        value={slide.locationDetails?.gmapsUrl || ''}
+                        onChange={(e) => updateSlide(idx, {
+                          locationDetails: { ...(slide.locationDetails || { venueName: '', address: '', gmapsUrl: '', wazeUrl: '' }), gmapsUrl: e.target.value }
+                        })}
+                        placeholder="https://maps.app.goo.gl/..."
+                        className="w-full px-3 py-2 rounded-lg bg-slate-900 border border-slate-700 text-xs outline-none focus:border-amber-400"
+                      />
+                    </div>
+                    <div>
+                      <label className="text-[10px] text-slate-400 block mb-0.5">Pautan Waze</label>
+                      <input
+                        type="text"
+                        value={slide.locationDetails?.wazeUrl || ''}
+                        onChange={(e) => updateSlide(idx, {
+                          locationDetails: { ...(slide.locationDetails || { venueName: '', address: '', gmapsUrl: '', wazeUrl: '' }), wazeUrl: e.target.value }
+                        })}
+                        placeholder="https://waze.com/ul/..."
+                        className="w-full px-3 py-2 rounded-lg bg-slate-900 border border-slate-700 text-xs outline-none focus:border-amber-400"
+                      />
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {/* HELAIAN 3: TENTATIF */}
               {slide.type === 'tentative' && (
-                <div className="space-y-2">
-                  <label className="text-[11px] text-slate-400 block">Jadual Atur Cara Majlis:</label>
+                <div className="space-y-2.5">
+                  <label className="text-[11px] text-slate-400 block">Atur Cara & Masa Majlis:</label>
                   {(slide.timeline || []).map((tItem, tIdx) => (
                     <div key={tIdx} className="flex gap-2 items-center">
                       <input
@@ -348,14 +409,14 @@ export default function BuilderForm({
                         value={tItem.time}
                         onChange={(e) => updateTimelineItem(idx, tIdx, 'time', e.target.value)}
                         placeholder="Masa"
-                        className="w-24 px-2 py-1 rounded-lg bg-slate-900 border border-slate-700 text-xs text-amber-300 outline-none"
+                        className="w-24 px-2.5 py-1.5 rounded-lg bg-slate-900 border border-slate-700 text-xs text-amber-300 outline-none"
                       />
                       <input
                         type="text"
                         value={tItem.activity}
                         onChange={(e) => updateTimelineItem(idx, tIdx, 'activity', e.target.value)}
                         placeholder="Aktiviti"
-                        className="flex-1 px-2 py-1 rounded-lg bg-slate-900 border border-slate-700 text-xs outline-none"
+                        className="flex-1 px-2.5 py-1.5 rounded-lg bg-slate-900 border border-slate-700 text-xs outline-none"
                       />
                       <button
                         type="button"
@@ -371,64 +432,8 @@ export default function BuilderForm({
                     onClick={() => addTimelineItem(idx)}
                     className="text-xs text-amber-400 font-semibold hover:underline pt-1 flex items-center gap-1"
                   >
-                    <i className="fa-solid fa-plus text-[10px]" /> Tambah Atur Cara
+                    <i className="fa-solid fa-plus text-[10px]" /> Tambah Baris Masa
                   </button>
-                </div>
-              )}
-
-              {/* HELAIAN 3: LOKASI */}
-              {slide.type === 'location' && (
-                <div className="space-y-2.5">
-                  <div>
-                    <label className="text-[11px] text-slate-400 block mb-1">Nama Dewan / Lokasi</label>
-                    <input
-                      type="text"
-                      value={slide.locationDetails?.venueName || ''}
-                      onChange={(e) => updateSlide(idx, {
-                        locationDetails: { ...(slide.locationDetails || { venueName: '', address: '', gmapsUrl: '', wazeUrl: '' }), venueName: e.target.value }
-                      })}
-                      className="w-full px-3 py-1.5 rounded-xl bg-slate-900 border border-slate-700 text-xs outline-none focus:border-amber-400"
-                    />
-                  </div>
-
-                  <div>
-                    <label className="text-[11px] text-slate-400 block mb-1">Alamat Penuh</label>
-                    <textarea
-                      rows={2}
-                      value={slide.locationDetails?.address || ''}
-                      onChange={(e) => updateSlide(idx, {
-                        locationDetails: { ...(slide.locationDetails || { venueName: '', address: '', gmapsUrl: '', wazeUrl: '' }), address: e.target.value }
-                      })}
-                      className="w-full px-3 py-1.5 rounded-xl bg-slate-900 border border-slate-700 text-xs outline-none focus:border-amber-400"
-                    />
-                  </div>
-
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                    <div>
-                      <label className="text-[10px] text-slate-400 block mb-0.5">Pautan Google Maps</label>
-                      <input
-                        type="text"
-                        value={slide.locationDetails?.gmapsUrl || ''}
-                        onChange={(e) => updateSlide(idx, {
-                          locationDetails: { ...(slide.locationDetails || { venueName: '', address: '', gmapsUrl: '', wazeUrl: '' }), gmapsUrl: e.target.value }
-                        })}
-                        placeholder="https://maps.google.com/..."
-                        className="w-full px-2.5 py-1 rounded-lg bg-slate-900 border border-slate-700 text-xs outline-none"
-                      />
-                    </div>
-                    <div>
-                      <label className="text-[10px] text-slate-400 block mb-0.5">Pautan Waze</label>
-                      <input
-                        type="text"
-                        value={slide.locationDetails?.wazeUrl || ''}
-                        onChange={(e) => updateSlide(idx, {
-                          locationDetails: { ...(slide.locationDetails || { venueName: '', address: '', gmapsUrl: '', wazeUrl: '' }), wazeUrl: e.target.value }
-                        })}
-                        placeholder="https://waze.com/ul/..."
-                        className="w-full px-2.5 py-1 rounded-lg bg-slate-900 border border-slate-700 text-xs outline-none"
-                      />
-                    </div>
-                  </div>
                 </div>
               )}
 
@@ -440,7 +445,7 @@ export default function BuilderForm({
                     rows={2}
                     value={slide.bodyText || ''}
                     onChange={(e) => updateSlide(idx, { bodyText: e.target.value })}
-                    className="w-full px-3 py-1.5 rounded-xl bg-slate-900 border border-slate-700 text-xs outline-none focus:border-amber-400"
+                    className="w-full px-3 py-2 rounded-xl bg-slate-900 border border-slate-700 text-xs outline-none focus:border-amber-400"
                   />
                 </div>
               )}
@@ -471,7 +476,7 @@ export default function BuilderForm({
             onClick={onSave}
             disabled={isSaving}
             type="button"
-            className="w-full py-3 rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-slate-950 font-bold text-xs tracking-wider uppercase transition-all shadow-lg active:scale-98 disabled:opacity-50 cursor-pointer flex items-center justify-center gap-2"
+            className="w-full py-3.5 rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-slate-950 font-bold text-xs tracking-wider uppercase transition-all shadow-lg active:scale-98 disabled:opacity-50 cursor-pointer flex items-center justify-center gap-2"
           >
             {isSaving ? (
               <>
@@ -485,8 +490,8 @@ export default function BuilderForm({
           </button>
 
           {generatedUrl && (
-            <div className="p-3 rounded-xl bg-amber-500/10 border border-amber-500/30 text-center space-y-1">
-              <span className="text-[11px] text-amber-300 font-semibold block">Pautan Kad Anda:</span>
+            <div className="p-3.5 rounded-xl bg-amber-500/10 border border-amber-500/30 text-center space-y-1.5">
+              <span className="text-xs text-amber-300 font-semibold block">Pautan Kad Anda Sedia:</span>
               <a 
                 href={generatedUrl} 
                 target="_blank" 
