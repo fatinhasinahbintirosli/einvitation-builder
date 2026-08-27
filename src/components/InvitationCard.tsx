@@ -9,7 +9,7 @@ interface Props {
   guestName?: string;
 }
 
-// Komponen Typing Effect Tanpa Kursor '|'
+// Komponen Typing Effect Halus Tanpa Kursor '|'
 function TypewriterText({ 
   text = '', 
   speed = 50, 
@@ -63,9 +63,11 @@ export function InvitationCard({
   const touchStartY = useRef<number | null>(null);
   const isTransitioning = useRef<boolean>(false);
 
-  const slides = data?.slides && data.slides.length > 0 ? data.slides : [
+  // Sekatan Freemium: Versi percuma dihadkan kepada 2 helaian sahaja
+  const allSlides = data?.slides && data.slides.length > 0 ? data.slides : [
     { id: '1', type: 'intro' as const, title: 'Jemputan', bodyText: 'Tiada maklumat helaian.' }
   ];
+  const slides = isPaid ? allSlides : allSlides.slice(0, 2);
   const totalSlides = slides.length;
 
   const toggleMusic = (e: React.MouseEvent) => {
@@ -110,7 +112,7 @@ export function InvitationCard({
     }
   };
 
-  // Navigasi Roda Tetikus (Mouse Wheel)
+  // Navigasi Roda Tetikus (Mouse Wheel) Menegak
   const handleWheel = (e: React.WheelEvent) => {
     if (!isOpen || isTransitioning.current) return;
     if (e.deltaY > 30) {
@@ -120,7 +122,7 @@ export function InvitationCard({
     }
   };
 
-  // Navigasi Leretan Skrin Sentuh (Touch Gestures)
+  // Navigasi Sentuhan Telefon (Touch Gestures)
   const handleTouchStart = (e: React.TouchEvent) => {
     touchStartY.current = e.touches[0].clientY;
   };
@@ -165,7 +167,7 @@ export function InvitationCard({
         <audio ref={audioRef} loop src={data.cover.audioUrl} />
       )}
 
-      {/* 3. BUTANG MUZIK */}
+      {/* 3. BUTANG MUZIK BULAT */}
       <button
         onClick={toggleMusic}
         type="button"
@@ -174,7 +176,7 @@ export function InvitationCard({
         <i className={`fa-solid text-sm ${isPlaying ? 'fa-compact-disc fa-spin text-amber-300' : 'fa-volume-xmark text-slate-400'}`} />
       </button>
 
-      {/* ================= 4. MUKA DEPAN ================= */}
+      {/* ================= 4. MUKA DEPAN (SLIDE NAIK SECARA ELEGAN) ================= */}
       <div 
         className={`absolute inset-0 z-50 flex flex-col items-center justify-center p-6 text-white transition-all duration-[1200ms] ease-[cubic-bezier(0.16,1,0.3,1)] ${
           isOpen ? '-translate-y-full opacity-0 pointer-events-none' : 'translate-y-0 opacity-100 pointer-events-auto'
@@ -214,7 +216,7 @@ export function InvitationCard({
         </button>
       </div>
 
-      {/* ================= 5. HELAIAN KAD ================= */}
+      {/* ================= 5. KANDUNGAN HELAIAN ================= */}
       <div className="relative w-full h-full overflow-hidden flex flex-col justify-center items-center">
         {slides.map((slide, idx) => {
           const offset = idx - currentSlide;
@@ -231,10 +233,12 @@ export function InvitationCard({
                 zIndex: isCurrent ? 20 : 10
               }}
             >
+              {/* Kad Putih Tengah */}
               <div 
-                className="w-full max-w-[345px] h-[78%] max-h-[540px] rounded-[28px] p-6 text-center shadow-2xl border border-amber-200/40 flex flex-col justify-between items-center bg-white/95 backdrop-blur-sm relative"
+                className="w-full max-w-[345px] h-[80%] max-h-[550px] rounded-[28px] p-6 text-center shadow-2xl border border-amber-200/40 flex flex-col justify-between items-center bg-white/95 backdrop-blur-sm relative"
                 style={{ color: '#2c332e' }}
               >
+                {/* Hiasan Bucu Atas Kad */}
                 <div className="w-full flex justify-between items-center text-amber-700/60 text-xs px-1">
                   <span>❧</span>
                   <span className="text-[11px] font-bold uppercase tracking-[2px]" style={{ color: data?.theme?.goldColor || '#b59049', fontFamily: 'Cinzel, serif' }}>
@@ -243,7 +247,10 @@ export function InvitationCard({
                   <span>☙</span>
                 </div>
 
+                {/* Kandungan Helaian */}
                 <div className="my-auto w-full py-1 flex flex-col items-center justify-center">
+                  
+                  {/* Slaid 1: INTRO */}
                   {slide.type === 'intro' && (
                     <div className="space-y-3 w-full">
                       <p className="text-sm text-slate-800 font-arabic leading-loose">
@@ -279,6 +286,7 @@ export function InvitationCard({
                     </div>
                   )}
 
+                  {/* Slaid 2: TENTATIF */}
                   {slide.type === 'tentative' && (
                     <div className="w-full space-y-3.5 max-w-[270px]">
                       {slide.timeline?.map((item, tIdx) => (
@@ -296,6 +304,7 @@ export function InvitationCard({
                     </div>
                   )}
 
+                  {/* Slaid 3: LOKASI */}
                   {slide.type === 'location' && slide.locationDetails && (
                     <div className="space-y-3 max-w-[270px]">
                       <h3 className="text-base font-bold" style={{ color: data?.theme?.primaryColor || '#3d5343' }}>
@@ -319,6 +328,7 @@ export function InvitationCard({
                     </div>
                   )}
 
+                  {/* Slaid 4: TERIMA KASIH */}
                   {slide.type === 'thank_you' && (
                     <div className="space-y-3">
                       <div className="text-3xl text-amber-600">❧ ❦ ☙</div>
@@ -334,6 +344,19 @@ export function InvitationCard({
                   )}
                 </div>
 
+                {/* Notis Kunci Versi Percuma pada Helaian Terakhir */}
+                {!isPaid && idx === 1 && (
+                  <div className="w-full mb-2 p-2.5 rounded-2xl bg-amber-500/10 border border-amber-500/30 text-center">
+                    <span className="text-[10px] text-amber-800 font-bold block">
+                      🔒 Helaian Lokasi & Tentatif Terkunci
+                    </span>
+                    <span className="text-[9px] text-slate-500 block">
+                      Tingkatkan ke versi penuh untuk buka semua ciri jemputan.
+                    </span>
+                  </div>
+                )}
+
+                {/* Butang Navigasi Bawah */}
                 <div className="w-full flex flex-col items-center gap-1">
                   {idx < totalSlides - 1 ? (
                     <button 
@@ -365,5 +388,4 @@ export function InvitationCard({
   );
 }
 
-// Eksport Default
 export default InvitationCard;
