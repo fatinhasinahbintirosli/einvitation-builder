@@ -13,7 +13,7 @@ interface Props {
 function TypewriterText({ 
   text = '', 
   speed = 50, 
-  delay = 250, 
+  delay = 200, 
   className = '', 
   style 
 }: { 
@@ -110,10 +110,9 @@ export default function InvitationCard({
     }
   };
 
-  // Navigasi Roda Tetikus PC (Mouse Wheel) Menegak
+  // Navigasi Roda Tetikus (Mouse Wheel) Menegak
   const handleWheel = (e: React.WheelEvent) => {
     if (!isOpen || isTransitioning.current) return;
-    
     if (e.deltaY > 30) {
       nextSlide();
     } else if (e.deltaY < -30) {
@@ -121,14 +120,13 @@ export default function InvitationCard({
     }
   };
 
-  // Navigasi Sentuhan Telefon (Touch Gestures)
+  // Navigasi Leretan Skrin Sentuh (Touch Gestures)
   const handleTouchStart = (e: React.TouchEvent) => {
     touchStartY.current = e.touches[0].clientY;
   };
 
   const handleTouchEnd = (e: React.TouchEvent) => {
     if (!isOpen || touchStartY.current === null || isTransitioning.current) return;
-    
     const diffY = touchStartY.current - e.changedTouches[0].clientY;
 
     if (diffY > 40) {
@@ -144,28 +142,14 @@ export default function InvitationCard({
       onWheel={handleWheel}
       onTouchStart={handleTouchStart}
       onTouchEnd={handleTouchEnd}
-      className="relative w-full max-w-[420px] h-[92vh] max-h-[820px] min-h-[660px] rounded-[36px] overflow-hidden shadow-2xl border-[5px] border-amber-500/40 outline outline-4 outline-amber-700/20 bg-slate-950 flex flex-col justify-between items-center select-none"
+      className="relative w-full max-w-[430px] h-[100dvh] sm:h-[840px] overflow-hidden shadow-2xl sm:rounded-[36px] bg-slate-950 flex flex-col justify-between items-center select-none"
       style={{
         backgroundImage: `url(${data.theme?.bgPatternUrl || ''})`,
         backgroundSize: 'cover',
         backgroundPosition: 'center'
       }}
     >
-      {/* ================= 1. BINGKAI DEKORATIF MEWAH (ROYAL FRAME) ================= */}
-      <div className="absolute inset-2.5 rounded-[28px] border border-amber-300/30 pointer-events-none z-30 flex flex-col justify-between p-3">
-        <div className="flex justify-between items-center text-[10px] text-amber-300/60">
-          <span>❖</span>
-          <span className="tracking-[3px] uppercase text-[8px]">E-Invitation</span>
-          <span>❖</span>
-        </div>
-        <div className="flex justify-between items-center text-[10px] text-amber-300/60">
-          <span>❖</span>
-          <span>❧ ❦ ☙</span>
-          <span>❖</span>
-        </div>
-      </div>
-
-      {/* 2. LAPISAN WATERMARK JIKA BELUM BAYAR */}
+      {/* 1. LAPISAN WATERMARK JIKA BELUM BAYAR */}
       {!isPaid && (
         <div className="absolute inset-0 z-[100] pointer-events-none flex flex-col items-center justify-around opacity-25">
           {[...Array(6)].map((_, i) => (
@@ -176,40 +160,21 @@ export default function InvitationCard({
         </div>
       )}
 
-      {/* 3. AUDIO ENGINE */}
+      {/* 2. AUDIO ENGINE */}
       {data.cover?.audioUrl && (
         <audio ref={audioRef} loop src={data.cover.audioUrl} />
       )}
 
-      {/* 4. BUTANG MUZIK TERAPUNG */}
-      {isOpen && (
-        <button
-          onClick={toggleMusic}
-          type="button"
-          className="absolute top-5 right-5 z-40 w-9 h-9 rounded-full flex items-center justify-center text-white border border-amber-300 bg-slate-900/80 backdrop-blur shadow-xl transition-transform active:scale-90"
-        >
-          <i className={`fa-solid text-xs ${isPlaying ? 'fa-compact-disc fa-spin text-amber-400' : 'fa-volume-xmark text-slate-400'}`} />
-        </button>
-      )}
+      {/* 3. BUTANG MUZIK (BULATAN MINIMALIS ATAS KANAN) */}
+      <button
+        onClick={toggleMusic}
+        type="button"
+        className="absolute top-6 right-6 z-40 w-10 h-10 rounded-full flex items-center justify-center text-amber-200 border-2 border-amber-400/80 bg-slate-900/90 backdrop-blur shadow-2xl transition-transform active:scale-90"
+      >
+        <i className={`fa-solid text-sm ${isPlaying ? 'fa-compact-disc fa-spin text-amber-300' : 'fa-volume-xmark text-slate-400'}`} />
+      </button>
 
-      {/* 5. INDIKATOR TITIK MENEGAK */}
-      {isOpen && (
-        <div className="absolute right-4 top-1/2 -translate-y-1/2 z-40 flex flex-col items-center gap-2 bg-black/50 backdrop-blur-md py-3 px-1.5 rounded-full border border-amber-400/20 shadow-xl">
-          {slides.map((_, i) => (
-            <button
-              key={i}
-              onClick={() => {
-                if (!isTransitioning.current) setCurrentSlide(i);
-              }}
-              className={`w-2 rounded-full transition-all duration-1000 ease-[cubic-bezier(0.19,1,0.22,1)] ${
-                currentSlide === i ? 'bg-amber-400 h-6' : 'bg-white/30 h-2 hover:bg-white/60'
-              }`}
-            />
-          ))}
-        </div>
-      )}
-
-      {/* ================= 6. MUKA DEPAN (SLIDE NAIK ELEGAN) ================= */}
+      {/* ================= 4. MUKA DEPAN (SLIDE NAIK SECARA ELEGAN) ================= */}
       <div 
         className={`absolute inset-0 z-50 flex flex-col items-center justify-center p-6 text-white transition-all duration-[1200ms] ease-[cubic-bezier(0.16,1,0.3,1)] ${
           isOpen ? '-translate-y-full opacity-0 pointer-events-none' : 'translate-y-0 opacity-100 pointer-events-auto'
@@ -249,8 +214,8 @@ export default function InvitationCard({
         </button>
       </div>
 
-      {/* ================= 7. ENJIN HELAIAN MENEGAK 50% LEBIH SMOOTH ================= */}
-      <div className="relative w-full h-full overflow-hidden">
+      {/* ================= 5. KANDUNGAN HELAIAN (FLAT MINIMALIST LOOK) ================= */}
+      <div className="relative w-full h-full overflow-hidden flex flex-col justify-center items-center">
         {slides.map((slide, idx) => {
           const offset = idx - currentSlide;
           const isCurrent = offset === 0;
@@ -260,58 +225,59 @@ export default function InvitationCard({
               key={slide.id || idx}
               className="absolute inset-0 w-full h-full p-6 flex flex-col justify-center items-center transition-all duration-[1100ms] ease-[cubic-bezier(0.19,1,0.22,1)]"
               style={{
-                transform: `translateY(${offset * 100}%) scale(${isCurrent ? 1 : 0.95})`,
+                transform: `translateY(${offset * 100}%) scale(${isCurrent ? 1 : 0.96})`,
                 opacity: isCurrent ? 1 : 0,
                 pointerEvents: isCurrent ? 'auto' : 'none',
                 zIndex: isCurrent ? 20 : 10
               }}
             >
-              {/* Kotak Kandungan Helaian */}
+              {/* Kad Putih Tengah (Sama Seperti Gambar 2) */}
               <div 
-                className="w-full h-[82%] max-h-[580px] rounded-3xl p-6 text-center shadow-2xl border flex flex-col justify-between items-center bg-white/95 backdrop-blur-sm relative"
-                style={{
-                  borderColor: `${data.theme?.goldColor || '#b59049'}60`,
-                  color: '#2c332e'
-                }}
+                className="w-full max-w-[345px] h-[78%] max-h-[540px] rounded-[28px] p-6 text-center shadow-2xl border border-amber-200/40 flex flex-col justify-between items-center bg-white/95 backdrop-blur-sm relative"
+                style={{ color: '#2c332e' }}
               >
-                {/* Bingkai Dalaman Halus */}
-                <div className="absolute inset-2 border border-amber-900/10 rounded-2xl pointer-events-none" />
-
-                {/* Bahagian Atas Kad */}
-                <div className="w-full z-10">
-                  <div className="flex justify-between items-center text-[10px] text-slate-400 font-bold uppercase tracking-wider mb-1">
-                    <span>Helaian {idx + 1} / {totalSlides}</span>
-                    <span className="text-amber-700">❧ ❦ ☙</span>
-                  </div>
-                  <h2 className="text-sm font-bold uppercase tracking-[2px]" style={{ color: data.theme?.goldColor || '#b59049', fontFamily: 'Cinzel, serif' }}>
-                    {slide.title || 'Jemputan'}
-                  </h2>
-                  <div className="w-10 h-0.5 mx-auto mt-1 rounded-full" style={{ backgroundColor: data.theme?.goldColor || '#b59049' }} />
+                {/* Hiasan Bucu Atas Kad */}
+                <div className="w-full flex justify-between items-center text-amber-700/60 text-xs px-1">
+                  <span>❧</span>
+                  <span className="text-[11px] font-bold uppercase tracking-[2px]" style={{ color: data.theme?.goldColor || '#b59049', fontFamily: 'Cinzel, serif' }}>
+                    {slide.title || 'JEMPUTAN MAJLIS'}
+                  </span>
+                  <span>☙</span>
                 </div>
 
-                {/* Bahagian Kandungan Slaid (Typing Lembut & Santai) */}
-                <div className="my-auto w-full py-2 flex flex-col items-center justify-center z-10">
+                {/* Kandungan Helaian */}
+                <div className="my-auto w-full py-1 flex flex-col items-center justify-center">
                   
                   {/* Slaid: INTRO */}
                   {slide.type === 'intro' && (
-                    <div className="space-y-3">
-                      <p className="text-xs text-slate-600 leading-relaxed max-w-[280px] mx-auto min-h-[52px]">
+                    <div className="space-y-3 w-full">
+                      <p className="text-sm text-slate-800 font-arabic leading-loose">
+                        بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ
+                      </p>
+
+                      <p className="text-xs text-slate-600 leading-relaxed max-w-[270px] mx-auto min-h-[46px]">
                         {isCurrent ? (
-                          <TypewriterText text={slide.bodyText || ''} speed={55} delay={300} />
+                          <TypewriterText text={slide.bodyText || ''} speed={50} delay={250} />
                         ) : (
                           slide.bodyText
                         )}
                       </p>
 
+                      {/* Bingkai Gambar Bulat Bergelang Emas */}
                       {slide.imageUrl && (
-                        <div className="w-28 h-32 mx-auto rounded-full border-2 p-1 overflow-hidden shadow-inner my-2" style={{ borderColor: data.theme?.goldColor || '#b59049' }}>
-                          <img src={slide.imageUrl} alt="Visual" className="w-full h-full object-cover rounded-full" />
+                        <div className="relative my-2 flex flex-col items-center">
+                          <div 
+                            className="w-32 h-40 rounded-full border-2 p-1 overflow-hidden shadow-md bg-white"
+                            style={{ borderColor: data.theme?.goldColor || '#c49a45' }}
+                          >
+                            <img src={slide.imageUrl} alt="Visual" className="w-full h-full object-cover rounded-full" />
+                          </div>
                         </div>
                       )}
 
                       <h3 className="text-lg font-bold" style={{ color: data.theme?.primaryColor || '#3d5343', fontFamily: 'Playfair Display, serif' }}>
                         {isCurrent ? (
-                          <TypewriterText text={slide.subtitle || ''} speed={65} delay={900} />
+                          <TypewriterText text={slide.subtitle || ''} speed={60} delay={800} />
                         ) : (
                           slide.subtitle
                         )}
@@ -321,13 +287,13 @@ export default function InvitationCard({
 
                   {/* Slaid: TENTATIVE */}
                   {slide.type === 'tentative' && (
-                    <div className="w-full space-y-3 max-w-[280px]">
+                    <div className="w-full space-y-3.5 max-w-[270px]">
                       {slide.timeline?.map((item, tIdx) => (
                         <div key={tIdx} className="flex justify-between items-center border-b border-dashed border-amber-900/20 pb-2 text-xs">
                           <span className="font-bold text-amber-800 shrink-0">{item.time}</span>
                           <span className="text-slate-700 text-right">
                             {isCurrent ? (
-                              <TypewriterText text={item.activity} speed={50} delay={tIdx * 350 + 200} />
+                              <TypewriterText text={item.activity} speed={45} delay={tIdx * 300 + 150} />
                             ) : (
                               item.activity
                             )}
@@ -339,18 +305,18 @@ export default function InvitationCard({
 
                   {/* Slaid: LOCATION */}
                   {slide.type === 'location' && slide.locationDetails && (
-                    <div className="space-y-3 max-w-[280px]">
+                    <div className="space-y-3 max-w-[270px]">
                       <h3 className="text-base font-bold" style={{ color: data.theme?.primaryColor || '#3d5343' }}>
                         {slide.locationDetails.venueName}
                       </h3>
                       <p className="text-xs text-slate-600 leading-relaxed whitespace-pre-line min-h-[44px]">
                         {isCurrent ? (
-                          <TypewriterText text={slide.locationDetails.address} speed={45} delay={300} />
+                          <TypewriterText text={slide.locationDetails.address} speed={45} delay={250} />
                         ) : (
                           slide.locationDetails.address
                         )}
                       </p>
-                      <div className="flex justify-center gap-3 pt-2">
+                      <div className="flex justify-center gap-3 pt-3">
                         <a href={slide.locationDetails.gmapsUrl} target="_blank" rel="noreferrer" className="px-4 py-2 rounded-full text-[11px] font-semibold text-white bg-slate-800 hover:bg-slate-700 flex items-center gap-1.5 shadow active:scale-95 transition-transform">
                           <i className="fa-solid fa-map-pin text-red-400" /> Google Maps
                         </a>
@@ -365,9 +331,9 @@ export default function InvitationCard({
                   {slide.type === 'thank_you' && (
                     <div className="space-y-3">
                       <div className="text-3xl text-amber-600">❧ ❦ ☙</div>
-                      <p className="text-xs leading-relaxed text-slate-700 max-w-[280px] mx-auto min-h-[44px]">
+                      <p className="text-xs leading-relaxed text-slate-700 max-w-[270px] mx-auto min-h-[44px]">
                         {isCurrent ? (
-                          <TypewriterText text={slide.bodyText || 'Sekalung penghargaan dan terima kasih atas kehadiran dan doa tulus ikhlas anda.'} speed={55} delay={300} />
+                          <TypewriterText text={slide.bodyText || 'Sekalung penghargaan dan terima kasih atas kehadiran dan doa tulus ikhlas anda.'} speed={50} delay={250} />
                         ) : (
                           slide.bodyText
                         )}
@@ -377,34 +343,25 @@ export default function InvitationCard({
                   )}
                 </div>
 
-                {/* Bahagian Navigasi Bawah Kad */}
-                <div className="w-full flex flex-col items-center gap-1.5 pt-2 border-t border-slate-200 z-10">
+                {/* Butang Navigasi Bawah */}
+                <div className="w-full flex flex-col items-center gap-1">
                   {idx < totalSlides - 1 ? (
                     <button 
                       onClick={nextSlide} 
                       type="button"
-                      className="px-6 py-2 rounded-full bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-slate-950 font-bold text-xs tracking-wider flex items-center gap-1.5 shadow-md active:scale-95 transition-all cursor-pointer"
+                      className="text-amber-800/80 hover:text-amber-900 text-[10px] tracking-[3px] uppercase font-bold flex flex-col items-center gap-1 transition-transform active:scale-95 cursor-pointer"
                       style={{ fontFamily: 'Cinzel, serif' }}
                     >
-                      SELAK KE BAWAH <i className="fa-solid fa-chevron-down text-xs animate-bounce" />
+                      <i className="fa-solid fa-chevron-down text-[10px] animate-bounce" />
+                      SELAK
                     </button>
                   ) : (
                     <button 
                       onClick={handleCloseCard} 
                       type="button"
-                      className="px-6 py-2 rounded-full bg-slate-900 text-white font-semibold text-xs flex items-center gap-1.5 shadow active:scale-95 cursor-pointer"
+                      className="px-5 py-1.5 rounded-full bg-slate-900 text-white font-semibold text-xs flex items-center gap-1.5 shadow active:scale-95 cursor-pointer"
                     >
-                      <i className="fa-solid fa-lock text-xs" /> TUTUP JEMPUTAN
-                    </button>
-                  )}
-
-                  {idx > 0 && (
-                    <button 
-                      onClick={prevSlide} 
-                      type="button"
-                      className="text-[10px] text-slate-500 hover:text-slate-800 font-semibold uppercase tracking-wider flex items-center gap-1 py-0.5"
-                    >
-                      <i className="fa-solid fa-chevron-up text-[8px]" /> Helaian Atas
+                      <i className="fa-solid fa-lock text-[10px]" /> TUTUP
                     </button>
                   )}
                 </div>
