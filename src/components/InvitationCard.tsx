@@ -11,6 +11,24 @@ interface Props {
   activeSlideIndex?: number | 'cover';
 }
 
+function hexToRgba(hex: string = '#ffffff', opacity: number = 90): string {
+  const cleanHex = hex.replace('#', '');
+  let r = 255, g = 255, b = 255;
+
+  if (cleanHex.length === 6) {
+    r = parseInt(cleanHex.substring(0, 2), 16);
+    g = parseInt(cleanHex.substring(2, 4), 16);
+    b = parseInt(cleanHex.substring(4, 6), 16);
+  } else if (cleanHex.length === 3) {
+    r = parseInt(cleanHex[0] + cleanHex[0], 16);
+    g = parseInt(cleanHex[1] + cleanHex[1], 16);
+    b = parseInt(cleanHex[2] + cleanHex[2], 16);
+  }
+
+  const alpha = Math.max(0, Math.min(100, opacity)) / 100;
+  return `rgba(${r}, ${g}, ${b}, ${alpha})`;
+}
+
 function TypewriterText({ 
   text = '', 
   speed = 40, 
@@ -73,10 +91,12 @@ export function InvitationCard({
   const slides = maxSlides && maxSlides > 0 ? rawSlides.slice(0, maxSlides) : rawSlides;
   const totalSlides = slides.length;
 
-  // Auto-reload and synchronize music on select
+  // Reliable Audio Synchronization
   useEffect(() => {
     if (audioRef.current && data?.cover?.audioUrl) {
       const audio = audioRef.current;
+      audio.pause();
+      audio.currentTime = 0;
       audio.src = data.cover.audioUrl;
       audio.load();
       if (isPlaying) {
@@ -171,15 +191,21 @@ export function InvitationCard({
   // 2. Inner Slide Wallpaper Resolution
   const slideWallpaperUrl = data?.theme?.slideBgUrl || data?.theme?.bgPatternUrl;
 
-  // 3. Card Opacity & Glassmorphism
-  const rawOpacity = typeof data?.theme?.cardOpacity === 'number' ? data.theme.cardOpacity : 92;
-  const opacityVal = Math.min(100, Math.max(20, rawOpacity));
-  const cardBgColor = `rgba(255, 255, 255, ${opacityVal / 100})`;
+  // 3. Card Box Color & 0-100% Opacity
+  const boxBaseColor = data?.theme?.cardBoxColor || '#ffffff';
+  const rawOpacity = typeof data?.theme?.cardOpacity === 'number' ? data.theme.cardOpacity : 90;
+  const opacityVal = Math.min(100, Math.max(0, rawOpacity));
+  const isCompletelyTransparent = opacityVal === 0;
+  const cardBgStyle = isCompletelyTransparent ? 'transparent' : hexToRgba(boxBaseColor, opacityVal);
 
-  // 4. Typography & Scaling
-  const headingFont = data?.theme?.headingFont || 'Cinzel, serif';
-  const bodyFont = data?.theme?.bodyFont || 'Playfair Display, serif';
-  const scale = (data?.theme?.fontSizeScale || 100) / 100;
+  // 4. Typography: Cover vs Slide Sizing & Fonts
+  const coverHeadingFont = data?.theme?.coverHeadingFont || 'Cinzel, serif';
+  const coverBodyFont = data?.theme?.coverBodyFont || 'Playfair Display, serif';
+  const coverScale = (data?.theme?.coverFontSizeScale || 100) / 100;
+
+  const slideHeadingFont = data?.theme?.slideHeadingFont || 'Cinzel, serif';
+  const slideBodyFont = data?.theme?.slideBodyFont || 'Playfair Display, serif';
+  const slideScale = (data?.theme?.slideFontSizeScale || 100) / 100;
 
   return (
     <div 
@@ -210,7 +236,6 @@ export function InvitationCard({
         <audio 
           ref={audioRef} 
           loop 
-          crossOrigin="anonymous"
           src={data.cover.audioUrl} 
         />
       )}
@@ -245,28 +270,28 @@ export function InvitationCard({
           
           <p 
             className="tracking-[4px] uppercase text-slate-200 text-center" 
-            style={{ fontFamily: headingFont, fontSize: `${12 * scale}px` }}
+            style={{ fontFamily: coverHeadingFont, fontSize: `${12 * coverScale}px` }}
           >
             {data?.cover?.tagline || 'The Wedding Celebration Of'}
           </p>
 
           <h1 
             className="text-white my-4 text-center font-normal drop-shadow-md" 
-            style={{ fontFamily: 'Great Vibes, cursive', fontSize: `${44 * scale}px` }}
+            style={{ fontFamily: 'Great Vibes, cursive', fontSize: `${44 * coverScale}px` }}
           >
             {data?.cover?.mainTitle || 'Emma & Liam'}
           </h1>
 
           <p 
             className="tracking-widest text-amber-200 text-center" 
-            style={{ fontFamily: headingFont, fontSize: `${12 * scale}px` }}
+            style={{ fontFamily: coverHeadingFont, fontSize: `${12 * coverScale}px` }}
           >
             {data?.cover?.dateText || 'SUNDAY, OCTOBER 18, 2026'}
           </p>
 
           <div className="mt-8 px-6 py-3 bg-white/10 backdrop-blur-md rounded-2xl border border-amber-300/30 text-center shadow-lg">
             <span className="text-[10px] tracking-wider uppercase block text-slate-300">Cordially Invited:</span>
-            <span className="font-semibold" style={{ fontFamily: bodyFont, fontSize: `${14 * scale}px` }}>
+            <span className="font-semibold" style={{ fontFamily: coverBodyFont, fontSize: `${14 * coverScale}px` }}>
               {guestName}
             </span>
           </div>
@@ -275,14 +300,14 @@ export function InvitationCard({
             onClick={handleOpenCard}
             type="button"
             className="mt-10 px-8 py-3.5 rounded-full border-2 border-amber-300 bg-gradient-to-r from-amber-500 to-amber-600 text-slate-950 font-bold text-xs tracking-widest uppercase shadow-2xl hover:scale-105 active:scale-95 transition-all flex items-center gap-2 cursor-pointer"
-            style={{ fontFamily: headingFont }}
+            style={{ fontFamily: coverHeadingFont }}
           >
             <i className="fa-regular fa-envelope-open text-sm" /> OPEN INVITATION
           </button>
         </div>
       </div>
 
-      {/* ================= 5. SLIDES SECTION (10% ENLARGED + DYNAMIC TYPOGRAPHY) ================= */}
+      {/* ================= 5. SLIDES SECTION (0-100% OPACITY & DYNAMIC TYPOGRAPHY) ================= */}
       <div className="relative w-full h-full overflow-hidden flex flex-col justify-center items-center">
         {slides.map((slide, idx) => {
           const offset = idx - currentSlide;
@@ -300,24 +325,29 @@ export function InvitationCard({
                 zIndex: isCurrent ? 20 : 10
               }}
             >
-              {/* Card Container with Dynamic Opacity */}
+              {/* Card Container (0% to 100% Opacity + Custom Box Color) */}
               <div 
-                className="w-full max-w-[375px] h-[84%] max-h-[600px] rounded-[32px] p-6 sm:p-7 text-center shadow-2xl border border-white/60 flex flex-col justify-between items-center relative backdrop-blur-md"
+                className={`w-full max-w-[375px] h-[84%] max-h-[600px] rounded-[32px] p-6 sm:p-7 text-center flex flex-col justify-between items-center relative transition-all duration-300 ${
+                  isCompletelyTransparent 
+                    ? 'border-transparent shadow-none bg-transparent' 
+                    : 'shadow-2xl border border-white/50 backdrop-blur-md'
+                }`}
                 style={{ 
-                  backgroundColor: cardBgColor,
-                  color: '#1e293b',
+                  backgroundColor: cardBgStyle,
+                  color: isCompletelyTransparent ? '#ffffff' : '#1e293b',
+                  textShadow: isCompletelyTransparent ? '0 2px 8px rgba(0,0,0,0.85)' : undefined,
                   transform: 'translateZ(0)'
                 }}
               >
-                {/* Header Border Decoration */}
-                <div className="w-full flex justify-between items-center text-amber-700/70 text-xs px-1">
+                {/* Header Decoration */}
+                <div className="w-full flex justify-between items-center text-xs px-1" style={{ color: data?.theme?.goldColor || '#b59049' }}>
                   <span>❧</span>
                   <span 
                     className="font-bold uppercase tracking-[2.5px]" 
                     style={{ 
                       color: data?.theme?.goldColor || '#b59049', 
-                      fontFamily: headingFont,
-                      fontSize: `${12 * scale}px`
+                      fontFamily: slideHeadingFont,
+                      fontSize: `${12 * slideScale}px`
                     }}
                   >
                     {slide.title || 'SPECIAL INVITATION'}
@@ -328,12 +358,16 @@ export function InvitationCard({
                 {/* Slide Body Content */}
                 <div className="my-auto w-full py-1 flex flex-col items-center justify-center">
                   
-                  {/* 1. INTRO / WELCOME */}
+                  {/* 1. INTRO */}
                   {slide.type === 'intro' && (
                     <div className="space-y-3.5 w-full flex flex-col items-center">
                       <p 
-                        className="text-slate-800 leading-relaxed max-w-[310px] mx-auto min-h-[48px] font-normal"
-                        style={{ fontFamily: bodyFont, fontSize: `${13.5 * scale}px` }}
+                        className="leading-relaxed max-w-[310px] mx-auto min-h-[48px] font-normal"
+                        style={{ 
+                          fontFamily: slideBodyFont, 
+                          fontSize: `${13.5 * slideScale}px`,
+                          color: isCompletelyTransparent ? '#f8fafc' : '#334155'
+                        }}
                       >
                         {isCurrent ? <TypewriterText text={slide.bodyText || ''} speed={40} delay={250} /> : slide.bodyText}
                       </p>
@@ -352,9 +386,9 @@ export function InvitationCard({
                       <h3 
                         className="font-bold tracking-wide" 
                         style={{ 
-                          color: data?.theme?.primaryColor || '#1e293b', 
-                          fontFamily: headingFont,
-                          fontSize: `${18 * scale}px`
+                          color: isCompletelyTransparent ? '#fbbf24' : (data?.theme?.primaryColor || '#1e293b'), 
+                          fontFamily: slideHeadingFont,
+                          fontSize: `${18 * slideScale}px`
                         }}
                       >
                         {isCurrent ? <TypewriterText text={slide.subtitle || ''} speed={50} delay={700} /> : slide.subtitle}
@@ -362,10 +396,10 @@ export function InvitationCard({
                     </div>
                   )}
 
-                  {/* 2. LOCATION & MAPS */}
+                  {/* 2. LOCATION */}
                   {slide.type === 'location' && slide.locationDetails && (
                     <div className="space-y-4 max-w-[310px] w-full flex flex-col items-center">
-                      <div className="w-14 h-14 rounded-full bg-amber-500/15 border border-amber-500/40 flex items-center justify-center text-amber-800 text-xl shadow-sm">
+                      <div className="w-14 h-14 rounded-full bg-amber-500/20 border border-amber-500/50 flex items-center justify-center text-amber-500 text-xl shadow-sm">
                         <i className="fa-solid fa-map-location-dot" />
                       </div>
 
@@ -373,16 +407,20 @@ export function InvitationCard({
                         <h3 
                           className="font-bold" 
                           style={{ 
-                            color: data?.theme?.primaryColor || '#1e293b',
-                            fontFamily: headingFont,
-                            fontSize: `${17 * scale}px`
+                            color: isCompletelyTransparent ? '#fbbf24' : (data?.theme?.primaryColor || '#1e293b'),
+                            fontFamily: slideHeadingFont,
+                            fontSize: `${17 * slideScale}px`
                           }}
                         >
                           {slide.locationDetails.venueName}
                         </h3>
                         <p 
-                          className="text-slate-700 leading-relaxed whitespace-pre-line min-h-[48px]"
-                          style={{ fontFamily: bodyFont, fontSize: `${13 * scale}px` }}
+                          className="leading-relaxed whitespace-pre-line min-h-[48px]"
+                          style={{ 
+                            fontFamily: slideBodyFont, 
+                            fontSize: `${13 * slideScale}px`,
+                            color: isCompletelyTransparent ? '#f8fafc' : '#334155'
+                          }}
                         >
                           {isCurrent ? <TypewriterText text={slide.locationDetails.address} speed={35} delay={250} /> : slide.locationDetails.address}
                         </p>
@@ -390,12 +428,12 @@ export function InvitationCard({
 
                       <div className="flex justify-center gap-3 pt-2 w-full">
                         {slide.locationDetails.gmapsUrl && (
-                          <a href={slide.locationDetails.gmapsUrl} target="_blank" rel="noreferrer" onClick={(e) => e.stopPropagation()} className="flex-1 py-2.5 px-3 rounded-xl text-xs font-semibold text-white bg-slate-900 hover:bg-slate-800 flex items-center justify-center gap-2 shadow-md active:scale-95 transition-transform">
+                          <a href={slide.locationDetails.gmapsUrl} target="_blank" rel="noreferrer" onClick={(e) => e.stopPropagation()} className="flex-1 py-2.5 px-3 rounded-xl text-xs font-semibold text-white bg-slate-900/90 hover:bg-slate-900 flex items-center justify-center gap-2 shadow-md active:scale-95 transition-transform border border-white/20">
                             <i className="fa-solid fa-location-arrow text-red-400 text-xs" /> Google Maps
                           </a>
                         )}
                         {slide.locationDetails.wazeUrl && (
-                          <a href={slide.locationDetails.wazeUrl} target="_blank" rel="noreferrer" onClick={(e) => e.stopPropagation()} className="flex-1 py-2.5 px-3 rounded-xl text-xs font-semibold text-white bg-cyan-700 hover:bg-cyan-600 flex items-center justify-center gap-2 shadow-md active:scale-95 transition-transform">
+                          <a href={slide.locationDetails.wazeUrl} target="_blank" rel="noreferrer" onClick={(e) => e.stopPropagation()} className="flex-1 py-2.5 px-3 rounded-xl text-xs font-semibold text-white bg-cyan-700/90 hover:bg-cyan-700 flex items-center justify-center gap-2 shadow-md active:scale-95 transition-transform border border-white/20">
                             <i className="fa-brands fa-waze text-white text-xs" /> Waze
                           </a>
                         )}
@@ -403,20 +441,24 @@ export function InvitationCard({
                     </div>
                   )}
 
-                  {/* 3. EVENT TIMELINE / ITINERARY */}
+                  {/* 3. TENTATIVE */}
                   {slide.type === 'tentative' && (
                     <div className="w-full space-y-3.5 max-w-[300px]">
                       {slide.timeline?.map((item, tIdx) => (
-                        <div key={tIdx} className="flex justify-between items-center border-b border-dashed border-amber-900/25 pb-2.5">
+                        <div key={tIdx} className="flex justify-between items-center border-b border-dashed border-amber-500/30 pb-2.5">
                           <span 
-                            className="font-bold text-amber-900 shrink-0"
-                            style={{ fontFamily: headingFont, fontSize: `${13 * scale}px` }}
+                            className="font-bold shrink-0 text-amber-400"
+                            style={{ fontFamily: slideHeadingFont, fontSize: `${13 * slideScale}px` }}
                           >
                             {item.time}
                           </span>
                           <span 
-                            className="text-slate-800 text-right font-medium"
-                            style={{ fontFamily: bodyFont, fontSize: `${13 * scale}px` }}
+                            className="text-right font-medium"
+                            style={{ 
+                              fontFamily: slideBodyFont, 
+                              fontSize: `${13 * slideScale}px`,
+                              color: isCompletelyTransparent ? '#f8fafc' : '#1e293b'
+                            }}
                           >
                             {isCurrent ? <TypewriterText text={item.activity} speed={40} delay={tIdx * 250 + 150} /> : item.activity}
                           </span>
@@ -425,7 +467,7 @@ export function InvitationCard({
                     </div>
                   )}
 
-                  {/* 4. QR CODE / GIFTS */}
+                  {/* 4. IMAGE_QR */}
                   {slide.type === 'image_qr' && (
                     <div className="space-y-3.5 max-w-[300px] flex flex-col items-center">
                       {slide.imageUrl ? (
@@ -433,50 +475,58 @@ export function InvitationCard({
                           <img src={slide.imageUrl} alt="QR Code" className="w-full h-full object-contain rounded-xl" />
                         </div>
                       ) : (
-                        <div className="w-40 h-40 rounded-2xl bg-slate-100 border border-dashed border-slate-300 flex items-center justify-center text-slate-400 text-sm">
+                        <div className="w-40 h-40 rounded-2xl bg-slate-100/90 border border-dashed border-slate-300 flex items-center justify-center text-slate-500 text-sm">
                           <i className="fa-solid fa-qrcode text-4xl" />
                         </div>
                       )}
                       <h4 
-                        className="font-bold text-slate-900" 
+                        className="font-bold" 
                         style={{ 
-                          color: data?.theme?.primaryColor || '#1e293b',
-                          fontFamily: headingFont,
-                          fontSize: `${16 * scale}px`
+                          color: isCompletelyTransparent ? '#fbbf24' : (data?.theme?.primaryColor || '#1e293b'),
+                          fontFamily: slideHeadingFont,
+                          fontSize: `${16 * slideScale}px`
                         }}
                       >
                         {slide.subtitle || 'Registry & Gift QR'}
                       </h4>
                       <p 
-                        className="text-slate-700 leading-relaxed"
-                        style={{ fontFamily: bodyFont, fontSize: `${12.5 * scale}px` }}
+                        className="leading-relaxed"
+                        style={{ 
+                          fontFamily: slideBodyFont, 
+                          fontSize: `${12.5 * slideScale}px`,
+                          color: isCompletelyTransparent ? '#f8fafc' : '#334155'
+                        }}
                       >
-                        {slide.bodyText || 'Scan the QR code above for gifts or best wishes.'}
+                        {slide.bodyText || 'Scan the QR code above for your warm gift.'}
                       </p>
                     </div>
                   )}
 
-                  {/* 5. GUESTBOOK & WISHES */}
+                  {/* 5. GUESTBOOK */}
                   {slide.type === 'guestbook' && (
                     <div className="space-y-3.5 max-w-[300px] w-full text-center">
-                      <div className="w-12 h-12 mx-auto rounded-full bg-amber-500/15 flex items-center justify-center text-amber-800 text-lg">
+                      <div className="w-12 h-12 mx-auto rounded-full bg-amber-500/20 border border-amber-500/40 flex items-center justify-center text-amber-400 text-lg">
                         <i className="fa-solid fa-book-open-reader" />
                       </div>
                       <h4 
                         className="font-bold" 
                         style={{ 
-                          color: data?.theme?.primaryColor || '#1e293b',
-                          fontFamily: headingFont,
-                          fontSize: `${16 * scale}px`
+                          color: isCompletelyTransparent ? '#fbbf24' : (data?.theme?.primaryColor || '#1e293b'),
+                          fontFamily: slideHeadingFont,
+                          fontSize: `${16 * slideScale}px`
                         }}
                       >
                         {slide.subtitle || 'Wishes & Blessings'}
                       </h4>
                       <p 
-                        className="text-slate-700 leading-relaxed"
-                        style={{ fontFamily: bodyFont, fontSize: `${13 * scale}px` }}
+                        className="leading-relaxed"
+                        style={{ 
+                          fontFamily: slideBodyFont, 
+                          fontSize: `${13 * slideScale}px`,
+                          color: isCompletelyTransparent ? '#f8fafc' : '#334155'
+                        }}
                       >
-                        {slide.bodyText || 'May your presence and prayers bring joy to our special milestone.'}
+                        {slide.bodyText || 'May your presence and prayers bring joy to our new chapter.'}
                       </p>
                     </div>
                   )}
@@ -484,14 +534,18 @@ export function InvitationCard({
                   {/* 6. THANK YOU */}
                   {slide.type === 'thank_you' && (
                     <div className="space-y-3.5 max-w-[300px] mx-auto">
-                      <div className="text-3xl text-amber-600">❧ ❦ ☙</div>
+                      <div className="text-3xl text-amber-500">❧ ❦ ☙</div>
                       <p 
-                        className="leading-relaxed text-slate-700 min-h-[48px]"
-                        style={{ fontFamily: bodyFont, fontSize: `${13.5 * scale}px` }}
+                        className="leading-relaxed min-h-[48px]"
+                        style={{ 
+                          fontFamily: slideBodyFont, 
+                          fontSize: `${13.5 * slideScale}px`,
+                          color: isCompletelyTransparent ? '#f8fafc' : '#334155'
+                        }}
                       >
                         {isCurrent ? <TypewriterText text={slide.bodyText || 'With heartfelt gratitude for your love, support, and presence.'} speed={45} delay={250} /> : slide.bodyText}
                       </p>
-                      <div className="text-amber-600 text-xl">𖥸</div>
+                      <div className="text-amber-500 text-xl">𖥸</div>
                     </div>
                   )}
                 </div>
@@ -502,8 +556,8 @@ export function InvitationCard({
                     <button 
                       onClick={nextSlide} 
                       type="button"
-                      className="text-amber-800/85 hover:text-amber-950 text-[11px] tracking-[3px] uppercase font-bold flex flex-col items-center gap-1 transition-transform active:scale-95 cursor-pointer"
-                      style={{ fontFamily: headingFont }}
+                      className="text-amber-500 hover:text-amber-400 text-[11px] tracking-[3px] uppercase font-bold flex flex-col items-center gap-1 transition-transform active:scale-95 cursor-pointer"
+                      style={{ fontFamily: slideHeadingFont }}
                     >
                       <i className="fa-solid fa-chevron-down text-[11px] animate-bounce" />
                       NEXT
@@ -512,7 +566,7 @@ export function InvitationCard({
                     <button 
                       onClick={handleCloseCard} 
                       type="button"
-                      className="px-6 py-2 rounded-full bg-slate-900 hover:bg-slate-800 text-white font-semibold text-xs flex items-center gap-1.5 shadow-lg active:scale-95 cursor-pointer transition-transform"
+                      className="px-6 py-2 rounded-full bg-slate-900 hover:bg-slate-800 text-white font-semibold text-xs flex items-center gap-1.5 shadow-lg active:scale-95 cursor-pointer transition-transform border border-white/20"
                     >
                       <i className="fa-solid fa-lock text-[10px]" /> CLOSE
                     </button>

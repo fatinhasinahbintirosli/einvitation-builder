@@ -17,7 +17,7 @@ interface Props {
   onActiveSlideChange?: (index: number | 'cover') => void;
 }
 
-// ================= 50 WALLPAPERS BY CATEGORY =================
+// 50 Wallpapers Library
 interface WallpaperItem {
   id: string;
   name: string;
@@ -26,7 +26,6 @@ interface WallpaperItem {
 }
 
 const WALLPAPER_LIBRARY: WallpaperItem[] = [
-  // 1. Heritage & Songket (8)
   { id: 'w1', name: 'Golden Songket Weave', category: 'Heritage & Gold', url: 'https://images.unsplash.com/photo-1607604276583-eef5d076aa5f?q=80&w=1080&auto=format&fit=crop' },
   { id: 'w2', name: 'Royal Dark Brocade', category: 'Heritage & Gold', url: 'https://images.unsplash.com/photo-1579783900882-c0d3dad7b119?q=80&w=1080&auto=format&fit=crop' },
   { id: 'w3', name: 'Crimson Velvet Texture', category: 'Heritage & Gold', url: 'https://images.unsplash.com/photo-1590736969955-71cc94801759?q=80&w=1080&auto=format&fit=crop' },
@@ -35,8 +34,6 @@ const WALLPAPER_LIBRARY: WallpaperItem[] = [
   { id: 'w6', name: 'Golden Threads Pattern', category: 'Heritage & Gold', url: 'https://images.unsplash.com/photo-1541701494587-cb58502866ab?q=80&w=1080&auto=format&fit=crop' },
   { id: 'w7', name: 'Midnight Navy Silk', category: 'Heritage & Gold', url: 'https://images.unsplash.com/photo-1550684848-fac1c5b4e853?q=80&w=1080&auto=format&fit=crop' },
   { id: 'w8', name: 'Ivory Silver Texture', category: 'Heritage & Gold', url: 'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?q=80&w=1080&auto=format&fit=crop' },
-
-  // 2. Floral & Botanical (9)
   { id: 'w9', name: 'Moody Dark Rose', category: 'Floral & Botanical', url: 'https://images.unsplash.com/photo-1518895949257-7621c3c786d7?q=80&w=1080&auto=format&fit=crop' },
   { id: 'w10', name: 'White Blossom Radiance', category: 'Floral & Botanical', url: 'https://images.unsplash.com/photo-1490750967868-88aa4486c946?q=80&w=1080&auto=format&fit=crop' },
   { id: 'w11', name: 'Soft Purple Orchid', category: 'Floral & Botanical', url: 'https://images.unsplash.com/photo-1526047932273-341f2a7631f9?q=80&w=1080&auto=format&fit=crop' },
@@ -46,8 +43,6 @@ const WALLPAPER_LIBRARY: WallpaperItem[] = [
   { id: 'w15', name: 'Sakura Petals Romance', category: 'Floral & Botanical', url: 'https://images.unsplash.com/photo-1522383225653-ed111181a951?q=80&w=1080&auto=format&fit=crop' },
   { id: 'w16', name: 'Pastel Blue Hydrangea', category: 'Floral & Botanical', url: 'https://images.unsplash.com/photo-1513836279014-a89f7a76ae86?q=80&w=1080&auto=format&fit=crop' },
   { id: 'w17', name: 'Vintage Garden Bouquet', category: 'Floral & Botanical', url: 'https://images.unsplash.com/photo-1521737604893-d14cc237f11d?q=80&w=1080&auto=format&fit=crop' },
-
-  // 3. Luxury Marble & Sparkles (8)
   { id: 'w18', name: 'Golden Dust Glow', category: 'Luxury Marble', url: 'https://images.unsplash.com/photo-1519751138087-5bf79df62d5b?q=80&w=1080&auto=format&fit=crop' },
   { id: 'w19', name: 'Black & Gold Veined Marble', category: 'Luxury Marble', url: 'https://images.unsplash.com/photo-1618221195710-dd6b41faaea6?q=80&w=1080&auto=format&fit=crop' },
   { id: 'w20', name: 'Crystal Sparkles Ambient', category: 'Luxury Marble', url: 'https://images.unsplash.com/photo-1513151233558-d860c5398176?q=80&w=1080&auto=format&fit=crop' },
@@ -56,8 +51,6 @@ const WALLPAPER_LIBRARY: WallpaperItem[] = [
   { id: 'w23', name: 'Diamond Shimmer Backdrop', category: 'Luxury Marble', url: 'https://images.unsplash.com/photo-1518709268805-4e9042af9f23?q=80&w=1080&auto=format&fit=crop' },
   { id: 'w24', name: 'Polished Bronze Sheet', category: 'Luxury Marble', url: 'https://images.unsplash.com/photo-1550684847-75bdda21cc95?q=80&w=1080&auto=format&fit=crop' },
   { id: 'w25', name: 'Abstract Gilded Orbs', category: 'Luxury Marble', url: 'https://images.unsplash.com/photo-1579783902614-a3fb3927b675?q=80&w=1080&auto=format&fit=crop' },
-
-  // 4. Pastel & Minimalist (9)
   { id: 'w26', name: 'Textured Handmade Paper', category: 'Pastel & Minimalist', url: 'https://images.unsplash.com/photo-1586075010923-2dd4570fb338?q=80&w=1080&auto=format&fit=crop' },
   { id: 'w27', name: 'Pure Carrara Marble', category: 'Pastel & Minimalist', url: 'https://images.unsplash.com/photo-1533090161767-e6ffed986c88?q=80&w=1080&auto=format&fit=crop' },
   { id: 'w28', name: 'Blush Sunset Clouds', category: 'Pastel & Minimalist', url: 'https://images.unsplash.com/photo-1534447677768-be436bb09401?q=80&w=1080&auto=format&fit=crop' },
@@ -67,8 +60,6 @@ const WALLPAPER_LIBRARY: WallpaperItem[] = [
   { id: 'w32', name: 'Peaceful Morning Mist', category: 'Pastel & Minimalist', url: 'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?q=80&w=1080&auto=format&fit=crop' },
   { id: 'w33', name: 'Soft Peach Silk Drape', category: 'Pastel & Minimalist', url: 'https://images.unsplash.com/photo-1516962215378-7fa2e137ae93?q=80&w=1080&auto=format&fit=crop' },
   { id: 'w34', name: 'Warm Cream Canvas', category: 'Pastel & Minimalist', url: 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=1080&auto=format&fit=crop' },
-
-  // 5. Nature & Rustic Woods (8)
   { id: 'w35', name: 'Emerald Forest Canopy', category: 'Nature & Rustic', url: 'https://images.unsplash.com/photo-1518531933037-91b2f5f229cc?q=80&w=1080&auto=format&fit=crop' },
   { id: 'w36', name: 'Sunlit Pine Grove', category: 'Nature & Rustic', url: 'https://images.unsplash.com/photo-1448375240586-882707db888b?q=80&w=1080&auto=format&fit=crop' },
   { id: 'w37', name: 'Lush Tropical Palms', category: 'Nature & Rustic', url: 'https://images.unsplash.com/photo-1509316975850-ff9c5deb0cd9?q=80&w=1080&auto=format&fit=crop' },
@@ -77,8 +68,6 @@ const WALLPAPER_LIBRARY: WallpaperItem[] = [
   { id: 'w40', name: 'Coastline Waves Serenity', category: 'Nature & Rustic', url: 'https://images.unsplash.com/photo-1506744038136-46273834b3fb?q=80&w=1080&auto=format&fit=crop' },
   { id: 'w41', name: 'Silver Dollar Eucalyptus', category: 'Nature & Rustic', url: 'https://images.unsplash.com/photo-1501004318641-b39e6451bec6?q=80&w=1080&auto=format&fit=crop' },
   { id: 'w42', name: 'Misty Mountain Horizon', category: 'Nature & Rustic', url: 'https://images.unsplash.com/photo-1426604966848-d7adac402bff?q=80&w=1080&auto=format&fit=crop' },
-
-  // 6. Geometric & Islamic Art (8)
   { id: 'w43', name: 'Gilded Arabesque Lattice', category: 'Geometric & Art', url: 'https://images.unsplash.com/photo-1564507592333-c60657eea523?q=80&w=1080&auto=format&fit=crop' },
   { id: 'w44', name: 'Royal Palace Mosaic', category: 'Geometric & Art', url: 'https://images.unsplash.com/photo-1544717305-2782549b5136?q=80&w=1080&auto=format&fit=crop' },
   { id: 'w45', name: 'Luminous Dome Illumination', category: 'Geometric & Art', url: 'https://images.unsplash.com/photo-1584551246679-0daf3d275d0f?q=80&w=1080&auto=format&fit=crop' },
@@ -99,7 +88,7 @@ const WALLPAPER_CATEGORIES = [
   'Geometric & Art'
 ];
 
-// ================= 50 RELIABLE STREAMABLE AUDIO TRACKS =================
+// 50 High-Reliability Audio Tracks
 interface MusicItem {
   id: string;
   name: string;
@@ -108,27 +97,22 @@ interface MusicItem {
 }
 
 const MUSIC_LIBRARY: MusicItem[] = [
-  // 1. Romantic & Wedding (8)
-  { id: 'm1', name: 'Pachelbel Canon in D (Piano & Strings)', category: 'Romantic & Wedding', url: 'https://ia800504.us.archive.org/11/items/CanonInD_201405/Canon%20in%20D.mp3' },
-  { id: 'm2', name: 'Debussy - Clair de Lune (Soft Serenade)', category: 'Romantic & Wedding', url: 'https://ia800301.us.archive.org/15/items/ClairDeLune_563/Debussy-ClairDeLune.mp3' },
-  { id: 'm3', name: 'Mendelssohn Wedding March (Grand Procession)', category: 'Romantic & Wedding', url: 'https://ia800703.us.archive.org/19/items/WeddingMarch_201405/WeddingMarch.mp3' },
-  { id: 'm4', name: 'Chopin Nocturne Op. 9 No. 2 (Intimate Romance)', category: 'Romantic & Wedding', url: 'https://ia800301.us.archive.org/1/items/ChopinNocturneOp.9No.2/Chopin-NocturneOp.9No.2.mp3' },
-  { id: 'm5', name: 'Satie - Gymnopédie No. 1 (Pure Tranquility)', category: 'Romantic & Wedding', url: 'https://ia802809.us.archive.org/24/items/ErikSatieGymnopedieNo1/ErikSatieGymnopedieNo1.mp3' },
-  { id: 'm6', name: 'Liszt - Liebestraum No. 3 (Love Dream)', category: 'Romantic & Wedding', url: 'https://ia800501.us.archive.org/28/items/LisztLiebestraumNo.3InA-flatMajor/Liszt_Liebestraum_No3.mp3' },
-  { id: 'm7', name: 'J.S. Bach - Air on the G String', category: 'Romantic & Wedding', url: 'https://ia800503.us.archive.org/15/items/BachAirOnTheGString_412/Bach-AirOnTheGString.mp3' },
-  { id: 'm8', name: 'Brahms - Lullaby of Devotion', category: 'Romantic & Wedding', url: 'https://ia800302.us.archive.org/10/items/BrahmsLullaby_895/BrahmsLullaby.mp3' },
-
-  // 2. Traditional & World Heritage (8)
+  { id: 'm1', name: 'Pachelbel - Canon in D (Piano & Strings)', category: 'Romantic & Wedding', url: 'https://upload.wikimedia.org/wikipedia/commons/2/2b/Pachelbel%27s_Canon.ogg' },
+  { id: 'm2', name: 'Debussy - Clair de Lune (Soft Moonlight)', category: 'Romantic & Wedding', url: 'https://upload.wikimedia.org/wikipedia/commons/a/ab/Clair_de_lune_%28Claude_Debussy%29_Suite_bergamasque.ogg' },
+  { id: 'm3', name: 'Mendelssohn - Wedding March (Royal Procession)', category: 'Romantic & Wedding', url: 'https://upload.wikimedia.org/wikipedia/commons/d/d3/Felix_Mendelssohn_-_Wedding_March_-_USAF_Band.ogg' },
+  { id: 'm4', name: 'Chopin - Nocturne in E-flat major, Op. 9, No. 2', category: 'Romantic & Wedding', url: 'https://upload.wikimedia.org/wikipedia/commons/d/d6/Chopin_-_Nocturne_Op._9_No._2_E_Flat_Major.ogg' },
+  { id: 'm5', name: 'Erik Satie - Gymnopédie No. 1 (Pure Serenity)', category: 'Romantic & Wedding', url: 'https://upload.wikimedia.org/wikipedia/commons/4/4b/Gymnopedie_No_1.ogg' },
+  { id: 'm6', name: 'Liszt - Liebestraum No. 3 (Love Dream)', category: 'Romantic & Wedding', url: 'https://upload.wikimedia.org/wikipedia/commons/5/52/Liszt_Liebestraum_No3.ogg' },
+  { id: 'm7', name: 'J.S. Bach - Air on the G String (Strings Serenade)', category: 'Romantic & Wedding', url: 'https://upload.wikimedia.org/wikipedia/commons/2/23/Air_on_the_G_String_%28BWV_1068%29.ogg' },
+  { id: 'm8', name: 'Brahms - Wiegenlied / Lullaby Op. 49 No. 4', category: 'Romantic & Wedding', url: 'https://upload.wikimedia.org/wikipedia/commons/1/10/Brahms_Wiegenlied.ogg' },
   { id: 'm9', name: 'Peaceful Gamelan Heritage Bells', category: 'Traditional & Heritage', url: 'https://ia800307.us.archive.org/28/items/GamelanMusic_201705/Gamelan_Peaceful_Melody.mp3' },
-  { id: 'm10', name: 'Rainforest Sape Fingerstyle', category: 'Traditional & Heritage', url: 'https://ia600307.us.archive.org/28/items/GamelanMusic_201705/Borneo_Sape_Acoustic.mp3' },
+  { id: 'm10', name: 'Borneo Sape Fingerstyle Serenity', category: 'Traditional & Heritage', url: 'https://ia600307.us.archive.org/28/items/GamelanMusic_201705/Borneo_Sape_Acoustic.mp3' },
   { id: 'm11', name: 'Arabian Oud Royal Serenade', category: 'Traditional & Heritage', url: 'https://ia800504.us.archive.org/11/items/ArabianOudMelody/Arabian_Oud_Serenade.mp3' },
   { id: 'm12', name: 'Eastern Bamboo Flute (Zen Spirit)', category: 'Traditional & Heritage', url: 'https://ia800504.us.archive.org/11/items/BambooFluteZen/Bamboo_Flute_Serenity.mp3' },
   { id: 'm13', name: 'Enchanted Angklung Chimes', category: 'Traditional & Heritage', url: 'https://ia800307.us.archive.org/28/items/GamelanMusic_201705/Angklung_Harmony.mp3' },
   { id: 'm14', name: 'Palace Gamelan Royal Entrance', category: 'Traditional & Heritage', url: 'https://ia800307.us.archive.org/28/items/GamelanMusic_201705/Royal_Gamelan_Entrance.mp3' },
   { id: 'm15', name: 'Meditative Suling Flute', category: 'Traditional & Heritage', url: 'https://ia800504.us.archive.org/11/items/BambooFluteZen/Sundanese_Flute_Relax.mp3' },
   { id: 'm16', name: 'Silk Road Ambient Strings', category: 'Traditional & Heritage', url: 'https://ia800504.us.archive.org/11/items/ArabianOudMelody/Middle_Eastern_Strings.mp3' },
-
-  // 3. Acoustic & Chill Harmony (8)
   { id: 'm17', name: 'Spring Breeze Acoustic Guitar', category: 'Acoustic & Chill', url: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3' },
   { id: 'm18', name: 'Fingerstyle Warmth & Love', category: 'Acoustic & Chill', url: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3' },
   { id: 'm19', name: 'Gentle Afternoon Strumming', category: 'Acoustic & Chill', url: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-3.mp3' },
@@ -137,8 +121,6 @@ const MUSIC_LIBRARY: MusicItem[] = [
   { id: 'm22', name: 'Sweet Memories with Friends', category: 'Acoustic & Chill', url: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-6.mp3' },
   { id: 'm23', name: 'Morning Dew Ambient Reflection', category: 'Acoustic & Chill', url: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-7.mp3' },
   { id: 'm24', name: 'Highland Serenity Folk', category: 'Acoustic & Chill', url: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-8.mp3' },
-
-  // 4. Spiritual & Ambient Grace (8)
   { id: 'm25', name: 'Spiritual Grace & Blessing Ambient', category: 'Spiritual & Ambient', url: 'https://ia800504.us.archive.org/11/items/ArabianOudMelody/Islamic_Peace_Ambient.mp3' },
   { id: 'm26', name: 'Ney Flute Sacred Meditation', category: 'Spiritual & Ambient', url: 'https://ia800504.us.archive.org/11/items/ArabianOudMelody/Spiritual_Ney_Flute.mp3' },
   { id: 'm27', name: 'Dawn Awakening Spiritual Strings', category: 'Spiritual & Ambient', url: 'https://ia800504.us.archive.org/11/items/ArabianOudMelody/Dawn_Spiritual_Strings.mp3' },
@@ -147,8 +129,6 @@ const MUSIC_LIBRARY: MusicItem[] = [
   { id: 'm30', name: 'Ambient Light Healing Pads', category: 'Spiritual & Ambient', url: 'https://ia800504.us.archive.org/11/items/ArabianOudMelody/Meditation_Ambient_Pad.mp3' },
   { id: 'm31', name: 'Mystic Desert Flute Reverie', category: 'Spiritual & Ambient', url: 'https://ia800504.us.archive.org/11/items/ArabianOudMelody/Turkish_Ney_Melody.mp3' },
   { id: 'm32', name: 'Evening Prayer of Gratitude', category: 'Spiritual & Ambient', url: 'https://ia800504.us.archive.org/11/items/ArabianOudMelody/Peaceful_Night_Prayer.mp3' },
-
-  // 5. Joyful, Baby & Celebration (9)
   { id: 'm33', name: 'Music Box Lullaby Dreams', category: 'Celebration & Joy', url: 'https://ia800302.us.archive.org/10/items/BrahmsLullaby_895/MusicBox_Twinkle.mp3' },
   { id: 'm34', name: 'Twinkle Glockenspiel Chime', category: 'Celebration & Joy', url: 'https://ia800302.us.archive.org/10/items/BrahmsLullaby_895/Twinkle_Glockenspiel.mp3' },
   { id: 'm35', name: 'Happy Ukulele Celebration', category: 'Celebration & Joy', url: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-9.mp3' },
@@ -158,17 +138,15 @@ const MUSIC_LIBRARY: MusicItem[] = [
   { id: 'm39', name: 'Tender Motherly Music Box', category: 'Celebration & Joy', url: 'https://ia800302.us.archive.org/10/items/BrahmsLullaby_895/Baby_Gentle_MusicBox.mp3' },
   { id: 'm40', name: 'First Steps of Wonder', category: 'Celebration & Joy', url: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-12.mp3' },
   { id: 'm41', name: 'Lively Birthday Festive Waltz', category: 'Celebration & Joy', url: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-13.mp3' },
-
-  // 6. Majestic Orchestra & Classical (9)
-  { id: 'm42', name: 'Vivaldi - Four Seasons (Spring Allegro)', category: 'Majestic Orchestra', url: 'https://ia800501.us.archive.org/31/items/VivaldiSpringMvt1Allegro/Vivaldi_Spring_1_Allegro.mp3' },
-  { id: 'm43', name: 'Tchaikovsky - Waltz of the Flowers', category: 'Majestic Orchestra', url: 'https://ia800502.us.archive.org/26/items/TchaikovskyWaltzOfTheFlowers/Tchaikovsky_WaltzFlowers.mp3' },
-  { id: 'm44', name: 'Mozart - Eine kleine Nachtmusik', category: 'Majestic Orchestra', url: 'https://ia800500.us.archive.org/11/items/MozartEineKleineNachtmusik_948/Mozart_EineKleineNachtmusik.mp3' },
-  { id: 'm45', name: 'J.S. Bach - Brandenburg Concerto No. 3', category: 'Majestic Orchestra', url: 'https://ia800503.us.archive.org/29/items/BachBrandenburgConcertoNo.3/Bach_Brandenburg_3.mp3' },
-  { id: 'm46', name: 'Beethoven - Moonlight Sonata Adagio', category: 'Majestic Orchestra', url: 'https://ia800304.us.archive.org/19/items/BeethovenMoonlightSonata_854/Beethoven_MoonlightSonata.mp3' },
+  { id: 'm42', name: 'Vivaldi - Four Seasons (Spring Allegro)', category: 'Majestic Orchestra', url: 'https://upload.wikimedia.org/wikipedia/commons/3/3c/Antonio_Vivaldi_-_The_Four_Seasons_-_Spring_-_1._Allegro.ogg' },
+  { id: 'm43', name: 'Tchaikovsky - Waltz of the Flowers', category: 'Majestic Orchestra', url: 'https://upload.wikimedia.org/wikipedia/commons/c/c5/Tchaikovsky_Waltz_of_the_Flowers.ogg' },
+  { id: 'm44', name: 'Mozart - Eine kleine Nachtmusik', category: 'Majestic Orchestra', url: 'https://upload.wikimedia.org/wikipedia/commons/c/c8/Mozart_-_Eine_kleine_Nachtmusik_-_1._Allegro.ogg' },
+  { id: 'm45', name: 'J.S. Bach - Brandenburg Concerto No. 3', category: 'Majestic Orchestra', url: 'https://upload.wikimedia.org/wikipedia/commons/4/45/Bach_-_Brandenburg_Concerto_No._3_-_1._Allegro.ogg' },
+  { id: 'm46', name: 'Beethoven - Moonlight Sonata Adagio', category: 'Majestic Orchestra', url: 'https://upload.wikimedia.org/wikipedia/commons/e/eb/Beethoven_Moonlight_1st_movement.ogg' },
   { id: 'm47', name: 'Royal Grand Ballroom Waltz', category: 'Majestic Orchestra', url: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-14.mp3' },
   { id: 'm48', name: 'Imperial Coronation Symphony', category: 'Majestic Orchestra', url: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-15.mp3' },
   { id: 'm49', name: 'Cinematic Gala Theme', category: 'Majestic Orchestra', url: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-16.mp3' },
-  { id: 'm50', name: 'Grand Finale Strings & Brass', category: 'Majestic Orchestra', url: 'https://ia800504.us.archive.org/11/items/CanonInD_201405/Canon%20in%20D.mp3' },
+  { id: 'm50', name: 'Grand Finale Strings & Brass', category: 'Majestic Orchestra', url: 'https://upload.wikimedia.org/wikipedia/commons/2/2b/Pachelbel%27s_Canon.ogg' },
 ];
 
 const MUSIC_CATEGORIES = [
@@ -181,7 +159,6 @@ const MUSIC_CATEGORIES = [
   'Majestic Orchestra'
 ];
 
-// Curated Fonts for Headings & Titles
 const FONT_PRESETS_HEADING = [
   { name: 'Cinzel (Royal Roman)', value: 'Cinzel, serif' },
   { name: 'Great Vibes (Romantic Calligraphy)', value: 'Great Vibes, cursive' },
@@ -192,7 +169,6 @@ const FONT_PRESETS_HEADING = [
   { name: 'Poppins (Clean Chic Sans)', value: 'Poppins, sans-serif' },
 ];
 
-// Curated Fonts for Body & Details
 const FONT_PRESETS_BODY = [
   { name: 'Playfair Display (Classic Serif)', value: 'Playfair Display, serif' },
   { name: 'Inter (Sleek Clean Sans)', value: 'Inter, sans-serif' },
@@ -201,7 +177,6 @@ const FONT_PRESETS_BODY = [
   { name: 'Montserrat (Refined Sans)', value: 'Montserrat, sans-serif' },
 ];
 
-// Font Size Scale Presets
 const FONT_SIZE_PRESETS = [
   { label: 'Compact (90%)', value: 90 },
   { label: 'Standard (100%)', value: 100 },
@@ -220,11 +195,22 @@ const COLOR_PRESETS = [
   { name: 'Classic Slate', hex: '#1e293b' },
 ];
 
+const CARD_BOX_COLORS = [
+  { name: 'Pure White', hex: '#ffffff' },
+  { name: 'Warm Ivory', hex: '#fdfbf7' },
+  { name: 'Cream Linen', hex: '#f5f0e8' },
+  { name: 'Midnight Glass', hex: '#0f172a' },
+  { name: 'Deep Emerald', hex: '#142820' },
+  { name: 'Velvet Maroon', hex: '#2e1219' },
+  { name: 'Charcoal Tint', hex: '#1e293b' },
+];
+
 const OPACITY_PRESETS = [
-  { label: '100% Solid', value: 100 },
-  { label: '90% Crisp', value: 90 },
+  { label: '0% Invisible', value: 0 },
+  { label: '50% Glass', value: 50 },
   { label: '75% Frosted', value: 75 },
-  { label: '55% Sheer', value: 55 },
+  { label: '90% Crisp', value: 90 },
+  { label: '100% Solid', value: 100 },
 ];
 
 export default function BuilderForm({ 
@@ -255,8 +241,8 @@ export default function BuilderForm({
   const modalAudioRef = useRef<HTMLAudioElement | null>(null);
 
   const bgType = data.theme?.coverBgType || 'color';
-  const currentOpacity = typeof data.theme?.cardOpacity === 'number' ? data.theme.cardOpacity : 92;
-  const currentFontSizeScale = data.theme?.fontSizeScale || 100;
+  const currentOpacity = typeof data.theme?.cardOpacity === 'number' ? data.theme.cardOpacity : 90;
+  const currentBoxColor = data.theme?.cardBoxColor || '#ffffff';
 
   const updateData = (newData: CardData) => {
     onChange(newData);
@@ -273,7 +259,7 @@ export default function BuilderForm({
     }
   };
 
-  // Live Audio Preview in Music Library Modal
+  // Immediate Audio Preview in Music Library Modal
   const handleTogglePreviewMusic = (url: string) => {
     if (!modalAudioRef.current) return;
     const audio = modalAudioRef.current;
@@ -286,18 +272,21 @@ export default function BuilderForm({
       setIsLoadingAudio(true);
       setPreviewTrackUrl(url);
       audio.pause();
+      audio.currentTime = 0;
       audio.src = url;
-      audio.volume = 1.0;
       audio.load();
 
-      audio.play()
-        .then(() => {
-          setIsLoadingAudio(false);
-        })
-        .catch((err) => {
-          console.warn('Audio playback info:', err);
-          setIsLoadingAudio(false);
-        });
+      const playPromise = audio.play();
+      if (playPromise !== undefined) {
+        playPromise
+          .then(() => {
+            setIsLoadingAudio(false);
+          })
+          .catch((err) => {
+            console.warn('Playback error:', err);
+            setIsLoadingAudio(false);
+          });
+      }
     }
   };
 
@@ -467,9 +456,9 @@ export default function BuilderForm({
     } else if (newType === 'tentative' && !currentSlide.timeline) {
       updated.title = 'EVENT SCHEDULE';
       updated.timeline = [
-        { time: '05:00 PM', activity: 'Guest Arrival & Welcome Drinks' },
+        { time: '05:00 PM', activity: 'Guest Arrival & Welcome Canapés' },
         { time: '06:30 PM', activity: 'Solemnization / Main Ceremony' },
-        { time: '08:00 PM', activity: 'Gala Dinner & Photography' }
+        { time: '08:00 PM', activity: 'Gala Dinner & Speeches' }
       ];
     } else if (newType === 'image_qr') {
       updated.title = 'GIFT REGISTRY / QR';
@@ -549,7 +538,6 @@ export default function BuilderForm({
       {/* Hidden Audio Element for Modal Preview */}
       <audio 
         ref={modalAudioRef} 
-        crossOrigin="anonymous"
         onEnded={() => setPreviewTrackUrl(null)}
         onError={() => {
           setIsLoadingAudio(false);
@@ -559,7 +547,7 @@ export default function BuilderForm({
 
       <div>
         <h2 className="text-2xl font-bold text-white tracking-wide">Digital Invitation Studio</h2>
-        <p className="text-xs text-slate-400 mt-1">Customize cover aesthetic, fonts, inner slides, transparency, and background music.</p>
+        <p className="text-xs text-slate-400 mt-1">Independent cover & slide font customization, box color & 0-100% transparency.</p>
       </div>
 
       {/* Navigation Tabs */}
@@ -571,7 +559,7 @@ export default function BuilderForm({
             activeTab === 'cover' ? 'bg-amber-500 text-slate-950 font-bold shadow' : 'text-slate-400 hover:text-white'
           }`}
         >
-          1. Cover & Typography
+          1. Cover Page
         </button>
         <button
           type="button"
@@ -580,7 +568,7 @@ export default function BuilderForm({
             activeTab === 'slides' ? 'bg-amber-500 text-slate-950 font-bold shadow' : 'text-slate-400 hover:text-white'
           }`}
         >
-          2. Slides & Background ({data.slides?.length || 0})
+          2. Slides & Box Styling ({data.slides?.length || 0})
         </button>
         <button
           type="button"
@@ -593,23 +581,22 @@ export default function BuilderForm({
         </button>
       </div>
 
-      {/* ================= TAB 1: COVER & TYPOGRAPHY ================= */}
+      {/* ================= TAB 1: COVER PAGE ONLY ================= */}
       {activeTab === 'cover' && (
         <div className="p-5 rounded-2xl bg-slate-950/70 border border-slate-800 space-y-4">
           
-          {/* 1. TYPOGRAPHY & FONT CUSTOMIZATION */}
+          {/* COVER TYPOGRAPHY */}
           <div className="p-4 rounded-2xl bg-slate-900 border border-amber-500/25 space-y-3.5">
             <label className="text-xs font-bold text-amber-300 uppercase tracking-wider flex items-center gap-1.5">
-              <i className="fa-solid fa-font" /> Typography & Font Sizing
+              <i className="fa-solid fa-font" /> Cover Typography (Front Page Only)
             </label>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-              {/* Heading Font */}
               <div>
-                <label className="text-[11px] text-slate-400 block mb-1 font-medium">Header Font Style</label>
+                <label className="text-[11px] text-slate-400 block mb-1 font-medium">Cover Header Font</label>
                 <select
-                  value={data.theme?.headingFont || 'Cinzel, serif'}
-                  onChange={(e) => updateData({ ...data, theme: { ...data.theme, headingFont: e.target.value } })}
+                  value={data.theme?.coverHeadingFont || 'Cinzel, serif'}
+                  onChange={(e) => updateData({ ...data, theme: { ...data.theme, coverHeadingFont: e.target.value } })}
                   className="w-full px-3 py-2 rounded-xl bg-slate-950 border border-slate-700 text-amber-300 text-xs font-semibold outline-none cursor-pointer focus:border-amber-400"
                 >
                   {FONT_PRESETS_HEADING.map((f) => (
@@ -620,12 +607,11 @@ export default function BuilderForm({
                 </select>
               </div>
 
-              {/* Body Font */}
               <div>
-                <label className="text-[11px] text-slate-400 block mb-1 font-medium">Body Font Style</label>
+                <label className="text-[11px] text-slate-400 block mb-1 font-medium">Cover Guest Name Font</label>
                 <select
-                  value={data.theme?.bodyFont || 'Playfair Display, serif'}
-                  onChange={(e) => updateData({ ...data, theme: { ...data.theme, bodyFont: e.target.value } })}
+                  value={data.theme?.coverBodyFont || 'Playfair Display, serif'}
+                  onChange={(e) => updateData({ ...data, theme: { ...data.theme, coverBodyFont: e.target.value } })}
                   className="w-full px-3 py-2 rounded-xl bg-slate-950 border border-slate-700 text-slate-200 text-xs font-medium outline-none cursor-pointer focus:border-amber-400"
                 >
                   {FONT_PRESETS_BODY.map((f) => (
@@ -637,12 +623,12 @@ export default function BuilderForm({
               </div>
             </div>
 
-            {/* Font Size Scaling */}
+            {/* Cover Font Size Scaling */}
             <div className="pt-2 border-t border-slate-800/80 space-y-2">
               <div className="flex items-center justify-between">
-                <span className="text-[11px] text-slate-300 font-medium">Overall Font Scaling:</span>
+                <span className="text-[11px] text-slate-300 font-medium">Cover Font Scaling:</span>
                 <span className="text-xs font-mono font-bold text-amber-300 bg-amber-500/15 px-2 py-0.5 rounded border border-amber-500/30">
-                  {currentFontSizeScale}%
+                  {data.theme?.coverFontSizeScale || 100}%
                 </span>
               </div>
               <div className="grid grid-cols-2 sm:grid-cols-4 gap-1.5">
@@ -650,9 +636,9 @@ export default function BuilderForm({
                   <button
                     key={scalePreset.value}
                     type="button"
-                    onClick={() => updateData({ ...data, theme: { ...data.theme, fontSizeScale: scalePreset.value } })}
+                    onClick={() => updateData({ ...data, theme: { ...data.theme, coverFontSizeScale: scalePreset.value } })}
                     className={`py-1.5 px-2 rounded-lg text-[10px] font-semibold border transition-all ${
-                      currentFontSizeScale === scalePreset.value
+                      (data.theme?.coverFontSizeScale || 100) === scalePreset.value
                         ? 'bg-amber-500 text-slate-950 font-bold border-amber-400 shadow'
                         : 'bg-slate-950 text-slate-300 border-slate-700 hover:border-slate-500'
                     }`}
@@ -664,7 +650,7 @@ export default function BuilderForm({
             </div>
           </div>
 
-          {/* 2. COVER BACKGROUND (COLOR VS IMAGE) */}
+          {/* COVER BACKGROUND */}
           <div className="p-4 rounded-2xl bg-slate-900 border border-slate-800 space-y-3">
             <div className="flex items-center justify-between">
               <label className="text-xs font-bold text-amber-300 uppercase tracking-wider">
@@ -757,7 +743,7 @@ export default function BuilderForm({
                     onClick={() => openWallpaperModal('cover')}
                     className="flex-1 py-3 px-4 rounded-xl bg-gradient-to-r from-amber-500/20 to-amber-600/20 border border-amber-400/50 hover:bg-amber-500/30 text-amber-300 font-bold text-xs flex items-center justify-center gap-2 transition-all cursor-pointer"
                   >
-                    <i className="fa-solid fa-images text-base" /> Choose from Wallpaper Gallery (50 Items)
+                    <i className="fa-solid fa-images text-base" /> Choose Cover Wallpaper (50 Items)
                   </button>
 
                   <label className="py-3 px-4 rounded-xl bg-slate-950 border border-slate-700 hover:border-amber-400/60 text-slate-300 text-xs font-semibold flex items-center justify-center gap-2 cursor-pointer transition-all">
@@ -809,47 +795,62 @@ export default function BuilderForm({
         </div>
       )}
 
-      {/* ================= TAB 2: SLIDES & BACKGROUND ================= */}
+      {/* ================= TAB 2: SLIDES & CARD BOX STYLING ================= */}
       {activeTab === 'slides' && (
         <div className="space-y-4">
           
-          {/* INNER SLIDE WALLPAPER & TRANSPARENCY */}
-          <div className="p-4 rounded-2xl bg-slate-950/90 border border-amber-500/30 space-y-3.5">
+          {/* 1. CARD BOX COLOR & 0-100% OPACITY */}
+          <div className="p-4 rounded-2xl bg-slate-950/90 border border-amber-500/30 space-y-4">
             <div className="flex items-center justify-between">
               <label className="text-xs font-bold text-amber-300 uppercase tracking-wider flex items-center gap-1.5">
-                <i className="fa-solid fa-layer-group" /> Inner Slide Wallpaper (Cards Backdrop)
+                <i className="fa-solid fa-box-open" /> Card Box Color & Transparency (0% - 100%)
               </label>
+              <span className="text-xs font-mono font-bold text-amber-300 bg-amber-500/20 px-2 py-0.5 rounded border border-amber-500/30">
+                {currentOpacity === 0 ? '0% (Invisible Box)' : `${currentOpacity}% Opacity`}
+              </span>
             </div>
 
-            <div className="flex flex-col sm:flex-row gap-2">
-              <button
-                type="button"
-                onClick={() => openWallpaperModal('slide')}
-                className="flex-1 py-2.5 px-4 rounded-xl bg-gradient-to-r from-amber-500/20 to-amber-600/20 border border-amber-400/50 hover:bg-amber-500/30 text-amber-300 font-bold text-xs flex items-center justify-center gap-2 transition-all cursor-pointer"
-              >
-                <i className="fa-solid fa-images" /> Choose Inner Slide Wallpaper (50 Items)
-              </button>
-
-              <label className="py-2.5 px-4 rounded-xl bg-slate-900 border border-slate-700 hover:border-amber-400/60 text-slate-300 text-xs font-semibold flex items-center justify-center gap-2 cursor-pointer transition-all">
-                <i className="fa-solid fa-cloud-arrow-up text-amber-400" /> Upload File
-                <input type="file" accept="image/*" onChange={handleSlideWallpaperUpload} className="hidden" />
-              </label>
-            </div>
-
-            {/* Card Transparency Slider */}
-            <div className="pt-2 border-t border-slate-800 space-y-2.5">
-              <div className="flex items-center justify-between">
-                <span className="text-[11px] font-semibold text-slate-300">Card Frame Transparency (Glassmorphism):</span>
-                <span className="text-xs font-bold font-mono px-2 py-0.5 rounded-lg bg-amber-500/20 text-amber-300 border border-amber-500/30">
-                  {currentOpacity}%
-                </span>
+            {/* Choose Card Box Color */}
+            <div className="space-y-2">
+              <span className="text-[11px] text-slate-400 block font-medium">Select Card Box Color:</span>
+              <div className="grid grid-cols-4 sm:grid-cols-7 gap-2">
+                {CARD_BOX_COLORS.map((color) => (
+                  <button
+                    key={color.hex}
+                    type="button"
+                    onClick={() => updateData({ ...data, theme: { ...data.theme, cardBoxColor: color.hex } })}
+                    className={`h-9 rounded-xl border-2 transition-transform flex items-center justify-center ${
+                      currentBoxColor === color.hex ? 'border-amber-400 scale-105 shadow' : 'border-slate-700'
+                    }`}
+                    style={{ backgroundColor: color.hex }}
+                    title={color.name}
+                  >
+                    {currentBoxColor === color.hex && (
+                      <i className={`fa-solid fa-check text-xs ${color.hex === '#ffffff' || color.hex === '#fdfbf7' || color.hex === '#f5f0e8' ? 'text-slate-900' : 'text-white'}`} />
+                    )}
+                  </button>
+                ))}
               </div>
 
+              <div className="flex items-center gap-2 pt-1">
+                <label className="text-[11px] text-slate-400">Custom Box Color:</label>
+                <input
+                  type="color"
+                  value={currentBoxColor}
+                  onChange={(e) => updateData({ ...data, theme: { ...data.theme, cardBoxColor: e.target.value } })}
+                  className="w-7 h-7 rounded-lg bg-transparent cursor-pointer border border-slate-700"
+                />
+                <span className="text-xs text-amber-300 font-mono font-bold">{currentBoxColor}</span>
+              </div>
+            </div>
+
+            {/* 0-100% Opacity Slider */}
+            <div className="pt-2 border-t border-slate-800 space-y-2">
               <div className="flex items-center gap-3">
-                <span className="text-[10px] text-slate-500 font-medium">Transparent</span>
+                <span className="text-[10px] text-slate-400 font-bold">0% (Invisible)</span>
                 <input
                   type="range"
-                  min="20"
+                  min="0"
                   max="100"
                   step="5"
                   value={currentOpacity}
@@ -862,10 +863,10 @@ export default function BuilderForm({
                   }}
                   className="w-full accent-amber-500 cursor-pointer h-2 bg-slate-900 rounded-lg"
                 />
-                <span className="text-[10px] text-slate-400 font-medium">Solid</span>
+                <span className="text-[10px] text-slate-400 font-bold">100% (Solid)</span>
               </div>
 
-              <div className="grid grid-cols-2 sm:grid-cols-4 gap-1.5">
+              <div className="grid grid-cols-2 sm:grid-cols-5 gap-1.5">
                 {OPACITY_PRESETS.map((preset) => (
                   <button
                     key={preset.value}
@@ -879,7 +880,7 @@ export default function BuilderForm({
                     }}
                     className={`py-1 px-2 rounded-lg text-[10px] font-medium border transition-all ${
                       currentOpacity === preset.value
-                        ? 'bg-amber-500 text-slate-950 font-bold border-amber-400'
+                        ? 'bg-amber-500 text-slate-950 font-bold border-amber-400 shadow'
                         : 'bg-slate-900 text-slate-300 border-slate-700 hover:border-slate-500'
                     }`}
                   >
@@ -890,7 +891,94 @@ export default function BuilderForm({
             </div>
           </div>
 
-          {/* Slide List */}
+          {/* 2. SLIDE TYPOGRAPHY */}
+          <div className="p-4 rounded-2xl bg-slate-900 border border-slate-800 space-y-3.5">
+            <label className="text-xs font-bold text-amber-300 uppercase tracking-wider flex items-center gap-1.5">
+              <i className="fa-solid fa-font" /> Slide Typography (Inner Pages Only)
+            </label>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <div>
+                <label className="text-[11px] text-slate-400 block mb-1 font-medium">Slide Header Font</label>
+                <select
+                  value={data.theme?.slideHeadingFont || 'Cinzel, serif'}
+                  onChange={(e) => updateData({ ...data, theme: { ...data.theme, slideHeadingFont: e.target.value } })}
+                  className="w-full px-3 py-2 rounded-xl bg-slate-950 border border-slate-700 text-amber-300 text-xs font-semibold outline-none cursor-pointer focus:border-amber-400"
+                >
+                  {FONT_PRESETS_HEADING.map((f) => (
+                    <option key={f.value} value={f.value} style={{ fontFamily: f.value }}>
+                      {f.name}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              <div>
+                <label className="text-[11px] text-slate-400 block mb-1 font-medium">Slide Content Font</label>
+                <select
+                  value={data.theme?.slideBodyFont || 'Playfair Display, serif'}
+                  onChange={(e) => updateData({ ...data, theme: { ...data.theme, slideBodyFont: e.target.value } })}
+                  className="w-full px-3 py-2 rounded-xl bg-slate-950 border border-slate-700 text-slate-200 text-xs font-medium outline-none cursor-pointer focus:border-amber-400"
+                >
+                  {FONT_PRESETS_BODY.map((f) => (
+                    <option key={f.value} value={f.value} style={{ fontFamily: f.value }}>
+                      {f.name}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            </div>
+
+            {/* Slide Font Size Scaling */}
+            <div className="pt-2 border-t border-slate-800/80 space-y-2">
+              <div className="flex items-center justify-between">
+                <span className="text-[11px] text-slate-300 font-medium">Slide Content Scaling:</span>
+                <span className="text-xs font-mono font-bold text-amber-300 bg-amber-500/15 px-2 py-0.5 rounded border border-amber-500/30">
+                  {data.theme?.slideFontSizeScale || 100}%
+                </span>
+              </div>
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-1.5">
+                {FONT_SIZE_PRESETS.map((scalePreset) => (
+                  <button
+                    key={scalePreset.value}
+                    type="button"
+                    onClick={() => updateData({ ...data, theme: { ...data.theme, slideFontSizeScale: scalePreset.value } })}
+                    className={`py-1.5 px-2 rounded-lg text-[10px] font-semibold border transition-all ${
+                      (data.theme?.slideFontSizeScale || 100) === scalePreset.value
+                        ? 'bg-amber-500 text-slate-950 font-bold border-amber-400 shadow'
+                        : 'bg-slate-950 text-slate-300 border-slate-700 hover:border-slate-500'
+                    }`}
+                  >
+                    {scalePreset.label}
+                  </button>
+                ))}
+              </div>
+            </div>
+          </div>
+
+          {/* 3. INNER SLIDE WALLPAPER */}
+          <div className="p-4 rounded-2xl bg-slate-950/90 border border-slate-800 space-y-3">
+            <label className="text-xs font-bold text-amber-300 uppercase tracking-wider flex items-center gap-1.5">
+              <i className="fa-solid fa-layer-group" /> Inner Slide Wallpaper
+            </label>
+
+            <div className="flex flex-col sm:flex-row gap-2">
+              <button
+                type="button"
+                onClick={() => openWallpaperModal('slide')}
+                className="flex-1 py-2.5 px-4 rounded-xl bg-gradient-to-r from-amber-500/20 to-amber-600/20 border border-amber-400/50 hover:bg-amber-500/30 text-amber-300 font-bold text-xs flex items-center justify-center gap-2 transition-all cursor-pointer"
+              >
+                <i className="fa-solid fa-images" /> Choose Slide Wallpaper (50 Items)
+              </button>
+
+              <label className="py-2.5 px-4 rounded-xl bg-slate-900 border border-slate-700 hover:border-amber-400/60 text-slate-300 text-xs font-semibold flex items-center justify-center gap-2 cursor-pointer transition-all">
+                <i className="fa-solid fa-cloud-arrow-up text-amber-400" /> Upload File
+                <input type="file" accept="image/*" onChange={handleSlideWallpaperUpload} className="hidden" />
+              </label>
+            </div>
+          </div>
+
+          {/* 4. SLIDE LIST */}
           <div className="space-y-4 max-h-[460px] overflow-y-auto pr-1">
             {data.slides.map((slide, idx) => {
               const isCurrentlyActive = activeSlideIndex === idx;
@@ -1209,7 +1297,7 @@ export default function BuilderForm({
               </button>
             </div>
 
-            {/* Currently Selected Music Status */}
+            {/* Currently Selected Track Status */}
             {data.cover?.audioUrl && (
               <div className="pt-2 border-t border-slate-800 flex items-center justify-between text-xs text-amber-300">
                 <span className="font-semibold flex items-center gap-2 truncate">
@@ -1235,7 +1323,7 @@ export default function BuilderForm({
         </div>
       )}
 
-      {/* ================= SAVE & DUAL LINK GENERATION ================= */}
+      {/* ================= SAVE & CHECKOUT ================= */}
       {onSave && (
         <div className="p-4 rounded-2xl bg-slate-950/80 border border-slate-800 space-y-3 pt-3">
           {setSlug && slug !== undefined && (
@@ -1476,7 +1564,6 @@ export default function BuilderForm({
                         : 'bg-slate-950/60 border-slate-800 hover:border-slate-700'
                     }`}
                   >
-                    {/* Play / Pause Preview Button */}
                     <div className="flex items-center gap-3">
                       <button
                         type="button"
@@ -1503,7 +1590,6 @@ export default function BuilderForm({
                       </div>
                     </div>
 
-                    {/* Choose Track Button */}
                     <div className="flex items-center gap-2">
                       {isSelected ? (
                         <span className="px-3.5 py-2 rounded-xl bg-emerald-500/20 border border-emerald-500/40 text-emerald-300 text-xs font-bold flex items-center gap-1.5">

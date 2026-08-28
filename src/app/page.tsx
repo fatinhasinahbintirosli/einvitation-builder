@@ -10,14 +10,18 @@ const initialData: CardData = {
   theme: {
     coverBgType: 'color',
     coverBgColor: '#1e293b',
-    cardOpacity: 92,
+    cardBoxColor: '#ffffff',
+    cardOpacity: 90,
     backgroundColor: '#0f172a',
     cardBackgroundColor: 'rgba(255, 255, 255, 0.95)',
     primaryColor: '#1e293b',
     goldColor: '#b59049',
-    headingFont: 'Cinzel, serif',
-    bodyFont: 'Playfair Display, serif',
-    fontSizeScale: 100,
+    coverHeadingFont: 'Cinzel, serif',
+    coverBodyFont: 'Playfair Display, serif',
+    coverFontSizeScale: 100,
+    slideHeadingFont: 'Cinzel, serif',
+    slideBodyFont: 'Playfair Display, serif',
+    slideFontSizeScale: 100,
     bgPatternUrl: 'https://images.unsplash.com/photo-1607604276583-eef5d076aa5f?q=80&w=1080&auto=format&fit=crop',
     slideBgUrl: 'https://images.unsplash.com/photo-1607604276583-eef5d076aa5f?q=80&w=1080&auto=format&fit=crop'
   },
@@ -25,7 +29,7 @@ const initialData: CardData = {
     tagline: 'The Wedding Celebration Of',
     mainTitle: 'Emma & Liam',
     dateText: 'SUNDAY, OCTOBER 18, 2026',
-    audioUrl: 'https://ia800504.us.archive.org/11/items/CanonInD_201405/Canon%20in%20D.mp3'
+    audioUrl: 'https://upload.wikimedia.org/wikipedia/commons/2/2b/Pachelbel%27s_Canon.ogg'
   },
   slides: [
     {
@@ -107,7 +111,6 @@ export default function BuilderPage() {
   return (
     <main className="min-h-screen p-4 md:p-8 max-w-7xl mx-auto flex flex-col items-center bg-slate-950 text-slate-100">
       
-      {/* Main Studio Header */}
       <header className="text-center mb-8">
         <h1 className="text-3xl sm:text-4xl font-bold text-amber-400 tracking-wider" style={{ fontFamily: 'Cinzel, serif' }}>
           E-INVITATION BUILDER STUDIO
@@ -133,7 +136,7 @@ export default function BuilderPage() {
           />
         </div>
 
-        {/* Right Side: Live Card Preview (All slides shown, no watermark) */}
+        {/* Right Side: Live Card Preview */}
         <div className="lg:col-span-6 flex flex-col items-center justify-center sticky top-6">
           <div className="text-center mb-2">
             <span className="text-[11px] font-bold uppercase tracking-[2px] text-amber-400/80 bg-amber-500/10 px-3 py-1 rounded-full border border-amber-500/20">

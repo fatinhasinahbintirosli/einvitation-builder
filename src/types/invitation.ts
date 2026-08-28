@@ -28,22 +28,27 @@ export interface ThemeConfig {
   primaryColor?: string;
   goldColor?: string;
   backgroundColor?: string;
-  cardBackgroundColor?: string;
   
+  // Card Box Appearance & Custom Color
+  cardBoxColor?: string; // Hex color for card box (default: #ffffff)
+  cardOpacity?: number; // 0 to 100 (default: 90)
+
   // Separate Wallpaper Controls
   slideBgUrl?: string;
   bgPatternUrl?: string;
-  cardOpacity?: number; // 20 to 100
-
-  // Cover Background Controls
   coverBgType?: 'color' | 'image';
   coverBgColor?: string;
   coverBgUrl?: string;
 
-  // Typography & Font Sizing
-  headingFont?: string;
-  bodyFont?: string;
-  fontSizeScale?: number; // 90 to 120 (default: 100)
+  // Separate Cover Typography
+  coverHeadingFont?: string;
+  coverBodyFont?: string;
+  coverFontSizeScale?: number; // 90 to 130 (default: 100)
+
+  // Separate Slide Typography
+  slideHeadingFont?: string;
+  slideBodyFont?: string;
+  slideFontSizeScale?: number; // 90 to 130 (default: 100)
 
   doorStyle?: string;
   [key: string]: any;
