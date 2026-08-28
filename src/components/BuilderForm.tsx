@@ -1,7 +1,8 @@
 'use client';
 
-import React, { useState, useRef } from 'react';
+import React, { useState } from 'react';
 import { CardData, SlideType } from '@/types/invitation';
+import { globalAudio } from '@/lib/audioEngine';
 
 type SlideItem = CardData['slides'][number];
 
@@ -88,65 +89,65 @@ const WALLPAPER_CATEGORIES = [
   'Geometric & Art'
 ];
 
-// 50 High-Reliability Audio MP3 Tracks
+// 50 High-Quality Melodies Library
 interface MusicItem {
   id: string;
   name: string;
   category: string;
-  url: string;
+  trackCode: string;
 }
 
 const MUSIC_LIBRARY: MusicItem[] = [
-  { id: 'm1', name: 'Pachelbel - Canon in D (Piano & Strings)', category: 'Romantic & Wedding', url: 'https://ia800504.us.archive.org/11/items/CanonInD_201405/Canon%20in%20D.mp3' },
-  { id: 'm2', name: 'Debussy - Clair de Lune (Soft Moonlight)', category: 'Romantic & Wedding', url: 'https://ia800301.us.archive.org/15/items/ClairDeLune_563/Debussy-ClairDeLune.mp3' },
-  { id: 'm3', name: 'Mendelssohn - Wedding March (Royal Procession)', category: 'Romantic & Wedding', url: 'https://ia800703.us.archive.org/19/items/WeddingMarch_201405/WeddingMarch.mp3' },
-  { id: 'm4', name: 'Chopin - Nocturne in E-flat major, Op. 9, No. 2', category: 'Romantic & Wedding', url: 'https://ia800301.us.archive.org/1/items/ChopinNocturneOp.9No.2/Chopin-NocturneOp.9No.2.mp3' },
-  { id: 'm5', name: 'Erik Satie - Gymnopédie No. 1 (Pure Serenity)', category: 'Romantic & Wedding', url: 'https://ia802809.us.archive.org/24/items/ErikSatieGymnopedieNo1/ErikSatieGymnopedieNo1.mp3' },
-  { id: 'm6', name: 'Liszt - Liebestraum No. 3 (Love Dream)', category: 'Romantic & Wedding', url: 'https://ia800501.us.archive.org/28/items/LisztLiebestraumNo.3InA-flatMajor/Liszt_Liebestraum_No3.mp3' },
-  { id: 'm7', name: 'J.S. Bach - Air on the G String', category: 'Romantic & Wedding', url: 'https://ia800503.us.archive.org/15/items/BachAirOnTheGString_412/Bach-AirOnTheGString.mp3' },
-  { id: 'm8', name: 'Brahms - Wiegenlied / Lullaby Op. 49', category: 'Romantic & Wedding', url: 'https://ia800302.us.archive.org/10/items/BrahmsLullaby_895/BrahmsLullaby.mp3' },
-  { id: 'm9', name: 'Peaceful Gamelan Heritage Bells', category: 'Traditional & Heritage', url: 'https://ia800307.us.archive.org/28/items/GamelanMusic_201705/Gamelan_Peaceful_Melody.mp3' },
-  { id: 'm10', name: 'Borneo Sape Fingerstyle Serenity', category: 'Traditional & Heritage', url: 'https://ia600307.us.archive.org/28/items/GamelanMusic_201705/Borneo_Sape_Acoustic.mp3' },
-  { id: 'm11', name: 'Arabian Oud Royal Serenade', category: 'Traditional & Heritage', url: 'https://ia800504.us.archive.org/11/items/ArabianOudMelody/Arabian_Oud_Serenade.mp3' },
-  { id: 'm12', name: 'Eastern Bamboo Flute (Zen Spirit)', category: 'Traditional & Heritage', url: 'https://ia800504.us.archive.org/11/items/BambooFluteZen/Bamboo_Flute_Serenity.mp3' },
-  { id: 'm13', name: 'Enchanted Angklung Chimes', category: 'Traditional & Heritage', url: 'https://ia800307.us.archive.org/28/items/GamelanMusic_201705/Angklung_Harmony.mp3' },
-  { id: 'm14', name: 'Palace Gamelan Royal Entrance', category: 'Traditional & Heritage', url: 'https://ia800307.us.archive.org/28/items/GamelanMusic_201705/Royal_Gamelan_Entrance.mp3' },
-  { id: 'm15', name: 'Meditative Suling Flute', category: 'Traditional & Heritage', url: 'https://ia800504.us.archive.org/11/items/BambooFluteZen/Sundanese_Flute_Relax.mp3' },
-  { id: 'm16', name: 'Silk Road Ambient Strings', category: 'Traditional & Heritage', url: 'https://ia800504.us.archive.org/11/items/ArabianOudMelody/Middle_Eastern_Strings.mp3' },
-  { id: 'm17', name: 'Spring Breeze Acoustic Guitar', category: 'Acoustic & Chill', url: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3' },
-  { id: 'm18', name: 'Fingerstyle Warmth & Love', category: 'Acoustic & Chill', url: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3' },
-  { id: 'm19', name: 'Gentle Afternoon Strumming', category: 'Acoustic & Chill', url: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-3.mp3' },
-  { id: 'm20', name: 'Golden Sunset Acoustic Glow', category: 'Acoustic & Chill', url: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-4.mp3' },
-  { id: 'm21', name: 'Coffeehouse Piano & Nylon Guitar', category: 'Acoustic & Chill', url: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-5.mp3' },
-  { id: 'm22', name: 'Sweet Memories with Friends', category: 'Acoustic & Chill', url: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-6.mp3' },
-  { id: 'm23', name: 'Morning Dew Ambient Reflection', category: 'Acoustic & Chill', url: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-7.mp3' },
-  { id: 'm24', name: 'Highland Serenity Folk', category: 'Acoustic & Chill', url: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-8.mp3' },
-  { id: 'm25', name: 'Spiritual Grace & Blessing Ambient', category: 'Spiritual & Ambient', url: 'https://ia800504.us.archive.org/11/items/ArabianOudMelody/Islamic_Peace_Ambient.mp3' },
-  { id: 'm26', name: 'Ney Flute Sacred Meditation', category: 'Spiritual & Ambient', url: 'https://ia800504.us.archive.org/11/items/ArabianOudMelody/Spiritual_Ney_Flute.mp3' },
-  { id: 'm27', name: 'Dawn Awakening Spiritual Strings', category: 'Spiritual & Ambient', url: 'https://ia800504.us.archive.org/11/items/ArabianOudMelody/Dawn_Spiritual_Strings.mp3' },
-  { id: 'm28', name: 'Humble Gratitude Oud Harmony', category: 'Spiritual & Ambient', url: 'https://ia800504.us.archive.org/11/items/ArabianOudMelody/Spiritual_Oud_Harmony.mp3' },
-  { id: 'm29', name: 'Peaceful Sanctuary Meditation', category: 'Spiritual & Ambient', url: 'https://ia800504.us.archive.org/11/items/BambooFluteZen/Peaceful_Meditation_Flute.mp3' },
-  { id: 'm30', name: 'Ambient Light Healing Pads', category: 'Spiritual & Ambient', url: 'https://ia800504.us.archive.org/11/items/ArabianOudMelody/Meditation_Ambient_Pad.mp3' },
-  { id: 'm31', name: 'Mystic Desert Flute Reverie', category: 'Spiritual & Ambient', url: 'https://ia800504.us.archive.org/11/items/ArabianOudMelody/Turkish_Ney_Melody.mp3' },
-  { id: 'm32', name: 'Evening Prayer of Gratitude', category: 'Spiritual & Ambient', url: 'https://ia800504.us.archive.org/11/items/ArabianOudMelody/Peaceful_Night_Prayer.mp3' },
-  { id: 'm33', name: 'Music Box Lullaby Dreams', category: 'Celebration & Joy', url: 'https://ia800302.us.archive.org/10/items/BrahmsLullaby_895/MusicBox_Twinkle.mp3' },
-  { id: 'm34', name: 'Twinkle Glockenspiel Chime', category: 'Celebration & Joy', url: 'https://ia800302.us.archive.org/10/items/BrahmsLullaby_895/Twinkle_Glockenspiel.mp3' },
-  { id: 'm35', name: 'Happy Ukulele Celebration', category: 'Celebration & Joy', url: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-9.mp3' },
-  { id: 'm36', name: 'Sweet Dreams Nursery Tune', category: 'Celebration & Joy', url: 'https://ia800302.us.archive.org/10/items/BrahmsLullaby_895/Sweet_Dreams_Baby.mp3' },
-  { id: 'm37', name: 'Playful Sunshine Acoustic', category: 'Celebration & Joy', url: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-10.mp3' },
-  { id: 'm38', name: 'Joyful Family Gathering', category: 'Celebration & Joy', url: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-11.mp3' },
-  { id: 'm39', name: 'Tender Motherly Music Box', category: 'Celebration & Joy', url: 'https://ia800302.us.archive.org/10/items/BrahmsLullaby_895/Baby_Gentle_MusicBox.mp3' },
-  { id: 'm40', name: 'First Steps of Wonder', category: 'Celebration & Joy', url: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-12.mp3' },
-  { id: 'm41', name: 'Lively Birthday Festive Waltz', category: 'Celebration & Joy', url: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-13.mp3' },
-  { id: 'm42', name: 'Vivaldi - Four Seasons (Spring Allegro)', category: 'Majestic Orchestra', url: 'https://ia800501.us.archive.org/31/items/VivaldiSpringMvt1Allegro/Vivaldi_Spring_1_Allegro.mp3' },
-  { id: 'm43', name: 'Tchaikovsky - Waltz of the Flowers', category: 'Majestic Orchestra', url: 'https://ia800502.us.archive.org/26/items/TchaikovskyWaltzOfTheFlowers/Tchaikovsky_WaltzFlowers.mp3' },
-  { id: 'm44', name: 'Mozart - Eine kleine Nachtmusik', category: 'Majestic Orchestra', url: 'https://ia800500.us.archive.org/11/items/MozartEineKleineNachtmusik_948/Mozart_EineKleineNachtmusik.mp3' },
-  { id: 'm45', name: 'J.S. Bach - Brandenburg Concerto No. 3', category: 'Majestic Orchestra', url: 'https://ia800503.us.archive.org/29/items/BachBrandenburgConcertoNo.3/Bach_Brandenburg_3.mp3' },
-  { id: 'm46', name: 'Beethoven - Moonlight Sonata Adagio', category: 'Majestic Orchestra', url: 'https://ia800304.us.archive.org/19/items/BeethovenMoonlightSonata_854/Beethoven_MoonlightSonata.mp3' },
-  { id: 'm47', name: 'Royal Grand Ballroom Waltz', category: 'Majestic Orchestra', url: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-14.mp3' },
-  { id: 'm48', name: 'Imperial Coronation Symphony', category: 'Majestic Orchestra', url: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-15.mp3' },
-  { id: 'm49', name: 'Cinematic Gala Theme', category: 'Majestic Orchestra', url: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-16.mp3' },
-  { id: 'm50', name: 'Grand Finale Strings & Brass', category: 'Majestic Orchestra', url: 'https://ia800504.us.archive.org/11/items/CanonInD_201405/Canon%20in%20D.mp3' },
+  { id: 'm1', name: 'Pachelbel - Canon in D (Piano & Strings)', category: 'Romantic & Wedding', trackCode: 'm1' },
+  { id: 'm2', name: 'Debussy - Clair de Lune (Soft Serenade)', category: 'Romantic & Wedding', trackCode: 'm2' },
+  { id: 'm3', name: 'Mendelssohn - Wedding March (Royal Fanfare)', category: 'Romantic & Wedding', trackCode: 'm3' },
+  { id: 'm4', name: 'Chopin - Nocturne Op. 9 No. 2 (Sweet Romance)', category: 'Romantic & Wedding', trackCode: 'm4' },
+  { id: 'm5', name: 'Erik Satie - Gymnopédie No. 1 (Tranquility)', category: 'Romantic & Wedding', trackCode: 'm5' },
+  { id: 'm6', name: 'Liszt - Liebestraum No. 3 (Love Dream)', category: 'Romantic & Wedding', trackCode: 'm6' },
+  { id: 'm7', name: 'J.S. Bach - Air on the G String (Strings Pad)', category: 'Romantic & Wedding', trackCode: 'm7' },
+  { id: 'm8', name: 'Brahms - Lullaby of Devotion', category: 'Romantic & Wedding', trackCode: 'm8' },
+  { id: 'm9', name: 'Peaceful Gamelan Heritage Chimes', category: 'Traditional & Heritage', trackCode: 'm9' },
+  { id: 'm10', name: 'Rainforest Sape Folk Acoustic', category: 'Traditional & Heritage', trackCode: 'm10' },
+  { id: 'm11', name: 'Arabian Oud Royal Serenade', category: 'Traditional & Heritage', trackCode: 'm11' },
+  { id: 'm12', name: 'Eastern Bamboo Flute (Zen Spirit)', category: 'Traditional & Heritage', trackCode: 'm12' },
+  { id: 'm13', name: 'Enchanted Angklung Harmony', category: 'Traditional & Heritage', trackCode: 'm13' },
+  { id: 'm14', name: 'Palace Gamelan Royal Entrance', category: 'Traditional & Heritage', trackCode: 'm14' },
+  { id: 'm15', name: 'Meditative Suling Flute', category: 'Traditional & Heritage', trackCode: 'm15' },
+  { id: 'm16', name: 'Silk Road Ambient Strings', category: 'Traditional & Heritage', trackCode: 'm16' },
+  { id: 'm17', name: 'Spring Breeze Acoustic Guitar', category: 'Acoustic & Chill', trackCode: 'm17' },
+  { id: 'm18', name: 'Fingerstyle Warmth & Love', category: 'Acoustic & Chill', trackCode: 'm18' },
+  { id: 'm19', name: 'Gentle Afternoon Strumming', category: 'Acoustic & Chill', trackCode: 'm19' },
+  { id: 'm20', name: 'Golden Sunset Acoustic Glow', category: 'Acoustic & Chill', trackCode: 'm20' },
+  { id: 'm21', name: 'Coffeehouse Piano & Nylon Guitar', category: 'Acoustic & Chill', trackCode: 'm21' },
+  { id: 'm22', name: 'Sweet Memories with Friends', category: 'Acoustic & Chill', trackCode: 'm22' },
+  { id: 'm23', name: 'Morning Dew Ambient Reflection', category: 'Acoustic & Chill', trackCode: 'm23' },
+  { id: 'm24', name: 'Highland Serenity Folk', category: 'Acoustic & Chill', trackCode: 'm24' },
+  { id: 'm25', name: 'Spiritual Grace & Blessing Ambient', category: 'Spiritual & Ambient', trackCode: 'm25' },
+  { id: 'm26', name: 'Ney Flute Sacred Meditation', category: 'Spiritual & Ambient', trackCode: 'm26' },
+  { id: 'm27', name: 'Dawn Awakening Spiritual Strings', category: 'Spiritual & Ambient', trackCode: 'm27' },
+  { id: 'm28', name: 'Humble Gratitude Oud Harmony', category: 'Spiritual & Ambient', trackCode: 'm28' },
+  { id: 'm29', name: 'Peaceful Sanctuary Meditation', category: 'Spiritual & Ambient', trackCode: 'm29' },
+  { id: 'm30', name: 'Ambient Light Healing Pads', category: 'Spiritual & Ambient', trackCode: 'm30' },
+  { id: 'm31', name: 'Mystic Desert Flute Reverie', category: 'Spiritual & Ambient', trackCode: 'm31' },
+  { id: 'm32', name: 'Evening Prayer of Gratitude', category: 'Spiritual & Ambient', trackCode: 'm32' },
+  { id: 'm33', name: 'Music Box Lullaby Dreams', category: 'Celebration & Joy', trackCode: 'm33' },
+  { id: 'm34', name: 'Twinkle Glockenspiel Chime', category: 'Celebration & Joy', trackCode: 'm34' },
+  { id: 'm35', name: 'Happy Ukulele Celebration', category: 'Celebration & Joy', trackCode: 'm35' },
+  { id: 'm36', name: 'Sweet Dreams Nursery Tune', category: 'Celebration & Joy', trackCode: 'm36' },
+  { id: 'm37', name: 'Playful Sunshine Acoustic', category: 'Celebration & Joy', trackCode: 'm37' },
+  { id: 'm38', name: 'Joyful Family Gathering', category: 'Celebration & Joy', trackCode: 'm38' },
+  { id: 'm39', name: 'Tender Motherly Music Box', category: 'Celebration & Joy', trackCode: 'm39' },
+  { id: 'm40', name: 'First Steps of Wonder', category: 'Celebration & Joy', trackCode: 'm40' },
+  { id: 'm41', name: 'Lively Birthday Festive Waltz', category: 'Celebration & Joy', trackCode: 'm41' },
+  { id: 'm42', name: 'Vivaldi - Four Seasons (Spring Allegro)', category: 'Majestic Orchestra', trackCode: 'm42' },
+  { id: 'm43', name: 'Tchaikovsky - Waltz of the Flowers', category: 'Majestic Orchestra', trackCode: 'm43' },
+  { id: 'm44', name: 'Mozart - Eine kleine Nachtmusik', category: 'Majestic Orchestra', trackCode: 'm44' },
+  { id: 'm45', name: 'J.S. Bach - Brandenburg Concerto No. 3', category: 'Majestic Orchestra', trackCode: 'm45' },
+  { id: 'm46', name: 'Beethoven - Moonlight Sonata Adagio', category: 'Majestic Orchestra', trackCode: 'm46' },
+  { id: 'm47', name: 'Royal Grand Ballroom Waltz', category: 'Majestic Orchestra', trackCode: 'm47' },
+  { id: 'm48', name: 'Imperial Coronation Symphony', category: 'Majestic Orchestra', trackCode: 'm48' },
+  { id: 'm49', name: 'Cinematic Gala Theme', category: 'Majestic Orchestra', trackCode: 'm49' },
+  { id: 'm50', name: 'Grand Finale Strings & Brass', category: 'Majestic Orchestra', trackCode: 'm50' },
 ];
 
 const MUSIC_CATEGORIES = [
@@ -236,11 +237,7 @@ export default function BuilderForm({
 
   const [isMusicModalOpen, setIsMusicModalOpen] = useState(false);
   const [selectedMusicCategory, setSelectedMusicCategory] = useState('All');
-  const [previewTrackUrl, setPreviewTrackUrl] = useState<string | null>(null);
-  const [isPlayingAudio, setIsPlayingAudio] = useState(false);
-  
-  // Dedicated Modal Audio Player Element
-  const modalAudioRef = useRef<HTMLAudioElement | null>(null);
+  const [previewTrackId, setPreviewTrackId] = useState<string | null>(null);
 
   const bgType = data.theme?.coverBgType || 'color';
   const currentOpacity = typeof data.theme?.cardOpacity === 'number' ? data.theme.cardOpacity : 90;
@@ -261,7 +258,7 @@ export default function BuilderForm({
     }
   };
 
-  // Direct Audio Upload from User's Device (100% Offline & Reliable!)
+  // Direct Audio Upload from Device (100% Offline & Reliable!)
   const handleAudioUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     setAudioUploadSuccess(null);
     const file = e.target.files?.[0];
@@ -277,44 +274,26 @@ export default function BuilderForm({
       const base64Audio = event.target?.result as string;
       updateData({ ...data, cover: { ...data.cover, audioUrl: base64Audio } });
       setAudioUploadSuccess(`Loaded: ${file.name}`);
+      globalAudio.play(base64Audio);
     };
     reader.readAsDataURL(file);
   };
 
-  // Instant HTML5 Audio Toggle in Modal
-  const handleTogglePreviewMusic = (url: string) => {
-    if (!modalAudioRef.current) return;
-    const audio = modalAudioRef.current;
-
-    if (previewTrackUrl === url && isPlayingAudio) {
-      audio.pause();
-      setIsPlayingAudio(false);
-      setPreviewTrackUrl(null);
+  // Instant Audio Playback in Modal
+  const handleTogglePreviewMusic = (trackCode: string) => {
+    if (previewTrackId === trackCode) {
+      globalAudio.stop();
+      setPreviewTrackId(null);
     } else {
-      audio.pause();
-      audio.currentTime = 0;
-      audio.src = url;
-      audio.load();
-      setPreviewTrackUrl(url);
-
-      audio.play()
-        .then(() => {
-          setIsPlayingAudio(true);
-        })
-        .catch((err) => {
-          console.warn('Browser Audio Note:', err);
-          setIsPlayingAudio(false);
-        });
+      globalAudio.play(trackCode);
+      setPreviewTrackId(trackCode);
     }
   };
 
-  const handleSelectTrack = (url: string) => {
-    if (modalAudioRef.current) {
-      modalAudioRef.current.pause();
-    }
-    setIsPlayingAudio(false);
-    setPreviewTrackUrl(null);
-    updateData({ ...data, cover: { ...data.cover, audioUrl: url } });
+  const handleSelectTrack = (trackCode: string) => {
+    globalAudio.stop();
+    setPreviewTrackId(null);
+    updateData({ ...data, cover: { ...data.cover, audioUrl: trackCode } });
     setIsMusicModalOpen(false);
   };
 
@@ -553,19 +532,6 @@ export default function BuilderForm({
   return (
     <div className="w-full bg-slate-900 border border-slate-800 rounded-3xl p-5 sm:p-7 text-slate-200 shadow-2xl space-y-5">
       
-      {/* Hidden Modal Audio Element */}
-      <audio 
-        ref={modalAudioRef} 
-        onEnded={() => {
-          setIsPlayingAudio(false);
-          setPreviewTrackUrl(null);
-        }}
-        onError={() => {
-          setIsPlayingAudio(false);
-          setPreviewTrackUrl(null);
-        }}
-      />
-
       <div>
         <h2 className="text-2xl font-bold text-white tracking-wide">Digital Invitation Studio</h2>
         <p className="text-xs text-slate-400 mt-1">Independent cover & slide font customization, box color & 0-100% transparency.</p>
@@ -1329,8 +1295,8 @@ export default function BuilderForm({
           <div className="p-4 rounded-2xl bg-slate-900 border border-amber-500/30 space-y-3">
             <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
               <div>
-                <span className="text-xs font-bold text-white block">Curated 50 Royalty-Free Audio Library</span>
-                <span className="text-[11px] text-slate-400 block">Click the play button to preview live audio samples.</span>
+                <span className="text-xs font-bold text-white block">Curated 50 Melody Library</span>
+                <span className="text-[11px] text-slate-400 block">Instant synthesis playback with zero delay.</span>
               </div>
               <button
                 type="button"
@@ -1345,7 +1311,7 @@ export default function BuilderForm({
             {data.cover?.audioUrl && (
               <div className="pt-2 border-t border-slate-800 flex items-center justify-between text-xs text-amber-300">
                 <span className="font-semibold flex items-center gap-2 truncate">
-                  <i className="fa-solid fa-music text-amber-400" /> Active Audio: {MUSIC_LIBRARY.find(m => m.url === data.cover?.audioUrl)?.name || (data.cover?.audioUrl.startsWith('data:audio') ? 'Custom Uploaded MP3' : 'Custom URL')}
+                  <i className="fa-solid fa-music text-amber-400" /> Active Audio: {MUSIC_LIBRARY.find(m => m.trackCode === data.cover?.audioUrl)?.name || (data.cover?.audioUrl.startsWith('data:audio') ? 'Custom Uploaded MP3' : 'Custom Track')}
                 </span>
                 <span className="text-[10px] bg-emerald-500/20 text-emerald-300 px-2 py-0.5 rounded font-bold border border-emerald-500/40">
                   Ready
@@ -1360,7 +1326,7 @@ export default function BuilderForm({
             <input
               type="text"
               placeholder="https://.../your-track.mp3"
-              value={data.cover?.audioUrl && !data.cover?.audioUrl.startsWith('data:audio') ? data.cover.audioUrl : ''}
+              value={data.cover?.audioUrl && !data.cover?.audioUrl.startsWith('data:audio') && !data.cover?.audioUrl.startsWith('m') ? data.cover.audioUrl : ''}
               onChange={(e) => updateData({ ...data, cover: { ...data.cover, audioUrl: e.target.value } })}
               className="w-full px-3.5 py-2.5 rounded-xl bg-slate-900 border border-slate-700 text-xs focus:border-amber-400 outline-none"
             />
@@ -1551,7 +1517,7 @@ export default function BuilderForm({
       )}
 
       {/* ========================================================================= */}
-      {/* 2. MODAL: 50-TRACK MUSIC LIBRARY WITH ACTIVE LIVE PREVIEW */}
+      {/* 2. MODAL: 50-TRACK MUSIC LIBRARY WITH INSTANT SYNTH AUDIO PLAYBACK */}
       {/* ========================================================================= */}
       {isMusicModalOpen && (
         <div className="fixed inset-0 z-[200] bg-black/85 backdrop-blur-md flex items-center justify-center p-3 sm:p-6">
@@ -1567,9 +1533,8 @@ export default function BuilderForm({
               <button
                 type="button"
                 onClick={() => {
-                  if (modalAudioRef.current) modalAudioRef.current.pause();
-                  setPreviewTrackUrl(null);
-                  setIsPlayingAudio(false);
+                  globalAudio.stop();
+                  setPreviewTrackId(null);
                   setIsMusicModalOpen(false);
                 }}
                 className="w-8 h-8 rounded-full bg-slate-800 hover:bg-slate-700 text-slate-300 flex items-center justify-center text-sm cursor-pointer"
@@ -1597,8 +1562,8 @@ export default function BuilderForm({
 
             <div className="p-4 sm:p-5 overflow-y-auto space-y-2.5 flex-1">
               {filteredMusic.map((track) => {
-                const isSelected = data.cover?.audioUrl === track.url;
-                const isCurrentPreview = previewTrackUrl === track.url && isPlayingAudio;
+                const isSelected = data.cover?.audioUrl === track.trackCode;
+                const isCurrentPreview = previewTrackId === track.trackCode;
 
                 return (
                   <div
@@ -1609,10 +1574,11 @@ export default function BuilderForm({
                         : 'bg-slate-950/60 border-slate-800 hover:border-slate-700'
                     }`}
                   >
+                    {/* Play / Pause Preview Button */}
                     <div className="flex items-center gap-3">
                       <button
                         type="button"
-                        onClick={() => handleTogglePreviewMusic(track.url)}
+                        onClick={() => handleTogglePreviewMusic(track.trackCode)}
                         className={`w-11 h-11 rounded-full flex items-center justify-center text-base transition-transform active:scale-90 cursor-pointer ${
                           isCurrentPreview
                             ? 'bg-amber-500 text-slate-950 shadow-lg ring-2 ring-amber-400'
@@ -1640,6 +1606,7 @@ export default function BuilderForm({
                       </div>
                     </div>
 
+                    {/* Choose Track Button */}
                     <div className="flex items-center gap-2">
                       {isSelected ? (
                         <span className="px-3.5 py-2 rounded-xl bg-emerald-500/20 border border-emerald-500/40 text-emerald-300 text-xs font-bold flex items-center gap-1.5">
@@ -1648,7 +1615,7 @@ export default function BuilderForm({
                       ) : (
                         <button
                           type="button"
-                          onClick={() => handleSelectTrack(track.url)}
+                          onClick={() => handleSelectTrack(track.trackCode)}
                           className="px-4 py-2 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold text-xs uppercase tracking-wider shadow transition-transform active:scale-95 cursor-pointer whitespace-nowrap"
                         >
                           Select Track

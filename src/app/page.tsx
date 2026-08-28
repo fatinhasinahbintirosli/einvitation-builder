@@ -13,7 +13,6 @@ const initialData: CardData = {
     cardBoxColor: '#ffffff',
     cardOpacity: 90,
     backgroundColor: '#0f172a',
-    cardBackgroundColor: 'rgba(255, 255, 255, 0.95)',
     primaryColor: '#1e293b',
     goldColor: '#b59049',
     coverHeadingFont: 'Cinzel, serif',
@@ -29,7 +28,7 @@ const initialData: CardData = {
     tagline: 'The Wedding Celebration Of',
     mainTitle: 'Emma & Liam',
     dateText: 'SUNDAY, OCTOBER 18, 2026',
-    audioUrl: 'https://upload.wikimedia.org/wikipedia/commons/2/2b/Pachelbel%27s_Canon.ogg'
+    audioUrl: 'm1'
   },
   slides: [
     {

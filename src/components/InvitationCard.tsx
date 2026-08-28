@@ -2,6 +2,7 @@
 
 import React, { useState, useRef, useEffect } from 'react';
 import { CardData } from '@/types/invitation';
+import { globalAudio } from '@/lib/audioEngine';
 
 interface Props {
   data: CardData;
@@ -80,7 +81,6 @@ export function InvitationCard({
   const [currentSlide, setCurrentSlide] = useState(0);
   const [isPlaying, setIsPlaying] = useState(false);
   
-  const audioRef = useRef<HTMLAudioElement | null>(null);
   const touchStartY = useRef<number | null>(null);
   const isTransitioning = useRef<boolean>(false);
 
@@ -91,19 +91,19 @@ export function InvitationCard({
   const slides = maxSlides && maxSlides > 0 ? rawSlides.slice(0, maxSlides) : rawSlides;
   const totalSlides = slides.length;
 
-  // Auto-reload and synchronize music on select
+  // Auto-reload audio if track changes while playing
   useEffect(() => {
-    if (audioRef.current && data?.cover?.audioUrl) {
-      const audio = audioRef.current;
-      audio.pause();
-      audio.currentTime = 0;
-      audio.src = data.cover.audioUrl;
-      audio.load();
-      if (isPlaying) {
-        audio.play().catch(() => {});
-      }
+    if (isPlaying && data?.cover?.audioUrl) {
+      globalAudio.play(data.cover.audioUrl);
     }
   }, [data?.cover?.audioUrl, isPlaying]);
+
+  // Clean up audio on unmount
+  useEffect(() => {
+    return () => {
+      globalAudio.stop();
+    };
+  }, []);
 
   // Auto-flip to active slide / cover during builder editing
   useEffect(() => {
@@ -119,19 +119,20 @@ export function InvitationCard({
 
   const toggleMusic = (e: React.MouseEvent) => {
     e.stopPropagation();
-    if (!audioRef.current) return;
     if (isPlaying) {
-      audioRef.current.pause();
+      globalAudio.stop();
       setIsPlaying(false);
     } else {
-      audioRef.current.play().then(() => setIsPlaying(true)).catch(() => {});
+      const track = data?.cover?.audioUrl || 'm1';
+      globalAudio.play(track);
+      setIsPlaying(true);
     }
   };
 
   const handleOpenCard = () => {
-    if (audioRef.current && !isPlaying) {
-      audioRef.current.play().then(() => setIsPlaying(true)).catch(() => {});
-    }
+    const track = data?.cover?.audioUrl || 'm1';
+    globalAudio.play(track);
+    setIsPlaying(true);
     setIsOpen(true);
     setCurrentSlide(0);
   };
@@ -231,16 +232,7 @@ export function InvitationCard({
         </div>
       )}
 
-      {/* 2. AUDIO STREAMING ELEMENT */}
-      {data?.cover?.audioUrl && (
-        <audio 
-          ref={audioRef} 
-          loop 
-          src={data.cover.audioUrl} 
-        />
-      )}
-
-      {/* 3. MUSIC TOGGLE BUTTON */}
+      {/* 2. MUSIC TOGGLE BUTTON */}
       <button
         onClick={toggleMusic}
         type="button"
@@ -249,7 +241,7 @@ export function InvitationCard({
         <i className={`fa-solid text-sm ${isPlaying ? 'fa-compact-disc fa-spin text-amber-300' : 'fa-volume-xmark text-slate-400'}`} />
       </button>
 
-      {/* ================= 4. COVER SECTION ================= */}
+      {/* ================= 3. COVER SECTION ================= */}
       <div 
         className={`absolute inset-0 z-50 flex flex-col items-center justify-center p-6 text-white transition-transform duration-[1000ms] ease-[cubic-bezier(0.16,1,0.3,1)] ${
           isOpen ? '-translate-y-full pointer-events-none' : 'translate-y-0 pointer-events-auto'
@@ -307,7 +299,7 @@ export function InvitationCard({
         </div>
       </div>
 
-      {/* ================= 5. SLIDES SECTION ================= */}
+      {/* ================= 4. SLIDES SECTION ================= */}
       <div className="relative w-full h-full overflow-hidden flex flex-col justify-center items-center">
         {slides.map((slide, idx) => {
           const offset = idx - currentSlide;
