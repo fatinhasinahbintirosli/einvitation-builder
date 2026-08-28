@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { CardData, SlideType } from '@/types/invitation';
 import { globalAudio } from '@/lib/audioEngine';
 
@@ -238,6 +238,18 @@ export default function BuilderForm({
   const [isMusicModalOpen, setIsMusicModalOpen] = useState(false);
   const [selectedMusicCategory, setSelectedMusicCategory] = useState('All');
   const [previewTrackId, setPreviewTrackId] = useState<string | null>(null);
+  const [isPlayingAudio, setIsPlayingAudio] = useState(false);
+
+  // Synchronize audio playing state with global Audio Service
+  useEffect(() => {
+    const unsubscribe = globalAudio.subscribe((state) => {
+      setIsPlayingAudio(state.isPlaying);
+      setPreviewTrackId(state.trackId);
+    });
+    return () => {
+      unsubscribe();
+    };
+  }, []);
 
   const bgType = data.theme?.coverBgType || 'color';
   const currentOpacity = typeof data.theme?.cardOpacity === 'number' ? data.theme.cardOpacity : 90;
@@ -279,20 +291,17 @@ export default function BuilderForm({
     reader.readAsDataURL(file);
   };
 
-  // Instant Audio Playback in Modal
+  // Instant Audio Play / Stop in Modal
   const handleTogglePreviewMusic = (trackCode: string) => {
-    if (previewTrackId === trackCode) {
+    if (previewTrackId === trackCode && isPlayingAudio) {
       globalAudio.stop();
-      setPreviewTrackId(null);
     } else {
       globalAudio.play(trackCode);
-      setPreviewTrackId(trackCode);
     }
   };
 
   const handleSelectTrack = (trackCode: string) => {
     globalAudio.stop();
-    setPreviewTrackId(null);
     updateData({ ...data, cover: { ...data.cover, audioUrl: trackCode } });
     setIsMusicModalOpen(false);
   };
@@ -1069,7 +1078,7 @@ export default function BuilderForm({
                   )}
 
                   {/* LOCATION */}
-                  {slide.type === 'location' && (
+                  {slide.type === 'location' && slide.locationDetails && (
                     <div className="space-y-3">
                       <div>
                         <label className="text-[11px] text-slate-400 block mb-1">Venue / Ballroom Name</label>
@@ -1528,13 +1537,12 @@ export default function BuilderForm({
                 <h3 className="text-lg font-bold text-white flex items-center gap-2">
                   <i className="fa-solid fa-compact-disc text-amber-400" /> Event Music Library
                 </h3>
-                <p className="text-xs text-slate-400">Click the Play (▶️) button to test audio tracks immediately.</p>
+                <p className="text-xs text-slate-400">Click the Play / Pause (▶️ / ⏸️) button to toggle live audio.</p>
               </div>
               <button
                 type="button"
                 onClick={() => {
                   globalAudio.stop();
-                  setPreviewTrackId(null);
                   setIsMusicModalOpen(false);
                 }}
                 className="w-8 h-8 rounded-full bg-slate-800 hover:bg-slate-700 text-slate-300 flex items-center justify-center text-sm cursor-pointer"
@@ -1563,7 +1571,7 @@ export default function BuilderForm({
             <div className="p-4 sm:p-5 overflow-y-auto space-y-2.5 flex-1">
               {filteredMusic.map((track) => {
                 const isSelected = data.cover?.audioUrl === track.trackCode;
-                const isCurrentPreview = previewTrackId === track.trackCode;
+                const isCurrentPreview = previewTrackId === track.trackCode && isPlayingAudio;
 
                 return (
                   <div
@@ -1574,7 +1582,7 @@ export default function BuilderForm({
                         : 'bg-slate-950/60 border-slate-800 hover:border-slate-700'
                     }`}
                   >
-                    {/* Play / Pause Preview Button */}
+                    {/* Play / Pause Toggle Button */}
                     <div className="flex items-center gap-3">
                       <button
                         type="button"
@@ -1597,8 +1605,8 @@ export default function BuilderForm({
                         <div className="flex items-center gap-2">
                           <span className="text-xs font-bold text-white block">{track.name}</span>
                           {isCurrentPreview && (
-                            <span className="flex items-center gap-0.5 text-amber-400 text-[10px] animate-pulse">
-                              <i className="fa-solid fa-waveform" /> Playing
+                            <span className="flex items-center gap-1 text-amber-400 text-[10px] font-bold animate-pulse">
+                              <i className="fa-solid fa-volume-high" /> Playing
                             </span>
                           )}
                         </div>

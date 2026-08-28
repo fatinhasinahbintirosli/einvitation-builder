@@ -91,17 +91,13 @@ export function InvitationCard({
   const slides = maxSlides && maxSlides > 0 ? rawSlides.slice(0, maxSlides) : rawSlides;
   const totalSlides = slides.length;
 
-  // Auto-reload audio if track changes while playing
+  // Real-time audio engine state synchronization
   useEffect(() => {
-    if (isPlaying && data?.cover?.audioUrl) {
-      globalAudio.play(data.cover.audioUrl);
-    }
-  }, [data?.cover?.audioUrl, isPlaying]);
-
-  // Clean up audio on unmount
-  useEffect(() => {
+    const unsubscribe = globalAudio.subscribe((state) => {
+      setIsPlaying(state.isPlaying);
+    });
     return () => {
-      globalAudio.stop();
+      unsubscribe();
     };
   }, []);
 
@@ -121,18 +117,15 @@ export function InvitationCard({
     e.stopPropagation();
     if (isPlaying) {
       globalAudio.stop();
-      setIsPlaying(false);
     } else {
       const track = data?.cover?.audioUrl || 'm1';
       globalAudio.play(track);
-      setIsPlaying(true);
     }
   };
 
   const handleOpenCard = () => {
     const track = data?.cover?.audioUrl || 'm1';
     globalAudio.play(track);
-    setIsPlaying(true);
     setIsOpen(true);
     setCurrentSlide(0);
   };
