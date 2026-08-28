@@ -3,7 +3,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { CardData, SlideType } from '@/types/invitation';
 import { supabase } from '@/lib/supabaseClient';
-import Link from 'next/link';
 
 type SlideItem = CardData['slides'][number];
 
@@ -151,7 +150,7 @@ export default function BuilderForm({
     }
   };
 
-  // Direct Audio File Upload
+  // Direct Audio File Upload from device
   const handleAudioUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
@@ -393,7 +392,6 @@ export default function BuilderForm({
     }
   };
 
-  // Dynamic Categories from Supabase
   const wallpaperCategories = ['All', ...Array.from(new Set(dbWallpapers.map(w => w.category).filter(Boolean)))];
   const musicCategories = ['All', ...Array.from(new Set(dbMusic.map(m => m.category).filter(Boolean)))];
 
@@ -421,18 +419,10 @@ export default function BuilderForm({
         }}
       />
 
-      <div className="flex items-center justify-between">
-        <div>
-          <h2 className="text-2xl font-bold text-white tracking-wide">Digital Invitation Studio</h2>
-          <p className="text-xs text-slate-400 mt-1">Independent cover & slide styling, custom fonts, 0-100% transparency & dynamic music.</p>
-        </div>
-        <Link
-          href="/admin"
-          className="px-3 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-amber-300 font-bold text-[11px] border border-slate-700 flex items-center gap-1.5 transition-all shadow-sm"
-          title="Manage Uploaded Wallpapers & Songs"
-        >
-          <i className="fa-solid fa-gear" /> Admin Portal
-        </Link>
+      {/* Header (Clean Studio Title - No visible Admin button) */}
+      <div>
+        <h2 className="text-2xl font-bold text-white tracking-wide">Digital Invitation Studio</h2>
+        <p className="text-xs text-slate-400 mt-1">Independent cover & slide styling, custom fonts, 0-100% transparency & dynamic music.</p>
       </div>
 
       {/* Navigation Tabs */}
@@ -1420,7 +1410,6 @@ export default function BuilderForm({
                         : 'bg-slate-950/60 border-slate-800 hover:border-slate-700'
                     }`}
                   >
-                    {/* Play / Pause Toggle Button */}
                     <div className="flex items-center gap-3">
                       <button
                         type="button"
@@ -1452,7 +1441,6 @@ export default function BuilderForm({
                       </div>
                     </div>
 
-                    {/* Choose Track Button */}
                     <div className="flex items-center gap-2">
                       {isSelected ? (
                         <span className="px-3.5 py-2 rounded-xl bg-emerald-500/20 border border-emerald-500/40 text-emerald-300 text-xs font-bold flex items-center gap-1.5">
@@ -1471,12 +1459,6 @@ export default function BuilderForm({
                   </div>
                 );
               })}
-
-              {filteredMusic.length === 0 && (
-                <div className="text-center py-8 text-xs text-slate-500">
-                  No music tracks found in this category. Go to <Link href="/admin" className="text-amber-400 underline font-bold">Admin Portal</Link> to upload new tracks.
-                </div>
-              )}
             </div>
 
           </div>
