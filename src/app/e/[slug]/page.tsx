@@ -14,9 +14,9 @@ export default async function PublicInvitationPage({ params, searchParams }: Pro
   const { slug } = params;
   const isPremiumParam = searchParams?.v === 'premium';
   const sessionId = searchParams?.session_id;
-  const guestName = searchParams?.to ? decodeURIComponent(searchParams.to) : "Dato' / Datin / Tuan / Puan";
+  const guestName = searchParams?.to ? decodeURIComponent(searchParams.to) : "Honored Guest / Family & Friends";
 
-  // Ambil data kad daripada Supabase
+  // Fetch card data from Supabase
   let { data: invitation, error } = await supabase
     .from('invitations')
     .select('*')
@@ -27,7 +27,7 @@ export default async function PublicInvitationPage({ params, searchParams }: Pro
     notFound();
   }
 
-  // Jika ada session_id daripada Stripe, sahkan pembayaran secara langsung
+  // Instant Verification on Stripe return
   if (sessionId && !invitation.is_paid && process.env.STRIPE_SECRET_KEY) {
     try {
       const stripe = new Stripe(process.env.STRIPE_SECRET_KEY, {
@@ -36,7 +36,6 @@ export default async function PublicInvitationPage({ params, searchParams }: Pro
       const session = await stripe.checkout.sessions.retrieve(sessionId);
 
       if (session.payment_status === 'paid' && session.metadata?.slug === slug) {
-        // Kemas kini status Supabase menjadi berbayar (is_paid = true)
         await supabase
           .from('invitations')
           .update({ is_paid: true })
@@ -45,7 +44,7 @@ export default async function PublicInvitationPage({ params, searchParams }: Pro
         invitation.is_paid = true;
       }
     } catch (err) {
-      console.error('Ralat pengesahan Stripe Session:', err);
+      console.error('Stripe verification note:', err);
     }
   }
 
@@ -57,7 +56,7 @@ export default async function PublicInvitationPage({ params, searchParams }: Pro
     <main className="min-h-screen bg-slate-950 flex flex-col items-center justify-center p-0 sm:p-4">
       {searchParams?.payment === 'success' && (
         <div className="fixed top-4 z-50 px-4 py-2 bg-emerald-500 text-slate-950 rounded-full font-bold text-xs shadow-xl animate-bounce">
-          🎉 Pembayaran Berjaya! Kad Premium Anda Telah Dibuka Kunci.
+          🎉 Payment Successful! Full Premium Access Unlocked.
         </div>
       )}
 

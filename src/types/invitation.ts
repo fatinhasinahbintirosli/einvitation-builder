@@ -30,15 +30,20 @@ export interface ThemeConfig {
   backgroundColor?: string;
   cardBackgroundColor?: string;
   
-  // Wallpaper Helaian (Inner Slide Background)
+  // Separate Wallpaper Controls
   slideBgUrl?: string;
   bgPatternUrl?: string;
-  cardOpacity?: number; // 20 hingga 100
+  cardOpacity?: number; // 20 to 100
 
-  // Wallpaper Muka Depan (Cover Background)
+  // Cover Background Controls
   coverBgType?: 'color' | 'image';
   coverBgColor?: string;
   coverBgUrl?: string;
+
+  // Typography & Font Sizing
+  headingFont?: string;
+  bodyFont?: string;
+  fontSizeScale?: number; // 90 to 120 (default: 100)
 
   doorStyle?: string;
   [key: string]: any;
