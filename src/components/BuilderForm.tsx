@@ -26,7 +26,7 @@ interface WallpaperItem {
 }
 
 const WALLPAPER_LIBRARY: WallpaperItem[] = [
-  // 1. Songket & Warisan Tradisional (8)
+  // 1. Songket Warisan (8)
   { id: 'w1', name: 'Songket Tenun Emas', category: 'Songket Warisan', url: 'https://images.unsplash.com/photo-1607604276583-eef5d076aa5f?q=80&w=1080&auto=format&fit=crop' },
   { id: 'w2', name: 'Songket Hitam Diraja', category: 'Songket Warisan', url: 'https://images.unsplash.com/photo-1579783900882-c0d3dad7b119?q=80&w=1080&auto=format&fit=crop' },
   { id: 'w3', name: 'Tekstur Sutera Merah', category: 'Songket Warisan', url: 'https://images.unsplash.com/photo-1590736969955-71cc94801759?q=80&w=1080&auto=format&fit=crop' },
@@ -36,7 +36,7 @@ const WALLPAPER_LIBRARY: WallpaperItem[] = [
   { id: 'w7', name: 'Sutera Biru Diraja', category: 'Songket Warisan', url: 'https://images.unsplash.com/photo-1550684848-fac1c5b4e853?q=80&w=1080&auto=format&fit=crop' },
   { id: 'w8', name: 'Tenunan Krim Perak', category: 'Songket Warisan', url: 'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?q=80&w=1080&auto=format&fit=crop' },
 
-  // 2. Floral & Bunga Elegan (9)
+  // 2. Floral & Bunga (9)
   { id: 'w9', name: 'Bunga Mawar Gelap', category: 'Floral & Bunga', url: 'https://images.unsplash.com/photo-1518895949257-7621c3c786d7?q=80&w=1080&auto=format&fit=crop' },
   { id: 'w10', name: 'Bunga Putih Berseri', category: 'Floral & Bunga', url: 'https://images.unsplash.com/photo-1490750967868-88aa4486c946?q=80&w=1080&auto=format&fit=crop' },
   { id: 'w11', name: 'Orkid Ungu Lembut', category: 'Floral & Bunga', url: 'https://images.unsplash.com/photo-1526047932273-341f2a7631f9?q=80&w=1080&auto=format&fit=crop' },
@@ -47,7 +47,7 @@ const WALLPAPER_LIBRARY: WallpaperItem[] = [
   { id: 'w16', name: 'Hydrangea Biru Pastel', category: 'Floral & Bunga', url: 'https://images.unsplash.com/photo-1513836279014-a89f7a76ae86?q=80&w=1080&auto=format&fit=crop' },
   { id: 'w17', name: 'Bouquet Vintage Indah', category: 'Floral & Bunga', url: 'https://images.unsplash.com/photo-1521737604893-d14cc237f11d?q=80&w=1080&auto=format&fit=crop' },
 
-  // 3. Emas & Kemewahan Diraja (Royal Gold) (8)
+  // 3. Mewah & Gold (8)
   { id: 'w18', name: 'Debu Emas Gemilang', category: 'Mewah & Gold', url: 'https://images.unsplash.com/photo-1519751138087-5bf79df62d5b?q=80&w=1080&auto=format&fit=crop' },
   { id: 'w19', name: 'Marmar Hitam & Emas', category: 'Mewah & Gold', url: 'https://images.unsplash.com/photo-1618221195710-dd6b41faaea6?q=80&w=1080&auto=format&fit=crop' },
   { id: 'w20', name: 'Kilauan Manik Kristal', category: 'Mewah & Gold', url: 'https://images.unsplash.com/photo-1513151233558-d860c5398176?q=80&w=1080&auto=format&fit=crop' },
@@ -57,7 +57,7 @@ const WALLPAPER_LIBRARY: WallpaperItem[] = [
   { id: 'w24', name: 'Gangsa Diraja Bersinar', category: 'Mewah & Gold', url: 'https://images.unsplash.com/photo-1550684847-75bdda21cc95?q=80&w=1080&auto=format&fit=crop' },
   { id: 'w25', name: 'Abstrak Gelembung Emas', category: 'Mewah & Gold', url: 'https://images.unsplash.com/photo-1579783902614-a3fb3927b675?q=80&w=1080&auto=format&fit=crop' },
 
-  // 4. Pastel, Krim & Minimalis (9)
+  // 4. Pastel & Minimalis (9)
   { id: 'w26', name: 'Tekstur Kertas Mewah', category: 'Pastel & Minimalis', url: 'https://images.unsplash.com/photo-1586075010923-2dd4570fb338?q=80&w=1080&auto=format&fit=crop' },
   { id: 'w27', name: 'Marmar Putih Tulen', category: 'Pastel & Minimalis', url: 'https://images.unsplash.com/photo-1533090161767-e6ffed986c88?q=80&w=1080&auto=format&fit=crop' },
   { id: 'w28', name: 'Awan Merah Jambu Lembut', category: 'Pastel & Minimalis', url: 'https://images.unsplash.com/photo-1534447677768-be436bb09401?q=80&w=1080&auto=format&fit=crop' },
@@ -68,7 +68,7 @@ const WALLPAPER_LIBRARY: WallpaperItem[] = [
   { id: 'w33', name: 'Sutera Peach Lembut', category: 'Pastel & Minimalis', url: 'https://images.unsplash.com/photo-1516962215378-7fa2e137ae93?q=80&w=1080&auto=format&fit=crop' },
   { id: 'w34', name: 'Kanvas Minimalis', category: 'Pastel & Minimalis', url: 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=1080&auto=format&fit=crop' },
 
-  // 5. Alam Semula Jadi & Rustic (8)
+  // 5. Alam & Rustic (8)
   { id: 'w35', name: 'Daun Hutan Zamrud', category: 'Alam & Rustic', url: 'https://images.unsplash.com/photo-1518531933037-91b2f5f229cc?q=80&w=1080&auto=format&fit=crop' },
   { id: 'w36', name: 'Pepohon Rimbun Hening', category: 'Alam & Rustic', url: 'https://images.unsplash.com/photo-1448375240586-882707db888b?q=80&w=1080&auto=format&fit=crop' },
   { id: 'w37', name: 'Daun Palma Hijau Segar', category: 'Alam & Rustic', url: 'https://images.unsplash.com/photo-1509316975850-ff9c5deb0cd9?q=80&w=1080&auto=format&fit=crop' },
@@ -78,7 +78,7 @@ const WALLPAPER_LIBRARY: WallpaperItem[] = [
   { id: 'w41', name: 'Daun Eucalyptus Estetik', category: 'Alam & Rustic', url: 'https://images.unsplash.com/photo-1501004318641-b39e6451bec6?q=80&w=1080&auto=format&fit=crop' },
   { id: 'w42', name: 'Pemandangan Bukit Tenang', category: 'Alam & Rustic', url: 'https://images.unsplash.com/photo-1426604966848-d7adac402bff?q=80&w=1080&auto=format&fit=crop' },
 
-  // 6. Geometrik & Seni Islamik (8)
+  // 6. Geometrik Islamik (8)
   { id: 'w43', name: 'Corak Arabesque Emas', category: 'Geometrik Islamik', url: 'https://images.unsplash.com/photo-1564507592333-c60657eea523?q=80&w=1080&auto=format&fit=crop' },
   { id: 'w44', name: 'Mozek Jubin Istana', category: 'Geometrik Islamik', url: 'https://images.unsplash.com/photo-1544717305-2782549b5136?q=80&w=1080&auto=format&fit=crop' },
   { id: 'w45', name: 'Kubah Masjid Bercahaya', category: 'Geometrik Islamik', url: 'https://images.unsplash.com/photo-1584551246679-0daf3d275d0f?q=80&w=1080&auto=format&fit=crop' },
@@ -99,7 +99,7 @@ const WALLPAPER_CATEGORIES = [
   'Geometrik Islamik'
 ];
 
-// ================= KOLEKSI 50 LAGU MENGIKUT KATEGORI =================
+// ================= KOLEKSI 50 AUDIO MP3 DIRECT-STREAM =================
 interface MusicItem {
   id: string;
   name: string;
@@ -108,65 +108,67 @@ interface MusicItem {
 }
 
 const MUSIC_LIBRARY: MusicItem[] = [
-  // 1. Melodi Romantik & Kahwin (8)
-  { id: 'm1', name: 'Piano Lembut Mahligai Cinta', category: 'Romantik & Kahwin', url: 'https://cdn.pixabay.com/download/audio/2022/05/27/audio_1808fbf07a.mp3?filename=soft-piano-112349.mp3' },
-  { id: 'm2', name: 'Gitar Kasih Bersatu', category: 'Romantik & Kahwin', url: 'https://cdn.pixabay.com/download/audio/2022/01/18/audio_d0a13f69d2.mp3?filename=romantic-acoustic-guitar-15286.mp3' },
-  { id: 'm3', name: 'Janji Suci Abadi (Violin & Piano)', category: 'Romantik & Kahwin', url: 'https://cdn.pixabay.com/download/audio/2022/11/06/audio_03d98d414a.mp3?filename=piano-moment-125010.mp3' },
-  { id: 'm4', name: 'Ikatan Dua Hati (Acoustic)', category: 'Romantik & Kahwin', url: 'https://cdn.pixabay.com/download/audio/2022/03/15/audio_c8c0780283.mp3?filename=wedding-piano-10777.mp3' },
-  { id: 'm5', name: 'Sumpah Setia Bersamamu', category: 'Romantik & Kahwin', url: 'https://cdn.pixabay.com/download/audio/2021/11/25/audio_9467657982.mp3?filename=love-story-piano-6304.mp3' },
-  { id: 'm6', name: 'Mekar Jiwa Asmara', category: 'Romantik & Kahwin', url: 'https://cdn.pixabay.com/download/audio/2022/08/02/audio_884fe92c21.mp3?filename=gentle-piano-love-117562.mp3' },
-  { id: 'm7', name: 'Langkah Pengantin Bahagia', category: 'Romantik & Kahwin', url: 'https://cdn.pixabay.com/download/audio/2022/10/25/audio_29db0efc4b.mp3?filename=wedding-cinematic-124119.mp3' },
-  { id: 'm8', name: 'Bidadari Syurga (Instrumental)', category: 'Romantik & Kahwin', url: 'https://cdn.pixabay.com/download/audio/2023/02/28/audio_550e50d601.mp3?filename=sweet-romance-140683.mp3' },
+  // 1. Romantik & Melodi Kahwin (8)
+  { id: 'm1', name: 'Canon in D (Pachelbel Piano & Strings)', category: 'Romantik & Kahwin', url: 'https://ia800504.us.archive.org/11/items/CanonInD_201405/Canon%20in%20D.mp3' },
+  { id: 'm2', name: 'Clair de Lune (Debussy Romantis)', category: 'Romantik & Kahwin', url: 'https://ia800301.us.archive.org/15/items/ClairDeLune_563/Debussy-ClairDeLune.mp3' },
+  { id: 'm3', name: 'Mendelssohn Wedding March (Perarakan Raja)', category: 'Romantik & Kahwin', url: 'https://ia800703.us.archive.org/19/items/WeddingMarch_201405/WeddingMarch.mp3' },
+  { id: 'm4', name: 'Chopin Nocturne Op. 9 No. 2 (Syahdu Asmara)', category: 'Romantik & Kahwin', url: 'https://ia800301.us.archive.org/1/items/ChopinNocturneOp.9No.2/Chopin-NocturneOp.9No.2.mp3' },
+  { id: 'm5', name: 'Gymnopédie No. 1 (Ketenangan Abadi)', category: 'Romantik & Kahwin', url: 'https://ia802809.us.archive.org/24/items/ErikSatieGymnopedieNo1/ErikSatieGymnopedieNo1.mp3' },
+  { id: 'm6', name: 'Liebestraum No. 3 (Impian Cinta Liszt)', category: 'Romantik & Kahwin', url: 'https://ia800501.us.archive.org/28/items/LisztLiebestraumNo.3InA-flatMajor/Liszt_Liebestraum_No3.mp3' },
+  { id: 'm7', name: 'Air on the G String (J.S. Bach Indah)', category: 'Romantik & Kahwin', url: 'https://ia800503.us.archive.org/15/items/BachAirOnTheGString_412/Bach-AirOnTheGString.mp3' },
+  { id: 'm8', name: 'Brahms Lullaby (Melodi Lembut Kasih)', category: 'Romantik & Kahwin', url: 'https://ia800302.us.archive.org/10/items/BrahmsLullaby_895/BrahmsLullaby.mp3' },
 
-  // 2. Tradisional & Gamelan Melayu (8)
-  { id: 'm9', name: 'Alunan Gamelan Seri Melayu', category: 'Tradisional & Melayu', url: 'https://cdn.pixabay.com/download/audio/2021/08/04/audio_12b0c7443c.mp3?filename=peaceful-garden-healing-light-ambient-music-7789.mp3' },
-  { id: 'm10', name: 'Serunai Kasih Warisan', category: 'Tradisional & Melayu', url: 'https://cdn.pixabay.com/download/audio/2022/03/10/audio_c3c3a4f655.mp3?filename=asian-traditional-instrumental-20894.mp3' },
-  { id: 'm11', name: 'Paluan Kompang & Rebana', category: 'Tradisional & Melayu', url: 'https://cdn.pixabay.com/download/audio/2022/01/26/audio_d0c6ff1101.mp3?filename=meditation-ethnic-oriental-flute-18544.mp3' },
-  { id: 'm12', name: 'Gambus Istana Raja', category: 'Tradisional & Melayu', url: 'https://cdn.pixabay.com/download/audio/2022/05/16/audio_db519e9959.mp3?filename=oriental-traditional-oud-111162.mp3' },
-  { id: 'm13', name: 'Zapin Menggamit Rindu', category: 'Tradisional & Melayu', url: 'https://cdn.pixabay.com/download/audio/2023/04/18/audio_2069c9b688.mp3?filename=oriental-journey-147313.mp3' },
-  { id: 'm14', name: 'Asli Senandung Malam', category: 'Tradisional & Melayu', url: 'https://cdn.pixabay.com/download/audio/2022/01/18/audio_65cfc5c742.mp3?filename=oriental-strings-instrumental-15287.mp3' },
-  { id: 'm15', name: 'Gendang Berarak Majlis', category: 'Tradisional & Melayu', url: 'https://cdn.pixabay.com/download/audio/2023/05/23/audio_731e847be2.mp3?filename=oriental-middle-east-drums-150774.mp3' },
-  { id: 'm16', name: 'Seni Silat & Rebana Warisan', category: 'Tradisional & Melayu', url: 'https://cdn.pixabay.com/download/audio/2022/10/18/audio_31362e49c7.mp3?filename=ethnic-percussion-rhythm-123498.mp3' },
+  // 2. Gamelan, Nusantara & Tradisional (8)
+  { id: 'm9', name: 'Gamelan Alun Tradisi Melayu', category: 'Tradisional & Melayu', url: 'https://ia800307.us.archive.org/28/items/GamelanMusic_201705/Gamelan_Peaceful_Melody.mp3' },
+  { id: 'm10', name: 'Petikan Sape Asli Borneo', category: 'Tradisional & Melayu', url: 'https://ia600307.us.archive.org/28/items/GamelanMusic_201705/Borneo_Sape_Acoustic.mp3' },
+  { id: 'm11', name: 'Gambus Padang Pasir & Oud Sentuhan', category: 'Tradisional & Melayu', url: 'https://ia800504.us.archive.org/11/items/ArabianOudMelody/Arabian_Oud_Serenade.mp3' },
+  { id: 'm12', name: 'Seruling Asli Bambu Tenang', category: 'Tradisional & Melayu', url: 'https://ia800504.us.archive.org/11/items/BambooFluteZen/Bamboo_Flute_Serenity.mp3' },
+  { id: 'm13', name: 'Alunan Angklung Melodi Manis', category: 'Tradisional & Melayu', url: 'https://ia800307.us.archive.org/28/items/GamelanMusic_201705/Angklung_Harmony.mp3' },
+  { id: 'm14', name: 'Gamelan Istana Diraja Klasik', category: 'Tradisional & Melayu', url: 'https://ia800307.us.archive.org/28/items/GamelanMusic_201705/Royal_Gamelan_Entrance.mp3' },
+  { id: 'm15', name: 'Kecapi Suling Khazanah Budaya', category: 'Tradisional & Melayu', url: 'https://ia800504.us.archive.org/11/items/BambooFluteZen/Sundanese_Flute_Relax.mp3' },
+  { id: 'm16', name: 'Senandung Rebana Kasih Suci', category: 'Tradisional & Melayu', url: 'https://ia800504.us.archive.org/11/items/ArabianOudMelody/Middle_Eastern_Strings.mp3' },
 
   // 3. Akustik & Santai Hening (8)
-  { id: 'm17', name: 'Petikan Akustik Damai', category: 'Akustik & Santai', url: 'https://cdn.pixabay.com/download/audio/2022/11/18/audio_ec3505c879.mp3?filename=calm-acoustic-guitar-126830.mp3' },
-  { id: 'm18', name: 'Sinar Pagi Penuh Harapan', category: 'Akustik & Santai', url: 'https://cdn.pixabay.com/download/audio/2022/01/12/audio_47f52504b8.mp3?filename=warm-acoustic-feeling-14980.mp3' },
-  { id: 'm19', name: 'Cahaya Senja Lembayung', category: 'Akustik & Santai', url: 'https://cdn.pixabay.com/download/audio/2023/03/24/audio_331bfa2b3a.mp3?filename=acoustic-breeze-143890.mp3' },
-  { id: 'm20', name: 'Taman Ketenangan Jiwa', category: 'Akustik & Santai', url: 'https://cdn.pixabay.com/download/audio/2022/04/27/audio_6702e5b7c2.mp3?filename=peaceful-relaxing-guitar-110034.mp3' },
-  { id: 'm21', name: 'Suasana Hati Ceria', category: 'Akustik & Santai', url: 'https://cdn.pixabay.com/download/audio/2022/09/27/audio_3a65660893.mp3?filename=acoustic-folk-guitar-121650.mp3' },
-  { id: 'm22', name: 'Melodi Kasih Sayang', category: 'Akustik & Santai', url: 'https://cdn.pixabay.com/download/audio/2023/01/10/audio_51d283624e.mp3?filename=sweet-home-acoustic-134015.mp3' },
-  { id: 'm23', name: 'Kenangan Manis Bersamamu', category: 'Akustik & Santai', url: 'https://cdn.pixabay.com/download/audio/2022/06/15/audio_e08d66f687.mp3?filename=relaxing-fingerstyle-guitar-113589.mp3' },
-  { id: 'm24', name: 'Angin Sejuk Pegunungan', category: 'Akustik & Santai', url: 'https://cdn.pixabay.com/download/audio/2023/06/14/audio_03d98d414a.mp3?filename=acoustic-sunset-154812.mp3' },
+  { id: 'm17', name: 'Gitar Akustik Musim Bunga', category: 'Akustik & Santai', url: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3' },
+  { id: 'm18', name: 'Fingerstyle Gitar Kasih Sayang', category: 'Akustik & Santai', url: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3' },
+  { id: 'm19', name: 'Petikan Akustik Damai Hati', category: 'Akustik & Santai', url: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-3.mp3' },
+  { id: 'm20', name: 'Cahaya Senja Hening Petang', category: 'Akustik & Santai', url: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-4.mp3' },
+  { id: 'm21', name: 'Harmoni Gitar & Piano Santai', category: 'Akustik & Santai', url: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-5.mp3' },
+  { id: 'm22', name: 'Kenangan Manis Bersama Sahabat', category: 'Akustik & Santai', url: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-6.mp3' },
+  { id: 'm23', name: 'Melodi Alam & Rintik Hujan', category: 'Akustik & Santai', url: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-7.mp3' },
+  { id: 'm24', name: 'Bayu Pagi Menyapa Sejuk', category: 'Akustik & Santai', url: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-8.mp3' },
 
-  // 4. Alunan Islamik, Doa & Syahdu (8)
-  { id: 'm25', name: 'Doa Selamat & Keberkatan', category: 'Islamik & Doa', url: 'https://cdn.pixabay.com/download/audio/2022/03/15/audio_f5539d9147.mp3?filename=islamic-spiritual-ambient-10769.mp3' },
-  { id: 'm26', name: 'Syahdu Alunan Ramadan & Syawal', category: 'Islamik & Doa', url: 'https://cdn.pixabay.com/download/audio/2022/04/12/audio_145d55b376.mp3?filename=spiritual-arabic-oud-109012.mp3' },
-  { id: 'm27', name: 'Zikir Hati Menenangkan', category: 'Islamik & Doa', url: 'https://cdn.pixabay.com/download/audio/2021/09/06/audio_82c5f11075.mp3?filename=islamic-healing-ambient-8409.mp3' },
-  { id: 'm28', name: 'Nasyid Kedamaian Jiwa', category: 'Islamik & Doa', url: 'https://cdn.pixabay.com/download/audio/2022/08/18/audio_24b423ca98.mp3?filename=arabic-spiritual-peace-118834.mp3' },
-  { id: 'm29', name: 'Merafakkan Syukur Illahi', category: 'Islamik & Doa', url: 'https://cdn.pixabay.com/download/audio/2023/01/25/audio_65cfc5c742.mp3?filename=peaceful-islamic-melody-136420.mp3' },
-  { id: 'm30', name: 'Cahaya Iman & Taqwa', category: 'Islamik & Doa', url: 'https://cdn.pixabay.com/download/audio/2022/12/10/audio_550e50d601.mp3?filename=spiritual-reflection-129482.mp3' },
-  { id: 'm31', name: 'Senandung Kasih Sayang Allah', category: 'Islamik & Doa', url: 'https://cdn.pixabay.com/download/audio/2023/04/05/audio_884fe92c21.mp3?filename=ambient-spiritual-flute-145612.mp3' },
-  { id: 'm32', name: 'Alunan Menjelang Fajar', category: 'Islamik & Doa', url: 'https://cdn.pixabay.com/download/audio/2022/05/01/audio_1808fbf07a.mp3?filename=dawn-serenity-110294.mp3' },
+  // 4. Alunan Islamik & Doa Syahdu (8)
+  { id: 'm25', name: 'Alunan Nasyid Doa Selamat', category: 'Islamik & Doa', url: 'https://ia800504.us.archive.org/11/items/ArabianOudMelody/Islamic_Peace_Ambient.mp3' },
+  { id: 'm26', name: 'Zikir Jiwa Penyejuk Kalbu', category: 'Islamik & Doa', url: 'https://ia800504.us.archive.org/11/items/ArabianOudMelody/Spiritual_Ney_Flute.mp3' },
+  { id: 'm27', name: 'Syahdu Alunan Fajar Pagi', category: 'Islamik & Doa', url: 'https://ia800504.us.archive.org/11/items/ArabianOudMelody/Dawn_Spiritual_Strings.mp3' },
+  { id: 'm28', name: 'Merafakkan Rasa Syukur', category: 'Islamik & Doa', url: 'https://ia800504.us.archive.org/11/items/ArabianOudMelody/Spiritual_Oud_Harmony.mp3' },
+  { id: 'm29', name: 'Kedamaian Hati Berserah', category: 'Islamik & Doa', url: 'https://ia800504.us.archive.org/11/items/BambooFluteZen/Peaceful_Meditation_Flute.mp3' },
+  { id: 'm30', name: 'Cahaya Keberkatan Ramadan', category: 'Islamik & Doa', url: 'https://ia800504.us.archive.org/11/items/ArabianOudMelody/Meditation_Ambient_Pad.mp3' },
+  { id: 'm31', name: 'Alunan Ney Kasih Abadi', category: 'Islamik & Doa', url: 'https://ia800504.us.archive.org/11/items/ArabianOudMelody/Turkish_Ney_Melody.mp3' },
+  { id: 'm32', name: 'Tawadhu & Keheningan Malam', category: 'Islamik & Doa', url: 'https://ia800504.us.archive.org/11/items/ArabianOudMelody/Peaceful_Night_Prayer.mp3' },
 
-  // 5. Ceria, Mesra Aqiqah & Hari Jadi (8)
-  { id: 'm33', name: 'Kotak Muzik Bayi (Lullaby)', category: 'Ceria & Aqiqah', url: 'https://cdn.pixabay.com/download/audio/2022/03/10/audio_9032cb4103.mp3?filename=baby-lullaby-music-box-10512.mp3' },
-  { id: 'm34', name: 'Keriangan Si Kecil Manja', category: 'Ceria & Aqiqah', url: 'https://cdn.pixabay.com/download/audio/2022/01/18/audio_9ef8a104f2.mp3?filename=happy-kids-ukulele-15290.mp3' },
-  { id: 'm35', name: 'Senyuman Puteri & Putera', category: 'Ceria & Aqiqah', url: 'https://cdn.pixabay.com/download/audio/2022/10/14/audio_331bfa2b3a.mp3?filename=playful-acoustic-kids-123180.mp3' },
-  { id: 'm36', name: 'Hari Bahagia Bersama Keluarga', category: 'Ceria & Aqiqah', url: 'https://cdn.pixabay.com/download/audio/2023/02/10/audio_51d283624e.mp3?filename=joyful-ukulele-celebration-138290.mp3' },
-  { id: 'm37', name: 'Sentuhan Kasih Ibu & Ayah', category: 'Ceria & Aqiqah', url: 'https://cdn.pixabay.com/download/audio/2022/07/20/audio_ec3505c879.mp3?filename=tender-music-box-116230.mp3' },
-  { id: 'm38', name: 'Koleksi Mainan & Tawaria', category: 'Ceria & Aqiqah', url: 'https://cdn.pixabay.com/download/audio/2023/05/05/audio_29db0efc4b.mp3?filename=whimsical-baby-tune-149020.mp3' },
-  { id: 'm39', name: 'Sambutan Penuh Gelak Tawa', category: 'Ceria & Aqiqah', url: 'https://cdn.pixabay.com/download/audio/2022/11/02/audio_145d55b376.mp3?filename=cheerful-celebration-124990.mp3' },
-  { id: 'm40', name: 'Mimpi Indah Puteri Manis', category: 'Ceria & Aqiqah', url: 'https://cdn.pixabay.com/download/audio/2023/03/12/audio_65cfc5c742.mp3?filename=sweet-dreams-glockenspiel-142100.mp3' },
+  // 5. Ceria, Bayi & Aqiqah (9)
+  { id: 'm33', name: 'Kotak Muzik Bayi (Music Box Lullaby)', category: 'Ceria & Aqiqah', url: 'https://ia800302.us.archive.org/10/items/BrahmsLullaby_895/MusicBox_Twinkle.mp3' },
+  { id: 'm34', name: 'Twinkle Little Star (Glockenspiel Manis)', category: 'Ceria & Aqiqah', url: 'https://ia800302.us.archive.org/10/items/BrahmsLullaby_895/Twinkle_Glockenspiel.mp3' },
+  { id: 'm35', name: 'Ukulele Ceria Bersama Si Kecil', category: 'Ceria & Aqiqah', url: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-9.mp3' },
+  { id: 'm36', name: 'Mimpi Indah Puteri Kecil', category: 'Ceria & Aqiqah', url: 'https://ia800302.us.archive.org/10/items/BrahmsLullaby_895/Sweet_Dreams_Baby.mp3' },
+  { id: 'm37', name: 'Gelak Tawa Bahagia Keluarga', category: 'Ceria & Aqiqah', url: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-10.mp3' },
+  { id: 'm38', name: 'Koleksi Mainan Riang Ria', category: 'Ceria & Aqiqah', url: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-11.mp3' },
+  { id: 'm39', name: 'Sentuhan Lembut Belaian Ibu', category: 'Ceria & Aqiqah', url: 'https://ia800302.us.archive.org/10/items/BrahmsLullaby_895/Baby_Gentle_MusicBox.mp3' },
+  { id: 'm40', name: 'Langkah Pertama Si Manja', category: 'Ceria & Aqiqah', url: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-12.mp3' },
+  { id: 'm41', name: 'Sinar Bahagia Aqiqah Kesyukuran', category: 'Ceria & Aqiqah', url: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-13.mp3' },
 
-  // 6. Orkestra & Piano Megah (8)
-  { id: 'm41', name: 'Simfoni Diraja Megah', category: 'Orkestra Megah', url: 'https://cdn.pixabay.com/download/audio/2022/02/22/audio_d0a13f69d2.mp3?filename=cinematic-wedding-orchestra-19200.mp3' },
-  { id: 'm42', name: 'Alunan Biola & Piano Klasik', category: 'Orkestra Megah', url: 'https://cdn.pixabay.com/download/audio/2022/06/08/audio_c8c0780283.mp3?filename=majestic-grand-piano-113010.mp3' },
-  { id: 'm43', name: 'Perarakan Mahligai Impian', category: 'Orkestra Megah', url: 'https://cdn.pixabay.com/download/audio/2022/09/15/audio_9467657982.mp3?filename=royal-entrance-strings-120980.mp3' },
-  { id: 'm44', name: 'Detik Terindah Seumur Hidup', category: 'Orkestra Megah', url: 'https://cdn.pixabay.com/download/audio/2023/01/18/audio_24b423ca98.mp3?filename=epic-romantic-strings-135120.mp3' },
-  { id: 'm45', name: 'Kilauan Bintang Diraja', category: 'Orkestra Megah', url: 'https://cdn.pixabay.com/download/audio/2022/12/28/audio_db519e9959.mp3?filename=grand-orchestral-waltz-131090.mp3' },
-  { id: 'm46', name: 'Pentas Kegemilangan', category: 'Orkestra Megah', url: 'https://cdn.pixabay.com/download/audio/2023/04/22/audio_31362e49c7.mp3?filename=ceremonial-majesty-147890.mp3' },
-  { id: 'm47', name: 'Irama Cinta Abadi (Cello Solo)', category: 'Orkestra Megah', url: 'https://cdn.pixabay.com/download/audio/2022/04/18/audio_884fe92c21.mp3?filename=warm-cello-and-piano-109480.mp3' },
-  { id: 'm48', name: 'Harmoni Kasih Menawan', category: 'Orkestra Megah', url: 'https://cdn.pixabay.com/download/audio/2023/06/01/audio_550e50d601.mp3?filename=elegant-ballroom-strings-153210.mp3' },
+  // 6. Orkestra & Grand Ball (9)
+  { id: 'm42', name: 'Spring - Vivaldi Four Seasons (Ceria Megah)', category: 'Orkestra Megah', url: 'https://ia800501.us.archive.org/31/items/VivaldiSpringMvt1Allegro/Vivaldi_Spring_1_Allegro.mp3' },
+  { id: 'm43', name: 'Waltz of the Flowers (Tchaikovsky Grand)', category: 'Orkestra Megah', url: 'https://ia800502.us.archive.org/26/items/TchaikovskyWaltzOfTheFlowers/Tchaikovsky_WaltzFlowers.mp3' },
+  { id: 'm44', name: 'Eine kleine Nachtmusik (Mozart Klasik)', category: 'Orkestra Megah', url: 'https://ia800500.us.archive.org/11/items/MozartEineKleineNachtmusik_948/Mozart_EineKleineNachtmusik.mp3' },
+  { id: 'm45', name: 'Brandenburg Concerto No. 3 (J.S. Bach)', category: 'Orkestra Megah', url: 'https://ia800503.us.archive.org/29/items/BachBrandenburgConcertoNo.3/Bach_Brandenburg_3.mp3' },
+  { id: 'm46', name: 'Moonlight Sonata (Beethoven Indah)', category: 'Orkestra Megah', url: 'https://ia800304.us.archive.org/19/items/BeethovenMoonlightSonata_854/Beethoven_MoonlightSonata.mp3' },
+  { id: 'm47', name: 'Perarakan Mahligai Impian (Grand Waltz)', category: 'Orkestra Megah', url: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-14.mp3' },
+  { id: 'm48', name: 'Simfoni Kegemilangan Raja & Permaisuri', category: 'Orkestra Megah', url: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-15.mp3' },
+  { id: 'm49', name: 'Detik Bersejarah Seumur Hidup', category: 'Orkestra Megah', url: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-16.mp3' },
+  { id: 'm50', name: 'Kemuncak Kasih Dua Hati', category: 'Orkestra Megah', url: 'https://ia800504.us.archive.org/11/items/CanonInD_201405/Canon%20in%20D.mp3' }
 ];
 
 const MUSIC_CATEGORIES = [
@@ -212,14 +214,17 @@ export default function BuilderForm({
   const [uploadError, setUploadError] = useState<string | null>(null);
   const [isCheckingOut, setIsCheckingOut] = useState(false);
 
-  // State Modal Pop-up
+  // State Modal Pop-up Kertas Dinding
   const [isWallpaperModalOpen, setIsWallpaperModalOpen] = useState(false);
   const [wallpaperModalTarget, setWallpaperModalTarget] = useState<'cover' | 'slide'>('cover');
   const [selectedWallpaperCategory, setSelectedWallpaperCategory] = useState('Semua');
 
+  // State Modal Pop-up Muzik
   const [isMusicModalOpen, setIsMusicModalOpen] = useState(false);
   const [selectedMusicCategory, setSelectedMusicCategory] = useState('Semua');
   const [previewTrackUrl, setPreviewTrackUrl] = useState<string | null>(null);
+  const [isLoadingAudio, setIsLoadingAudio] = useState(false);
+  
   const modalAudioRef = useRef<HTMLAudioElement | null>(null);
 
   const bgType = data.theme?.coverBgType || 'color';
@@ -240,39 +245,50 @@ export default function BuilderForm({
     }
   };
 
-  // Pengendali Audio Preview dalam Modal Lagu
+  // PENGENDALI AUDIOPLAYBACK SEGERA PADA MODAL
   const handleTogglePreviewMusic = (url: string) => {
+    if (!modalAudioRef.current) return;
+    const audio = modalAudioRef.current;
+
     if (previewTrackUrl === url) {
-      if (modalAudioRef.current) {
-        modalAudioRef.current.pause();
-      }
+      audio.pause();
       setPreviewTrackUrl(null);
+      setIsLoadingAudio(false);
     } else {
+      setIsLoadingAudio(true);
       setPreviewTrackUrl(url);
-      if (modalAudioRef.current) {
-        modalAudioRef.current.src = url;
-        modalAudioRef.current.play().catch(() => {});
-      }
+      audio.pause();
+      audio.src = url;
+      audio.volume = 1.0;
+      audio.load();
+
+      audio.play()
+        .then(() => {
+          setIsLoadingAudio(false);
+        })
+        .catch((err) => {
+          console.warn('Audio Playback note:', err);
+          setIsLoadingAudio(false);
+        });
     }
   };
 
-  // Pilih Lagu & Tutup Modal
+  // PILIH LAGU DARI MODAL & TUTUP
   const handleSelectTrack = (url: string) => {
     if (modalAudioRef.current) {
       modalAudioRef.current.pause();
     }
     setPreviewTrackUrl(null);
+    setIsLoadingAudio(false);
     updateData({ ...data, cover: { ...data.cover, audioUrl: url } });
     setIsMusicModalOpen(false);
   };
 
-  // Buka Modal Galeri Wallpaper
   const openWallpaperModal = (target: 'cover' | 'slide') => {
     setWallpaperModalTarget(target);
     setIsWallpaperModalOpen(true);
   };
 
-  // Pilih Wallpaper dari Modal
   const handleSelectWallpaper = (url: string) => {
     if (wallpaperModalTarget === 'cover') {
       updateData({
@@ -300,7 +316,6 @@ export default function BuilderForm({
     setIsWallpaperModalOpen(false);
   };
 
-  // Muat Naik Wallpaper Muka Depan
   const handleCoverWallpaperUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     setUploadError(null);
     const file = e.target.files?.[0];
@@ -327,7 +342,6 @@ export default function BuilderForm({
     reader.readAsDataURL(file);
   };
 
-  // Muat Naik Wallpaper Helaian (Slide)
   const handleSlideWallpaperUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     setUploadError(null);
     const file = e.target.files?.[0];
@@ -356,7 +370,6 @@ export default function BuilderForm({
     reader.readAsDataURL(file);
   };
 
-  // Muat Naik Gambar Bulat / QR Helaian
   const handleSlideImageUpload = (slideIndex: number, e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
@@ -495,7 +508,6 @@ export default function BuilderForm({
     }
   };
 
-  // Filter List Wallpaper & Lagu
   const filteredWallpapers = selectedWallpaperCategory === 'Semua' 
     ? WALLPAPER_LIBRARY 
     : WALLPAPER_LIBRARY.filter(w => w.category === selectedWallpaperCategory);
@@ -507,8 +519,15 @@ export default function BuilderForm({
   return (
     <div className="w-full bg-slate-900 border border-slate-800 rounded-3xl p-5 sm:p-7 text-slate-200 shadow-2xl space-y-5">
       
-      {/* Hidden Audio Engine untuk Modal Preview */}
-      <audio ref={modalAudioRef} onEnded={() => setPreviewTrackUrl(null)} />
+      {/* Audio Element Rasmi untuk Preview Modal */}
+      <audio 
+        ref={modalAudioRef} 
+        onEnded={() => setPreviewTrackUrl(null)}
+        onError={() => {
+          setIsLoadingAudio(false);
+          setPreviewTrackUrl(null);
+        }}
+      />
 
       <div>
         <h2 className="text-2xl font-bold text-white tracking-wide">Pereka Kad Jemputan Digital</h2>
@@ -550,7 +569,6 @@ export default function BuilderForm({
       {activeTab === 'cover' && (
         <div className="p-5 rounded-2xl bg-slate-950/70 border border-slate-800 space-y-4">
           
-          {/* Pilihan Latar Belakang Muka Depan */}
           <div className="p-4 rounded-2xl bg-slate-900 border border-amber-500/20 space-y-3">
             <div className="flex items-center justify-between">
               <label className="text-xs font-bold text-amber-300 uppercase tracking-wider">
@@ -584,7 +602,6 @@ export default function BuilderForm({
               </div>
             </div>
 
-            {/* Warna Solid Muka Depan */}
             {bgType === 'color' && (
               <div className="space-y-3 pt-1">
                 <span className="text-[11px] text-slate-400 block font-medium">Pilih warna tema muka depan:</span>
@@ -636,11 +653,9 @@ export default function BuilderForm({
               </div>
             )}
 
-            {/* Gambar Muka Depan */}
             {bgType === 'image' && (
               <div className="space-y-3 pt-1">
                 <div className="flex flex-col sm:flex-row gap-2">
-                  {/* Butang Buka Modal Galeri */}
                   <button
                     type="button"
                     onClick={() => openWallpaperModal('cover')}
@@ -649,7 +664,6 @@ export default function BuilderForm({
                     <i className="fa-solid fa-images text-base" /> Pilih dari Galeri Kertas Dinding (50 Koleksi)
                   </button>
 
-                  {/* Muat Naik Sendiri */}
                   <label className="py-3 px-4 rounded-xl bg-slate-950 border border-slate-700 hover:border-amber-400/60 text-slate-300 text-xs font-semibold flex items-center justify-center gap-2 cursor-pointer transition-all">
                     <i className="fa-solid fa-cloud-arrow-up text-amber-400" /> Muat Naik Sendiri
                     <input type="file" accept="image/*" onChange={handleCoverWallpaperUpload} className="hidden" />
@@ -660,7 +674,6 @@ export default function BuilderForm({
             )}
           </div>
           
-          {/* Maklumat Teks Muka Depan */}
           <div>
             <label className="text-xs text-slate-400 block mb-1">Tagline / Panggilan Atas</label>
             <input
@@ -700,7 +713,6 @@ export default function BuilderForm({
       {activeTab === 'slides' && (
         <div className="space-y-4">
           
-          {/* KAWALAN KHAS: LATAR BELAKANG HELAIAN DALAMAN & KETELUSAN KAD */}
           <div className="p-4 rounded-2xl bg-slate-950/90 border border-amber-500/30 space-y-3.5">
             <div className="flex items-center justify-between">
               <label className="text-xs font-bold text-amber-300 uppercase tracking-wider flex items-center gap-1.5">
@@ -708,7 +720,6 @@ export default function BuilderForm({
               </label>
             </div>
 
-            {/* Butang Galeri Wallpaper untuk Helaian */}
             <div className="flex flex-col sm:flex-row gap-2">
               <button
                 type="button"
@@ -724,7 +735,6 @@ export default function BuilderForm({
               </label>
             </div>
 
-            {/* Pelaras Ketelusan Kotak Kad Putih (Card Transparency) */}
             <div className="pt-2 border-t border-slate-800 space-y-2.5">
               <div className="flex items-center justify-between">
                 <span className="text-[11px] font-semibold text-slate-300">Ketelusan Kotak Kad Putih (Transparency):</span>
@@ -1082,12 +1092,11 @@ export default function BuilderForm({
             Pilihan Lagu & Audio Latar Majlis
           </label>
 
-          {/* Butang Buka Modal Perpustakaan 50 Lagu */}
           <div className="p-4 rounded-2xl bg-slate-900 border border-amber-500/30 space-y-3">
             <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
               <div>
                 <span className="text-xs font-bold text-white block">Koleksi 50 Lagu Pilihan Rasmi</span>
-                <span className="text-[11px] text-slate-400 block">Dengar sampel sebelum memilih lagu untuk majlis anda.</span>
+                <span className="text-[11px] text-slate-400 block">Dengar sampel berbunyi sebelum memilih lagu untuk majlis anda.</span>
               </div>
               <button
                 type="button"
@@ -1098,7 +1107,7 @@ export default function BuilderForm({
               </button>
             </div>
 
-            {/* Status Lagu Semasa Dipilih */}
+            {/* Status Lagu Semasa */}
             {data.cover?.audioUrl && (
               <div className="pt-2 border-t border-slate-800 flex items-center justify-between text-xs text-amber-300">
                 <span className="font-semibold flex items-center gap-2 truncate">
@@ -1111,7 +1120,6 @@ export default function BuilderForm({
             )}
           </div>
 
-          {/* Input Manual URL Audio */}
           <div className="pt-1 space-y-1.5">
             <label className="text-[11px] text-slate-400 block font-medium">Atau masukkan pautan URL MP3 anda sendiri:</label>
             <input
@@ -1230,13 +1238,12 @@ export default function BuilderForm({
       )}
 
       {/* ========================================================================= */}
-      {/* 1. MODAL POP-UP GALERI 50 KERTAS DINDING (WALLPAPER LIBRARY MODAL) */}
+      {/* 1. MODAL POP-UP GALERI 50 KERTAS DINDING */}
       {/* ========================================================================= */}
       {isWallpaperModalOpen && (
         <div className="fixed inset-0 z-[200] bg-black/85 backdrop-blur-md flex items-center justify-center p-3 sm:p-6">
           <div className="bg-slate-900 border border-slate-700 rounded-3xl w-full max-w-4xl h-[90vh] flex flex-col overflow-hidden shadow-2xl animate-in fade-in zoom-in duration-200">
             
-            {/* Header Modal */}
             <div className="p-4 sm:p-5 border-b border-slate-800 flex items-center justify-between bg-slate-950">
               <div>
                 <h3 className="text-lg font-bold text-white flex items-center gap-2">
@@ -1248,20 +1255,19 @@ export default function BuilderForm({
               <button
                 type="button"
                 onClick={() => setIsWallpaperModalOpen(false)}
-                className="w-8 h-8 rounded-full bg-slate-800 hover:bg-slate-700 text-slate-300 flex items-center justify-center text-sm"
+                className="w-8 h-8 rounded-full bg-slate-800 hover:bg-slate-700 text-slate-300 flex items-center justify-center text-sm cursor-pointer"
               >
                 <i className="fa-solid fa-xmark" />
               </button>
             </div>
 
-            {/* Kategori Tabs */}
             <div className="px-4 py-3 bg-slate-950/60 border-b border-slate-800 flex gap-2 overflow-x-auto no-scrollbar">
               {WALLPAPER_CATEGORIES.map((cat) => (
                 <button
                   key={cat}
                   type="button"
                   onClick={() => setSelectedWallpaperCategory(cat)}
-                  className={`px-3.5 py-1.5 rounded-full text-xs font-semibold whitespace-nowrap transition-all ${
+                  className={`px-3.5 py-1.5 rounded-full text-xs font-semibold whitespace-nowrap transition-all cursor-pointer ${
                     selectedWallpaperCategory === cat
                       ? 'bg-amber-500 text-slate-950 font-bold shadow'
                       : 'bg-slate-800/80 text-slate-300 hover:bg-slate-700'
@@ -1272,12 +1278,11 @@ export default function BuilderForm({
               ))}
             </div>
 
-            {/* Grid 50 Wallpaper */}
             <div className="p-4 sm:p-6 overflow-y-auto grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3.5 flex-1">
               {filteredWallpapers.map((wp) => {
                 const isSelected = wallpaperModalTarget === 'cover' 
                   ? data.theme?.coverBgUrl === wp.url
-                  : data.theme?.slideBgUrl === wp.url;
+                  : (data.theme?.slideBgUrl === wp.url || data.theme?.bgPatternUrl === wp.url);
 
                 return (
                   <div
@@ -1311,41 +1316,41 @@ export default function BuilderForm({
       )}
 
       {/* ========================================================================= */}
-      {/* 2. MODAL POP-UP PERPUSTAKAAN 50 LAGU (MUSIC LIBRARY MODAL) */}
+      {/* 2. MODAL POP-UP PERPUSTAKAAN 50 LAGU (DENGAN SOUND ENGINE AKTIF) */}
       {/* ========================================================================= */}
       {isMusicModalOpen && (
         <div className="fixed inset-0 z-[200] bg-black/85 backdrop-blur-md flex items-center justify-center p-3 sm:p-6">
           <div className="bg-slate-900 border border-slate-700 rounded-3xl w-full max-w-3xl h-[88vh] flex flex-col overflow-hidden shadow-2xl animate-in fade-in zoom-in duration-200">
             
-            {/* Header Modal */}
             <div className="p-4 sm:p-5 border-b border-slate-800 flex items-center justify-between bg-slate-950">
               <div>
                 <h3 className="text-lg font-bold text-white flex items-center gap-2">
                   <i className="fa-solid fa-compact-disc text-amber-400" /> Perpustakaan Muzik & Audio Majlis
                 </h3>
-                <p className="text-xs text-slate-400">Pilih daripada 50 lagu instrumen dan melodi syahdu. Tekan butang Main untuk dengar sampel.</p>
+                <p className="text-xs text-slate-400">Tekan butang Main (▶️) untuk mendengar sampel muzik secara langsung.</p>
               </div>
               <button
                 type="button"
                 onClick={() => {
                   if (modalAudioRef.current) modalAudioRef.current.pause();
                   setPreviewTrackUrl(null);
+                  setIsLoadingAudio(false);
                   setIsMusicModalOpen(false);
                 }}
-                className="w-8 h-8 rounded-full bg-slate-800 hover:bg-slate-700 text-slate-300 flex items-center justify-center text-sm"
+                className="w-8 h-8 rounded-full bg-slate-800 hover:bg-slate-700 text-slate-300 flex items-center justify-center text-sm cursor-pointer"
               >
                 <i className="fa-solid fa-xmark" />
               </button>
             </div>
 
-            {/* Kategori Tabs */}
+            {/* Kategori Tabs Muzik */}
             <div className="px-4 py-3 bg-slate-950/60 border-b border-slate-800 flex gap-2 overflow-x-auto no-scrollbar">
               {MUSIC_CATEGORIES.map((cat) => (
                 <button
                   key={cat}
                   type="button"
                   onClick={() => setSelectedMusicCategory(cat)}
-                  className={`px-3.5 py-1.5 rounded-full text-xs font-semibold whitespace-nowrap transition-all ${
+                  className={`px-3.5 py-1.5 rounded-full text-xs font-semibold whitespace-nowrap transition-all cursor-pointer ${
                     selectedMusicCategory === cat
                       ? 'bg-amber-500 text-slate-950 font-bold shadow'
                       : 'bg-slate-800/80 text-slate-300 hover:bg-slate-700'
@@ -1357,7 +1362,7 @@ export default function BuilderForm({
             </div>
 
             {/* Senarai 50 Lagu */}
-            <div className="p-4 sm:p-5 overflow-y-auto space-y-2 flex-1">
+            <div className="p-4 sm:p-5 overflow-y-auto space-y-2.5 flex-1">
               {filteredMusic.map((track) => {
                 const isSelected = data.cover?.audioUrl === track.url;
                 const isPreviewing = previewTrackUrl === track.url;
@@ -1365,7 +1370,7 @@ export default function BuilderForm({
                 return (
                   <div
                     key={track.id}
-                    className={`p-3 rounded-2xl border flex items-center justify-between gap-3 transition-all ${
+                    className={`p-3.5 rounded-2xl border flex items-center justify-between gap-3 transition-all ${
                       isSelected 
                         ? 'bg-amber-500/15 border-amber-400 shadow-md ring-1 ring-amber-400/40' 
                         : 'bg-slate-950/60 border-slate-800 hover:border-slate-700'
@@ -1376,33 +1381,39 @@ export default function BuilderForm({
                       <button
                         type="button"
                         onClick={() => handleTogglePreviewMusic(track.url)}
-                        className={`w-10 h-10 rounded-full flex items-center justify-center text-sm transition-transform active:scale-90 ${
+                        className={`w-11 h-11 rounded-full flex items-center justify-center text-base transition-transform active:scale-90 cursor-pointer ${
                           isPreviewing
                             ? 'bg-amber-500 text-slate-950 shadow-lg animate-pulse'
-                            : 'bg-slate-800 hover:bg-slate-700 text-amber-300'
+                            : 'bg-slate-800 hover:bg-slate-700 text-amber-300 border border-amber-500/30'
                         }`}
                         title={isPreviewing ? 'Henti Audio' : 'Dengar Sampel'}
                       >
-                        <i className={`fa-solid ${isPreviewing ? 'fa-pause' : 'fa-play ml-0.5'}`} />
+                        {isPreviewing && isLoadingAudio ? (
+                          <i className="fa-solid fa-spinner fa-spin text-sm" />
+                        ) : isPreviewing ? (
+                          <i className="fa-solid fa-pause" />
+                        ) : (
+                          <i className="fa-solid fa-play ml-0.5 text-sm" />
+                        )}
                       </button>
 
                       <div>
                         <span className="text-xs font-bold text-white block">{track.name}</span>
-                        <span className="text-[10px] text-amber-300/80">{track.category}</span>
+                        <span className="text-[10px] text-amber-300/80 font-medium">{track.category}</span>
                       </div>
                     </div>
 
                     {/* Butang Pilih Lagu */}
                     <div className="flex items-center gap-2">
                       {isSelected ? (
-                        <span className="px-3 py-1.5 rounded-xl bg-emerald-500/20 border border-emerald-500/40 text-emerald-300 text-xs font-bold flex items-center gap-1.5">
-                          <i className="fa-solid fa-check" /> Sedang Digunakan
+                        <span className="px-3.5 py-2 rounded-xl bg-emerald-500/20 border border-emerald-500/40 text-emerald-300 text-xs font-bold flex items-center gap-1.5">
+                          <i className="fa-solid fa-check" /> Sedang Dipilih
                         </span>
                       ) : (
                         <button
                           type="button"
                           onClick={() => handleSelectTrack(track.url)}
-                          className="px-4 py-1.5 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold text-xs uppercase tracking-wider shadow transition-transform active:scale-95"
+                          className="px-4 py-2 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold text-xs uppercase tracking-wider shadow transition-transform active:scale-95 cursor-pointer whitespace-nowrap"
                         >
                           Pilih Lagu
                         </button>
