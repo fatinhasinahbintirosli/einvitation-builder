@@ -1,8 +1,9 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { CardData, SlideType } from '@/types/invitation';
-import { globalAudio } from '@/lib/audioEngine';
+import { supabase } from '@/lib/supabaseClient';
+import Link from 'next/link';
 
 type SlideItem = CardData['slides'][number];
 
@@ -18,147 +19,21 @@ interface Props {
   onActiveSlideChange?: (index: number | 'cover') => void;
 }
 
-// 50 Wallpapers Library
-interface WallpaperItem {
+interface DynamicWallpaper {
   id: string;
   name: string;
   category: string;
   url: string;
+  order_index: number;
 }
 
-const WALLPAPER_LIBRARY: WallpaperItem[] = [
-  { id: 'w1', name: 'Golden Songket Weave', category: 'Heritage & Gold', url: 'https://images.unsplash.com/photo-1607604276583-eef5d076aa5f?q=80&w=1080&auto=format&fit=crop' },
-  { id: 'w2', name: 'Royal Dark Brocade', category: 'Heritage & Gold', url: 'https://images.unsplash.com/photo-1579783900882-c0d3dad7b119?q=80&w=1080&auto=format&fit=crop' },
-  { id: 'w3', name: 'Crimson Velvet Texture', category: 'Heritage & Gold', url: 'https://images.unsplash.com/photo-1590736969955-71cc94801759?q=80&w=1080&auto=format&fit=crop' },
-  { id: 'w4', name: 'Copper Batik Motif', category: 'Heritage & Gold', url: 'https://images.unsplash.com/photo-1606768666853-403c90a981ad?q=80&w=1080&auto=format&fit=crop' },
-  { id: 'w5', name: 'Emerald Royal Cloth', category: 'Heritage & Gold', url: 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=1080&auto=format&fit=crop' },
-  { id: 'w6', name: 'Golden Threads Pattern', category: 'Heritage & Gold', url: 'https://images.unsplash.com/photo-1541701494587-cb58502866ab?q=80&w=1080&auto=format&fit=crop' },
-  { id: 'w7', name: 'Midnight Navy Silk', category: 'Heritage & Gold', url: 'https://images.unsplash.com/photo-1550684848-fac1c5b4e853?q=80&w=1080&auto=format&fit=crop' },
-  { id: 'w8', name: 'Ivory Silver Texture', category: 'Heritage & Gold', url: 'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?q=80&w=1080&auto=format&fit=crop' },
-  { id: 'w9', name: 'Moody Dark Rose', category: 'Floral & Botanical', url: 'https://images.unsplash.com/photo-1518895949257-7621c3c786d7?q=80&w=1080&auto=format&fit=crop' },
-  { id: 'w10', name: 'White Blossom Radiance', category: 'Floral & Botanical', url: 'https://images.unsplash.com/photo-1490750967868-88aa4486c946?q=80&w=1080&auto=format&fit=crop' },
-  { id: 'w11', name: 'Soft Purple Orchid', category: 'Floral & Botanical', url: 'https://images.unsplash.com/photo-1526047932273-341f2a7631f9?q=80&w=1080&auto=format&fit=crop' },
-  { id: 'w12', name: 'Wildflower Aesthetic', category: 'Floral & Botanical', url: 'https://images.unsplash.com/photo-1463936575829-25148e1db1b8?q=80&w=1080&auto=format&fit=crop' },
-  { id: 'w13', name: 'Cream Rose Petals', category: 'Floral & Botanical', url: 'https://images.unsplash.com/photo-1508615039623-a25605d2b022?q=80&w=1080&auto=format&fit=crop' },
-  { id: 'w14', name: 'Golden Foliage Leaves', category: 'Floral & Botanical', url: 'https://images.unsplash.com/photo-1509198397868-475647b2a1e5?q=80&w=1080&auto=format&fit=crop' },
-  { id: 'w15', name: 'Sakura Petals Romance', category: 'Floral & Botanical', url: 'https://images.unsplash.com/photo-1522383225653-ed111181a951?q=80&w=1080&auto=format&fit=crop' },
-  { id: 'w16', name: 'Pastel Blue Hydrangea', category: 'Floral & Botanical', url: 'https://images.unsplash.com/photo-1513836279014-a89f7a76ae86?q=80&w=1080&auto=format&fit=crop' },
-  { id: 'w17', name: 'Vintage Garden Bouquet', category: 'Floral & Botanical', url: 'https://images.unsplash.com/photo-1521737604893-d14cc237f11d?q=80&w=1080&auto=format&fit=crop' },
-  { id: 'w18', name: 'Golden Dust Glow', category: 'Luxury Marble', url: 'https://images.unsplash.com/photo-1519751138087-5bf79df62d5b?q=80&w=1080&auto=format&fit=crop' },
-  { id: 'w19', name: 'Black & Gold Veined Marble', category: 'Luxury Marble', url: 'https://images.unsplash.com/photo-1618221195710-dd6b41faaea6?q=80&w=1080&auto=format&fit=crop' },
-  { id: 'w20', name: 'Crystal Sparkles Ambient', category: 'Luxury Marble', url: 'https://images.unsplash.com/photo-1513151233558-d860c5398176?q=80&w=1080&auto=format&fit=crop' },
-  { id: 'w21', name: 'Flowing Gold Waves', category: 'Luxury Marble', url: 'https://images.unsplash.com/photo-1507679799987-c73779587ccf?q=80&w=1080&auto=format&fit=crop' },
-  { id: 'w22', name: 'Warm Bokeh Illumination', category: 'Luxury Marble', url: 'https://images.unsplash.com/photo-1531685250784-7569952593d2?q=80&w=1080&auto=format&fit=crop' },
-  { id: 'w23', name: 'Diamond Shimmer Backdrop', category: 'Luxury Marble', url: 'https://images.unsplash.com/photo-1518709268805-4e9042af9f23?q=80&w=1080&auto=format&fit=crop' },
-  { id: 'w24', name: 'Polished Bronze Sheet', category: 'Luxury Marble', url: 'https://images.unsplash.com/photo-1550684847-75bdda21cc95?q=80&w=1080&auto=format&fit=crop' },
-  { id: 'w25', name: 'Abstract Gilded Orbs', category: 'Luxury Marble', url: 'https://images.unsplash.com/photo-1579783902614-a3fb3927b675?q=80&w=1080&auto=format&fit=crop' },
-  { id: 'w26', name: 'Textured Handmade Paper', category: 'Pastel & Minimalist', url: 'https://images.unsplash.com/photo-1586075010923-2dd4570fb338?q=80&w=1080&auto=format&fit=crop' },
-  { id: 'w27', name: 'Pure Carrara Marble', category: 'Pastel & Minimalist', url: 'https://images.unsplash.com/photo-1533090161767-e6ffed986c88?q=80&w=1080&auto=format&fit=crop' },
-  { id: 'w28', name: 'Blush Sunset Clouds', category: 'Pastel & Minimalist', url: 'https://images.unsplash.com/photo-1534447677768-be436bb09401?q=80&w=1080&auto=format&fit=crop' },
-  { id: 'w29', name: 'Soft Minimal Plaster', category: 'Pastel & Minimalist', url: 'https://images.unsplash.com/photo-1598928506311-c55ded91a20c?q=80&w=1080&auto=format&fit=crop' },
-  { id: 'w30', name: 'Cool Lavender Gradient', category: 'Pastel & Minimalist', url: 'https://images.unsplash.com/photo-1557683316-973673baf926?q=80&w=1080&auto=format&fit=crop' },
-  { id: 'w31', name: 'Natural Oatmeal Linen', category: 'Pastel & Minimalist', url: 'https://images.unsplash.com/photo-1528459801416-a9e53bbf4e17?q=80&w=1080&auto=format&fit=crop' },
-  { id: 'w32', name: 'Peaceful Morning Mist', category: 'Pastel & Minimalist', url: 'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?q=80&w=1080&auto=format&fit=crop' },
-  { id: 'w33', name: 'Soft Peach Silk Drape', category: 'Pastel & Minimalist', url: 'https://images.unsplash.com/photo-1516962215378-7fa2e137ae93?q=80&w=1080&auto=format&fit=crop' },
-  { id: 'w34', name: 'Warm Cream Canvas', category: 'Pastel & Minimalist', url: 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=1080&auto=format&fit=crop' },
-  { id: 'w35', name: 'Emerald Forest Canopy', category: 'Nature & Rustic', url: 'https://images.unsplash.com/photo-1518531933037-91b2f5f229cc?q=80&w=1080&auto=format&fit=crop' },
-  { id: 'w36', name: 'Sunlit Pine Grove', category: 'Nature & Rustic', url: 'https://images.unsplash.com/photo-1448375240586-882707db888b?q=80&w=1080&auto=format&fit=crop' },
-  { id: 'w37', name: 'Lush Tropical Palms', category: 'Nature & Rustic', url: 'https://images.unsplash.com/photo-1509316975850-ff9c5deb0cd9?q=80&w=1080&auto=format&fit=crop' },
-  { id: 'w38', name: 'Wild Green Meadows', category: 'Nature & Rustic', url: 'https://images.unsplash.com/photo-1470071459604-3b5ec3a7fe05?q=80&w=1080&auto=format&fit=crop' },
-  { id: 'w39', name: 'Rustic Cedar Timber', category: 'Nature & Rustic', url: 'https://images.unsplash.com/photo-1546484396-fb3fc6f95f98?q=80&w=1080&auto=format&fit=crop' },
-  { id: 'w40', name: 'Coastline Waves Serenity', category: 'Nature & Rustic', url: 'https://images.unsplash.com/photo-1506744038136-46273834b3fb?q=80&w=1080&auto=format&fit=crop' },
-  { id: 'w41', name: 'Silver Dollar Eucalyptus', category: 'Nature & Rustic', url: 'https://images.unsplash.com/photo-1501004318641-b39e6451bec6?q=80&w=1080&auto=format&fit=crop' },
-  { id: 'w42', name: 'Misty Mountain Horizon', category: 'Nature & Rustic', url: 'https://images.unsplash.com/photo-1426604966848-d7adac402bff?q=80&w=1080&auto=format&fit=crop' },
-  { id: 'w43', name: 'Gilded Arabesque Lattice', category: 'Geometric & Art', url: 'https://images.unsplash.com/photo-1564507592333-c60657eea523?q=80&w=1080&auto=format&fit=crop' },
-  { id: 'w44', name: 'Royal Palace Mosaic', category: 'Geometric & Art', url: 'https://images.unsplash.com/photo-1544717305-2782549b5136?q=80&w=1080&auto=format&fit=crop' },
-  { id: 'w45', name: 'Luminous Dome Illumination', category: 'Geometric & Art', url: 'https://images.unsplash.com/photo-1584551246679-0daf3d275d0f?q=80&w=1080&auto=format&fit=crop' },
-  { id: 'w46', name: 'Antique Moorish Archway', category: 'Geometric & Art', url: 'https://images.unsplash.com/photo-1519817650390-64a93db51149?q=80&w=1080&auto=format&fit=crop' },
-  { id: 'w47', name: 'Intricate Calligraphy Stone', category: 'Geometric & Art', url: 'https://images.unsplash.com/photo-1585036156171-384164a8c675?q=80&w=1080&auto=format&fit=crop' },
-  { id: 'w48', name: 'Moroccan Brass Lanterns', category: 'Geometric & Art', url: 'https://images.unsplash.com/photo-1509356843151-3e7d96241e11?q=80&w=1080&auto=format&fit=crop' },
-  { id: 'w49', name: 'Mandala Star Geometry', category: 'Geometric & Art', url: 'https://images.unsplash.com/photo-1579783901586-d88db74b4fe4?q=80&w=1080&auto=format&fit=crop' },
-  { id: 'w50', name: 'Traditional Carved Woodwork', category: 'Geometric & Art', url: 'https://images.unsplash.com/photo-1607604276583-eef5d076aa5f?q=80&w=1080&auto=format&fit=crop' },
-];
-
-const WALLPAPER_CATEGORIES = [
-  'All',
-  'Heritage & Gold',
-  'Floral & Botanical',
-  'Luxury Marble',
-  'Pastel & Minimalist',
-  'Nature & Rustic',
-  'Geometric & Art'
-];
-
-// 50 High-Quality Melodies Library
-interface MusicItem {
+interface DynamicMusic {
   id: string;
   name: string;
   category: string;
-  trackCode: string;
+  url: string;
+  order_index: number;
 }
-
-const MUSIC_LIBRARY: MusicItem[] = [
-  { id: 'm1', name: 'Pachelbel - Canon in D (Piano & Strings)', category: 'Romantic & Wedding', trackCode: 'm1' },
-  { id: 'm2', name: 'Debussy - Clair de Lune (Soft Serenade)', category: 'Romantic & Wedding', trackCode: 'm2' },
-  { id: 'm3', name: 'Mendelssohn - Wedding March (Royal Fanfare)', category: 'Romantic & Wedding', trackCode: 'm3' },
-  { id: 'm4', name: 'Chopin - Nocturne Op. 9 No. 2 (Sweet Romance)', category: 'Romantic & Wedding', trackCode: 'm4' },
-  { id: 'm5', name: 'Erik Satie - Gymnopédie No. 1 (Tranquility)', category: 'Romantic & Wedding', trackCode: 'm5' },
-  { id: 'm6', name: 'Liszt - Liebestraum No. 3 (Love Dream)', category: 'Romantic & Wedding', trackCode: 'm6' },
-  { id: 'm7', name: 'J.S. Bach - Air on the G String (Strings Pad)', category: 'Romantic & Wedding', trackCode: 'm7' },
-  { id: 'm8', name: 'Brahms - Lullaby of Devotion', category: 'Romantic & Wedding', trackCode: 'm8' },
-  { id: 'm9', name: 'Peaceful Gamelan Heritage Chimes', category: 'Traditional & Heritage', trackCode: 'm9' },
-  { id: 'm10', name: 'Rainforest Sape Folk Acoustic', category: 'Traditional & Heritage', trackCode: 'm10' },
-  { id: 'm11', name: 'Arabian Oud Royal Serenade', category: 'Traditional & Heritage', trackCode: 'm11' },
-  { id: 'm12', name: 'Eastern Bamboo Flute (Zen Spirit)', category: 'Traditional & Heritage', trackCode: 'm12' },
-  { id: 'm13', name: 'Enchanted Angklung Harmony', category: 'Traditional & Heritage', trackCode: 'm13' },
-  { id: 'm14', name: 'Palace Gamelan Royal Entrance', category: 'Traditional & Heritage', trackCode: 'm14' },
-  { id: 'm15', name: 'Meditative Suling Flute', category: 'Traditional & Heritage', trackCode: 'm15' },
-  { id: 'm16', name: 'Silk Road Ambient Strings', category: 'Traditional & Heritage', trackCode: 'm16' },
-  { id: 'm17', name: 'Spring Breeze Acoustic Guitar', category: 'Acoustic & Chill', trackCode: 'm17' },
-  { id: 'm18', name: 'Fingerstyle Warmth & Love', category: 'Acoustic & Chill', trackCode: 'm18' },
-  { id: 'm19', name: 'Gentle Afternoon Strumming', category: 'Acoustic & Chill', trackCode: 'm19' },
-  { id: 'm20', name: 'Golden Sunset Acoustic Glow', category: 'Acoustic & Chill', trackCode: 'm20' },
-  { id: 'm21', name: 'Coffeehouse Piano & Nylon Guitar', category: 'Acoustic & Chill', trackCode: 'm21' },
-  { id: 'm22', name: 'Sweet Memories with Friends', category: 'Acoustic & Chill', trackCode: 'm22' },
-  { id: 'm23', name: 'Morning Dew Ambient Reflection', category: 'Acoustic & Chill', trackCode: 'm23' },
-  { id: 'm24', name: 'Highland Serenity Folk', category: 'Acoustic & Chill', trackCode: 'm24' },
-  { id: 'm25', name: 'Spiritual Grace & Blessing Ambient', category: 'Spiritual & Ambient', trackCode: 'm25' },
-  { id: 'm26', name: 'Ney Flute Sacred Meditation', category: 'Spiritual & Ambient', trackCode: 'm26' },
-  { id: 'm27', name: 'Dawn Awakening Spiritual Strings', category: 'Spiritual & Ambient', trackCode: 'm27' },
-  { id: 'm28', name: 'Humble Gratitude Oud Harmony', category: 'Spiritual & Ambient', trackCode: 'm28' },
-  { id: 'm29', name: 'Peaceful Sanctuary Meditation', category: 'Spiritual & Ambient', trackCode: 'm29' },
-  { id: 'm30', name: 'Ambient Light Healing Pads', category: 'Spiritual & Ambient', trackCode: 'm30' },
-  { id: 'm31', name: 'Mystic Desert Flute Reverie', category: 'Spiritual & Ambient', trackCode: 'm31' },
-  { id: 'm32', name: 'Evening Prayer of Gratitude', category: 'Spiritual & Ambient', trackCode: 'm32' },
-  { id: 'm33', name: 'Music Box Lullaby Dreams', category: 'Celebration & Joy', trackCode: 'm33' },
-  { id: 'm34', name: 'Twinkle Glockenspiel Chime', category: 'Celebration & Joy', trackCode: 'm34' },
-  { id: 'm35', name: 'Happy Ukulele Celebration', category: 'Celebration & Joy', trackCode: 'm35' },
-  { id: 'm36', name: 'Sweet Dreams Nursery Tune', category: 'Celebration & Joy', trackCode: 'm36' },
-  { id: 'm37', name: 'Playful Sunshine Acoustic', category: 'Celebration & Joy', trackCode: 'm37' },
-  { id: 'm38', name: 'Joyful Family Gathering', category: 'Celebration & Joy', trackCode: 'm38' },
-  { id: 'm39', name: 'Tender Motherly Music Box', category: 'Celebration & Joy', trackCode: 'm39' },
-  { id: 'm40', name: 'First Steps of Wonder', category: 'Celebration & Joy', trackCode: 'm40' },
-  { id: 'm41', name: 'Lively Birthday Festive Waltz', category: 'Celebration & Joy', trackCode: 'm41' },
-  { id: 'm42', name: 'Vivaldi - Four Seasons (Spring Allegro)', category: 'Majestic Orchestra', trackCode: 'm42' },
-  { id: 'm43', name: 'Tchaikovsky - Waltz of the Flowers', category: 'Majestic Orchestra', trackCode: 'm43' },
-  { id: 'm44', name: 'Mozart - Eine kleine Nachtmusik', category: 'Majestic Orchestra', trackCode: 'm44' },
-  { id: 'm45', name: 'J.S. Bach - Brandenburg Concerto No. 3', category: 'Majestic Orchestra', trackCode: 'm45' },
-  { id: 'm46', name: 'Beethoven - Moonlight Sonata Adagio', category: 'Majestic Orchestra', trackCode: 'm46' },
-  { id: 'm47', name: 'Royal Grand Ballroom Waltz', category: 'Majestic Orchestra', trackCode: 'm47' },
-  { id: 'm48', name: 'Imperial Coronation Symphony', category: 'Majestic Orchestra', trackCode: 'm48' },
-  { id: 'm49', name: 'Cinematic Gala Theme', category: 'Majestic Orchestra', trackCode: 'm49' },
-  { id: 'm50', name: 'Grand Finale Strings & Brass', category: 'Majestic Orchestra', trackCode: 'm50' },
-];
-
-const MUSIC_CATEGORIES = [
-  'All',
-  'Romantic & Wedding',
-  'Traditional & Heritage',
-  'Acoustic & Chill',
-  'Spiritual & Ambient',
-  'Celebration & Joy',
-  'Majestic Orchestra'
-];
 
 const FONT_PRESETS_HEADING = [
   { name: 'Cinzel (Royal Roman)', value: 'Cinzel, serif' },
@@ -227,8 +102,11 @@ export default function BuilderForm({
 }: Props) {
   const [activeTab, setActiveTab] = useState<'cover' | 'slides' | 'music'>('cover');
   const [uploadError, setUploadError] = useState<string | null>(null);
-  const [audioUploadSuccess, setAudioUploadSuccess] = useState<string | null>(null);
   const [isCheckingOut, setIsCheckingOut] = useState(false);
+
+  // Dynamic Assets from Supabase
+  const [dbWallpapers, setDbWallpapers] = useState<DynamicWallpaper[]>([]);
+  const [dbMusic, setDbMusic] = useState<DynamicMusic[]>([]);
 
   // Modals state
   const [isWallpaperModalOpen, setIsWallpaperModalOpen] = useState(false);
@@ -237,18 +115,21 @@ export default function BuilderForm({
 
   const [isMusicModalOpen, setIsMusicModalOpen] = useState(false);
   const [selectedMusicCategory, setSelectedMusicCategory] = useState('All');
-  const [previewTrackId, setPreviewTrackId] = useState<string | null>(null);
+  const [previewTrackUrl, setPreviewTrackUrl] = useState<string | null>(null);
   const [isPlayingAudio, setIsPlayingAudio] = useState(false);
 
-  // Synchronize audio playing state with global Audio Service
+  const modalAudioRef = useRef<HTMLAudioElement | null>(null);
+
+  // Fetch live assets from Supabase
   useEffect(() => {
-    const unsubscribe = globalAudio.subscribe((state) => {
-      setIsPlayingAudio(state.isPlaying);
-      setPreviewTrackId(state.trackId);
-    });
-    return () => {
-      unsubscribe();
+    const fetchAssets = async () => {
+      const { data: wpData } = await supabase.from('wallpapers').select('*').order('order_index', { ascending: true });
+      if (wpData) setDbWallpapers(wpData);
+
+      const { data: mData } = await supabase.from('music_tracks').select('*').order('order_index', { ascending: true });
+      if (mData) setDbMusic(mData);
     };
+    fetchAssets();
   }, []);
 
   const bgType = data.theme?.coverBgType || 'color';
@@ -270,39 +151,54 @@ export default function BuilderForm({
     }
   };
 
-  // Direct Audio Upload from Device (100% Offline & Reliable!)
+  // Direct Audio File Upload
   const handleAudioUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setAudioUploadSuccess(null);
     const file = e.target.files?.[0];
     if (!file) return;
-
     if (file.size > 8 * 1024 * 1024) {
-      alert('Audio file size exceeds 8MB. Please choose a smaller MP3 file.');
+      alert('Audio file exceeds 8MB.');
       return;
     }
-
     const reader = new FileReader();
     reader.onload = (event) => {
       const base64Audio = event.target?.result as string;
       updateData({ ...data, cover: { ...data.cover, audioUrl: base64Audio } });
-      setAudioUploadSuccess(`Loaded: ${file.name}`);
-      globalAudio.play(base64Audio);
     };
     reader.readAsDataURL(file);
   };
 
-  // Instant Audio Play / Stop in Modal
-  const handleTogglePreviewMusic = (trackCode: string) => {
-    if (previewTrackId === trackCode && isPlayingAudio) {
-      globalAudio.stop();
+  // Live Audio Preview in Modal
+  const handleTogglePreviewMusic = (url: string) => {
+    if (!modalAudioRef.current) return;
+    const player = modalAudioRef.current;
+
+    if (previewTrackUrl === url && isPlayingAudio) {
+      player.pause();
+      setIsPlayingAudio(false);
+      setPreviewTrackUrl(null);
     } else {
-      globalAudio.play(trackCode);
+      player.pause();
+      player.src = url;
+      player.currentTime = 0;
+      player.load();
+      setPreviewTrackUrl(url);
+
+      player.play()
+        .then(() => setIsPlayingAudio(true))
+        .catch(err => {
+          console.warn('Playback notice:', err);
+          setIsPlayingAudio(false);
+        });
     }
   };
 
-  const handleSelectTrack = (trackCode: string) => {
-    globalAudio.stop();
-    updateData({ ...data, cover: { ...data.cover, audioUrl: trackCode } });
+  const handleSelectTrack = (url: string) => {
+    if (modalAudioRef.current) {
+      modalAudioRef.current.pause();
+    }
+    setIsPlayingAudio(false);
+    setPreviewTrackUrl(null);
+    updateData({ ...data, cover: { ...data.cover, audioUrl: url } });
     setIsMusicModalOpen(false);
   };
 
@@ -315,25 +211,15 @@ export default function BuilderForm({
     if (wallpaperModalTarget === 'cover') {
       updateData({
         ...data,
-        theme: {
-          ...data.theme,
-          coverBgType: 'image',
-          coverBgUrl: url
-        }
+        theme: { ...data.theme, coverBgType: 'image', coverBgUrl: url }
       });
       onActiveSlideChange?.('cover');
     } else {
       updateData({
         ...data,
-        theme: {
-          ...data.theme,
-          slideBgUrl: url,
-          bgPatternUrl: url
-        }
+        theme: { ...data.theme, slideBgUrl: url, bgPatternUrl: url }
       });
-      if (activeSlideIndex === 'cover') {
-        onActiveSlideChange?.(0);
-      }
+      if (activeSlideIndex === 'cover') onActiveSlideChange?.(0);
     }
     setIsWallpaperModalOpen(false);
   };
@@ -342,22 +228,16 @@ export default function BuilderForm({
     setUploadError(null);
     const file = e.target.files?.[0];
     if (!file) return;
-
     if (file.size > 3 * 1024 * 1024) {
-      setUploadError('File size exceeds 3MB. Please choose a smaller image.');
+      setUploadError('Image exceeds 3MB.');
       return;
     }
-
     const reader = new FileReader();
     reader.onload = (event) => {
       const base64Url = event.target?.result as string;
       updateData({
         ...data,
-        theme: {
-          ...data.theme,
-          coverBgType: 'image',
-          coverBgUrl: base64Url
-        }
+        theme: { ...data.theme, coverBgType: 'image', coverBgUrl: base64Url }
       });
       onActiveSlideChange?.('cover');
     };
@@ -368,26 +248,18 @@ export default function BuilderForm({
     setUploadError(null);
     const file = e.target.files?.[0];
     if (!file) return;
-
     if (file.size > 3 * 1024 * 1024) {
-      setUploadError('File size exceeds 3MB. Please choose a smaller image.');
+      setUploadError('Image exceeds 3MB.');
       return;
     }
-
     const reader = new FileReader();
     reader.onload = (event) => {
       const base64Url = event.target?.result as string;
       updateData({
         ...data,
-        theme: {
-          ...data.theme,
-          slideBgUrl: base64Url,
-          bgPatternUrl: base64Url
-        }
+        theme: { ...data.theme, slideBgUrl: base64Url, bgPatternUrl: base64Url }
       });
-      if (activeSlideIndex === 'cover') {
-        onActiveSlideChange?.(0);
-      }
+      if (activeSlideIndex === 'cover') onActiveSlideChange?.(0);
     };
     reader.readAsDataURL(file);
   };
@@ -395,15 +267,11 @@ export default function BuilderForm({
   const handleSlideImageUpload = (slideIndex: number, e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
-
     const reader = new FileReader();
     reader.onload = (event) => {
       const base64Url = event.target?.result as string;
       const updatedSlides = [...data.slides];
-      updatedSlides[slideIndex] = {
-        ...updatedSlides[slideIndex],
-        imageUrl: base64Url
-      };
+      updatedSlides[slideIndex] = { ...updatedSlides[slideIndex], imageUrl: base64Url };
       updateData({ ...data, slides: updatedSlides });
       onActiveSlideChange?.(slideIndex);
     };
@@ -412,10 +280,7 @@ export default function BuilderForm({
 
   const updateSlide = (index: number, updatedFields: Partial<SlideItem>) => {
     const updatedSlides = [...data.slides];
-    updatedSlides[index] = {
-      ...updatedSlides[index],
-      ...updatedFields
-    };
+    updatedSlides[index] = { ...updatedSlides[index], ...updatedFields };
     updateData({ ...data, slides: updatedSlides });
     onActiveSlideChange?.(index);
   };
@@ -507,9 +372,7 @@ export default function BuilderForm({
     setIsCheckingOut(true);
 
     try {
-      if (onSave) {
-        await onSave();
-      }
+      if (onSave) await onSave();
 
       const res = await fetch('/api/checkout', {
         method: 'POST',
@@ -530,20 +393,46 @@ export default function BuilderForm({
     }
   };
 
+  // Dynamic Categories from Supabase
+  const wallpaperCategories = ['All', ...Array.from(new Set(dbWallpapers.map(w => w.category).filter(Boolean)))];
+  const musicCategories = ['All', ...Array.from(new Set(dbMusic.map(m => m.category).filter(Boolean)))];
+
   const filteredWallpapers = selectedWallpaperCategory === 'All' 
-    ? WALLPAPER_LIBRARY 
-    : WALLPAPER_LIBRARY.filter(w => w.category === selectedWallpaperCategory);
+    ? dbWallpapers 
+    : dbWallpapers.filter(w => w.category === selectedWallpaperCategory);
 
   const filteredMusic = selectedMusicCategory === 'All'
-    ? MUSIC_LIBRARY
-    : MUSIC_LIBRARY.filter(m => m.category === selectedMusicCategory);
+    ? dbMusic
+    : dbMusic.filter(m => m.category === selectedMusicCategory);
 
   return (
     <div className="w-full bg-slate-900 border border-slate-800 rounded-3xl p-5 sm:p-7 text-slate-200 shadow-2xl space-y-5">
       
-      <div>
-        <h2 className="text-2xl font-bold text-white tracking-wide">Digital Invitation Studio</h2>
-        <p className="text-xs text-slate-400 mt-1">Independent cover & slide font customization, box color & 0-100% transparency.</p>
+      {/* Hidden Audio Player for Preview Modal */}
+      <audio 
+        ref={modalAudioRef} 
+        onEnded={() => {
+          setIsPlayingAudio(false);
+          setPreviewTrackUrl(null);
+        }}
+        onError={() => {
+          setIsPlayingAudio(false);
+          setPreviewTrackUrl(null);
+        }}
+      />
+
+      <div className="flex items-center justify-between">
+        <div>
+          <h2 className="text-2xl font-bold text-white tracking-wide">Digital Invitation Studio</h2>
+          <p className="text-xs text-slate-400 mt-1">Independent cover & slide styling, custom fonts, 0-100% transparency & dynamic music.</p>
+        </div>
+        <Link
+          href="/admin"
+          className="px-3 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-amber-300 font-bold text-[11px] border border-slate-700 flex items-center gap-1.5 transition-all shadow-sm"
+          title="Manage Uploaded Wallpapers & Songs"
+        >
+          <i className="fa-solid fa-gear" /> Admin Portal
+        </Link>
       </div>
 
       {/* Navigation Tabs */}
@@ -739,7 +628,7 @@ export default function BuilderForm({
                     onClick={() => openWallpaperModal('cover')}
                     className="flex-1 py-3 px-4 rounded-xl bg-gradient-to-r from-amber-500/20 to-amber-600/20 border border-amber-400/50 hover:bg-amber-500/30 text-amber-300 font-bold text-xs flex items-center justify-center gap-2 transition-all cursor-pointer"
                   >
-                    <i className="fa-solid fa-images text-base" /> Choose Cover Wallpaper (50 Items)
+                    <i className="fa-solid fa-images text-base" /> Choose Cover Wallpaper ({dbWallpapers.length} Items)
                   </button>
 
                   <label className="py-3 px-4 rounded-xl bg-slate-950 border border-slate-700 hover:border-amber-400/60 text-slate-300 text-xs font-semibold flex items-center justify-center gap-2 cursor-pointer transition-all">
@@ -964,7 +853,7 @@ export default function BuilderForm({
                 onClick={() => openWallpaperModal('slide')}
                 className="flex-1 py-2.5 px-4 rounded-xl bg-gradient-to-r from-amber-500/20 to-amber-600/20 border border-amber-400/50 hover:bg-amber-500/30 text-amber-300 font-bold text-xs flex items-center justify-center gap-2 transition-all cursor-pointer"
               >
-                <i className="fa-solid fa-images" /> Choose Slide Wallpaper (50 Items)
+                <i className="fa-solid fa-images" /> Choose Slide Wallpaper ({dbWallpapers.length} Items)
               </button>
 
               <label className="py-2.5 px-4 rounded-xl bg-slate-900 border border-slate-700 hover:border-amber-400/60 text-slate-300 text-xs font-semibold flex items-center justify-center gap-2 cursor-pointer transition-all">
@@ -1078,7 +967,7 @@ export default function BuilderForm({
                   )}
 
                   {/* LOCATION */}
-                  {slide.type === 'location' && slide.locationDetails && (
+                  {slide.type === 'location' && (
                     <div className="space-y-3">
                       <div>
                         <label className="text-[11px] text-slate-400 block mb-1">Venue / Ballroom Name</label>
@@ -1278,41 +1167,19 @@ export default function BuilderForm({
             Background Music & Audio Track
           </label>
 
-          {/* 1. DIRECT AUDIO FILE UPLOAD (100% RELIABLE) */}
-          <div className="p-4 rounded-2xl bg-slate-900 border border-emerald-500/30 space-y-3">
-            <div className="flex items-center justify-between">
-              <span className="text-xs font-bold text-white flex items-center gap-2">
-                <i className="fa-solid fa-cloud-arrow-up text-emerald-400 text-sm" /> 
-                Upload MP3 Audio File from Your Device
-              </span>
-              <span className="text-[10px] bg-emerald-500/20 text-emerald-300 px-2 py-0.5 rounded font-bold border border-emerald-500/30">
-                Guaranteed Audio
-              </span>
-            </div>
-            <p className="text-[11px] text-slate-400">
-              Upload any song directly from your phone or computer. Plays 100% offline with zero server restrictions.
-            </p>
-            
-            <label className="w-full py-3 px-4 rounded-xl bg-slate-950 border border-slate-700 hover:border-emerald-400/70 text-slate-200 text-xs font-bold flex items-center justify-center gap-2 cursor-pointer transition-all shadow-inner">
-              <i className="fa-solid fa-file-audio text-emerald-400 text-base" /> 
-              {audioUploadSuccess ? audioUploadSuccess : 'Choose MP3 File from Device (Max 8MB)'}
-              <input type="file" accept="audio/*" onChange={handleAudioUpload} className="hidden" />
-            </label>
-          </div>
-
-          {/* 2. PRESET 50 MUSIC LIBRARY */}
+          {/* 1. SELECT FROM DATABASE MUSIC LIBRARY */}
           <div className="p-4 rounded-2xl bg-slate-900 border border-amber-500/30 space-y-3">
             <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
               <div>
-                <span className="text-xs font-bold text-white block">Curated 50 Melody Library</span>
-                <span className="text-[11px] text-slate-400 block">Instant synthesis playback with zero delay.</span>
+                <span className="text-xs font-bold text-white block">Curated Music Library ({dbMusic.length} Songs)</span>
+                <span className="text-[11px] text-slate-400 block">Click the play button to preview audio before selecting.</span>
               </div>
               <button
                 type="button"
                 onClick={() => setIsMusicModalOpen(true)}
                 className="py-2.5 px-4 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold text-xs uppercase tracking-wider shadow-lg flex items-center gap-2 cursor-pointer transition-all whitespace-nowrap"
               >
-                <i className="fa-solid fa-compact-disc fa-spin" /> Open Music Library (50 Tracks)
+                <i className="fa-solid fa-compact-disc fa-spin" /> Open Music Library ({dbMusic.length} Tracks)
               </button>
             </div>
 
@@ -1320,7 +1187,7 @@ export default function BuilderForm({
             {data.cover?.audioUrl && (
               <div className="pt-2 border-t border-slate-800 flex items-center justify-between text-xs text-amber-300">
                 <span className="font-semibold flex items-center gap-2 truncate">
-                  <i className="fa-solid fa-music text-amber-400" /> Active Audio: {MUSIC_LIBRARY.find(m => m.trackCode === data.cover?.audioUrl)?.name || (data.cover?.audioUrl.startsWith('data:audio') ? 'Custom Uploaded MP3' : 'Custom Track')}
+                  <i className="fa-solid fa-music text-amber-400" /> Active Audio: {dbMusic.find(m => m.url === data.cover?.audioUrl)?.name || (data.cover?.audioUrl.startsWith('data:audio') ? 'Custom Uploaded Audio File' : 'Custom Audio URL')}
                 </span>
                 <span className="text-[10px] bg-emerald-500/20 text-emerald-300 px-2 py-0.5 rounded font-bold border border-emerald-500/40">
                   Ready
@@ -1329,16 +1196,13 @@ export default function BuilderForm({
             )}
           </div>
 
-          {/* 3. MANUAL MP3 URL */}
-          <div className="pt-1 space-y-1.5">
-            <label className="text-[11px] text-slate-400 block font-medium">Or enter a custom direct MP3 URL:</label>
-            <input
-              type="text"
-              placeholder="https://.../your-track.mp3"
-              value={data.cover?.audioUrl && !data.cover?.audioUrl.startsWith('data:audio') && !data.cover?.audioUrl.startsWith('m') ? data.cover.audioUrl : ''}
-              onChange={(e) => updateData({ ...data, cover: { ...data.cover, audioUrl: e.target.value } })}
-              className="w-full px-3.5 py-2.5 rounded-xl bg-slate-900 border border-slate-700 text-xs focus:border-amber-400 outline-none"
-            />
+          {/* 2. DIRECT AUDIO FILE UPLOAD */}
+          <div className="p-4 rounded-2xl bg-slate-900 border border-emerald-500/30 space-y-2">
+            <span className="text-xs font-bold text-white block">Or Upload Your Own MP3 File</span>
+            <label className="w-full py-2.5 px-4 rounded-xl bg-slate-950 border border-slate-700 hover:border-emerald-400/70 text-slate-200 text-xs font-bold flex items-center justify-center gap-2 cursor-pointer transition-all">
+              <i className="fa-solid fa-cloud-arrow-up text-emerald-400" /> Choose MP3 from Device (Max 8MB)
+              <input type="file" accept="audio/*" onChange={handleAudioUpload} className="hidden" />
+            </label>
           </div>
         </div>
       )}
@@ -1367,18 +1231,9 @@ export default function BuilderForm({
             type="button"
             className="w-full py-3.5 rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-slate-950 font-bold text-xs tracking-wider uppercase transition-all shadow-lg active:scale-98 disabled:opacity-50 cursor-pointer flex items-center justify-center gap-2"
           >
-            {isSaving ? (
-              <>
-                <i className="fa-solid fa-spinner fa-spin" /> Generating Invitation...
-              </>
-            ) : (
-              <>
-                <i className="fa-solid fa-paper-plane" /> Save & Generate Invitation Links
-              </>
-            )}
+            {isSaving ? 'Generating Invitation...' : 'Save & Generate Invitation Links'}
           </button>
 
-          {/* DUAL LINK SECTION */}
           {generatedUrl && (
             <div className="p-4 rounded-2xl bg-slate-900 border border-amber-500/30 space-y-3.5">
               <div className="text-center">
@@ -1393,12 +1248,7 @@ export default function BuilderForm({
                   <span className="text-emerald-400 font-bold">1. Free Link (2 Slides, Clean / No Watermark)</span>
                   <span className="text-[9px] px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-300 font-bold">FREE</span>
                 </div>
-                <a 
-                  href={generatedUrl} 
-                  target="_blank" 
-                  rel="noreferrer" 
-                  className="text-xs font-bold text-slate-200 underline break-all block hover:text-white"
-                >
+                <a href={generatedUrl} target="_blank" rel="noreferrer" className="text-xs font-bold text-slate-200 underline break-all block hover:text-white">
                   {generatedUrl}
                 </a>
               </div>
@@ -1409,12 +1259,7 @@ export default function BuilderForm({
                   <span className="text-amber-400 font-bold">2. Premium Preview Link (All Slides, Watermarked)</span>
                   <span className="text-[9px] px-2 py-0.5 rounded bg-amber-500/20 text-amber-300 font-bold">PREVIEW</span>
                 </div>
-                <a 
-                  href={`${generatedUrl}?v=premium`} 
-                  target="_blank" 
-                  rel="noreferrer" 
-                  className="text-xs font-bold text-amber-300 underline break-all block hover:text-amber-200"
-                >
+                <a href={`${generatedUrl}?v=premium`} target="_blank" rel="noreferrer" className="text-xs font-bold text-amber-300 underline break-all block hover:text-amber-200">
                   {`${generatedUrl}?v=premium`}
                 </a>
               </div>
@@ -1431,15 +1276,7 @@ export default function BuilderForm({
                   disabled={isCheckingOut}
                   className="w-full sm:w-auto px-5 py-2.5 rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-slate-950 font-bold text-xs uppercase tracking-wider text-center shadow-lg active:scale-95 transition-all cursor-pointer whitespace-nowrap flex items-center justify-center gap-2"
                 >
-                  {isCheckingOut ? (
-                    <>
-                      <i className="fa-solid fa-spinner fa-spin" /> Opening Stripe...
-                    </>
-                  ) : (
-                    <>
-                      <i className="fa-brands fa-stripe text-base" /> Unlock Full Access (RM 15)
-                    </>
-                  )}
+                  {isCheckingOut ? 'Opening Stripe...' : 'Unlock Full Access (RM 15)'}
                 </button>
               </div>
             </div>
@@ -1448,7 +1285,7 @@ export default function BuilderForm({
       )}
 
       {/* ========================================================================= */}
-      {/* 1. MODAL: 50-ITEM WALLPAPER GALLERY */}
+      {/* 1. MODAL: DYNAMIC WALLPAPERS FROM SUPABASE */}
       {/* ========================================================================= */}
       {isWallpaperModalOpen && (
         <div className="fixed inset-0 z-[200] bg-black/85 backdrop-blur-md flex items-center justify-center p-3 sm:p-6">
@@ -1460,7 +1297,7 @@ export default function BuilderForm({
                   <i className="fa-solid fa-images text-amber-400" /> 
                   Wallpaper Gallery ({wallpaperModalTarget === 'cover' ? 'Cover Page' : 'Inner Slides'})
                 </h3>
-                <p className="text-xs text-slate-400">Choose from 50 high-resolution portrait textures matching your event style.</p>
+                <p className="text-xs text-slate-400">Choose from {dbWallpapers.length} high-resolution portrait textures.</p>
               </div>
               <button
                 type="button"
@@ -1472,7 +1309,7 @@ export default function BuilderForm({
             </div>
 
             <div className="px-4 py-3 bg-slate-950/60 border-b border-slate-800 flex gap-2 overflow-x-auto no-scrollbar">
-              {WALLPAPER_CATEGORIES.map((cat) => (
+              {wallpaperCategories.map((cat) => (
                 <button
                   key={cat}
                   type="button"
@@ -1526,7 +1363,7 @@ export default function BuilderForm({
       )}
 
       {/* ========================================================================= */}
-      {/* 2. MODAL: 50-TRACK MUSIC LIBRARY WITH INSTANT SYNTH AUDIO PLAYBACK */}
+      {/* 2. MODAL: DYNAMIC MUSIC TRACKS FROM SUPABASE */}
       {/* ========================================================================= */}
       {isMusicModalOpen && (
         <div className="fixed inset-0 z-[200] bg-black/85 backdrop-blur-md flex items-center justify-center p-3 sm:p-6">
@@ -1537,12 +1374,13 @@ export default function BuilderForm({
                 <h3 className="text-lg font-bold text-white flex items-center gap-2">
                   <i className="fa-solid fa-compact-disc text-amber-400" /> Event Music Library
                 </h3>
-                <p className="text-xs text-slate-400">Click the Play / Pause (▶️ / ⏸️) button to toggle live audio.</p>
+                <p className="text-xs text-slate-400">Click the Play / Pause (▶️ / ⏸️) button to preview songs.</p>
               </div>
               <button
                 type="button"
                 onClick={() => {
-                  globalAudio.stop();
+                  if (modalAudioRef.current) modalAudioRef.current.pause();
+                  setIsPlayingAudio(false);
                   setIsMusicModalOpen(false);
                 }}
                 className="w-8 h-8 rounded-full bg-slate-800 hover:bg-slate-700 text-slate-300 flex items-center justify-center text-sm cursor-pointer"
@@ -1552,7 +1390,7 @@ export default function BuilderForm({
             </div>
 
             <div className="px-4 py-3 bg-slate-950/60 border-b border-slate-800 flex gap-2 overflow-x-auto no-scrollbar">
-              {MUSIC_CATEGORIES.map((cat) => (
+              {musicCategories.map((cat) => (
                 <button
                   key={cat}
                   type="button"
@@ -1570,8 +1408,8 @@ export default function BuilderForm({
 
             <div className="p-4 sm:p-5 overflow-y-auto space-y-2.5 flex-1">
               {filteredMusic.map((track) => {
-                const isSelected = data.cover?.audioUrl === track.trackCode;
-                const isCurrentPreview = previewTrackId === track.trackCode && isPlayingAudio;
+                const isSelected = data.cover?.audioUrl === track.url;
+                const isCurrentPreview = previewTrackUrl === track.url && isPlayingAudio;
 
                 return (
                   <div
@@ -1586,7 +1424,7 @@ export default function BuilderForm({
                     <div className="flex items-center gap-3">
                       <button
                         type="button"
-                        onClick={() => handleTogglePreviewMusic(track.trackCode)}
+                        onClick={() => handleTogglePreviewMusic(track.url)}
                         className={`w-11 h-11 rounded-full flex items-center justify-center text-base transition-transform active:scale-90 cursor-pointer ${
                           isCurrentPreview
                             ? 'bg-amber-500 text-slate-950 shadow-lg ring-2 ring-amber-400'
@@ -1623,7 +1461,7 @@ export default function BuilderForm({
                       ) : (
                         <button
                           type="button"
-                          onClick={() => handleSelectTrack(track.trackCode)}
+                          onClick={() => handleSelectTrack(track.url)}
                           className="px-4 py-2 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold text-xs uppercase tracking-wider shadow transition-transform active:scale-95 cursor-pointer whitespace-nowrap"
                         >
                           Select Track
@@ -1633,6 +1471,12 @@ export default function BuilderForm({
                   </div>
                 );
               })}
+
+              {filteredMusic.length === 0 && (
+                <div className="text-center py-8 text-xs text-slate-500">
+                  No music tracks found in this category. Go to <Link href="/admin" className="text-amber-400 underline font-bold">Admin Portal</Link> to upload new tracks.
+                </div>
+              )}
             </div>
 
           </div>
