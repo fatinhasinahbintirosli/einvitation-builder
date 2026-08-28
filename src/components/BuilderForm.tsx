@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { CardData, SlideType } from '@/types/invitation';
 
 type SlideItem = CardData['slides'][number];
@@ -88,7 +88,7 @@ const WALLPAPER_CATEGORIES = [
   'Geometric & Art'
 ];
 
-// 50 High-Reliability Audio Tracks
+// 50 High-Reliability Audio MP3 Tracks
 interface MusicItem {
   id: string;
   name: string;
@@ -97,14 +97,14 @@ interface MusicItem {
 }
 
 const MUSIC_LIBRARY: MusicItem[] = [
-  { id: 'm1', name: 'Pachelbel - Canon in D (Piano & Strings)', category: 'Romantic & Wedding', url: 'https://upload.wikimedia.org/wikipedia/commons/2/2b/Pachelbel%27s_Canon.ogg' },
-  { id: 'm2', name: 'Debussy - Clair de Lune (Soft Moonlight)', category: 'Romantic & Wedding', url: 'https://upload.wikimedia.org/wikipedia/commons/a/ab/Clair_de_lune_%28Claude_Debussy%29_Suite_bergamasque.ogg' },
-  { id: 'm3', name: 'Mendelssohn - Wedding March (Royal Procession)', category: 'Romantic & Wedding', url: 'https://upload.wikimedia.org/wikipedia/commons/d/d3/Felix_Mendelssohn_-_Wedding_March_-_USAF_Band.ogg' },
-  { id: 'm4', name: 'Chopin - Nocturne in E-flat major, Op. 9, No. 2', category: 'Romantic & Wedding', url: 'https://upload.wikimedia.org/wikipedia/commons/d/d6/Chopin_-_Nocturne_Op._9_No._2_E_Flat_Major.ogg' },
-  { id: 'm5', name: 'Erik Satie - Gymnopédie No. 1 (Pure Serenity)', category: 'Romantic & Wedding', url: 'https://upload.wikimedia.org/wikipedia/commons/4/4b/Gymnopedie_No_1.ogg' },
-  { id: 'm6', name: 'Liszt - Liebestraum No. 3 (Love Dream)', category: 'Romantic & Wedding', url: 'https://upload.wikimedia.org/wikipedia/commons/5/52/Liszt_Liebestraum_No3.ogg' },
-  { id: 'm7', name: 'J.S. Bach - Air on the G String (Strings Serenade)', category: 'Romantic & Wedding', url: 'https://upload.wikimedia.org/wikipedia/commons/2/23/Air_on_the_G_String_%28BWV_1068%29.ogg' },
-  { id: 'm8', name: 'Brahms - Wiegenlied / Lullaby Op. 49 No. 4', category: 'Romantic & Wedding', url: 'https://upload.wikimedia.org/wikipedia/commons/1/10/Brahms_Wiegenlied.ogg' },
+  { id: 'm1', name: 'Pachelbel - Canon in D (Piano & Strings)', category: 'Romantic & Wedding', url: 'https://ia800504.us.archive.org/11/items/CanonInD_201405/Canon%20in%20D.mp3' },
+  { id: 'm2', name: 'Debussy - Clair de Lune (Soft Moonlight)', category: 'Romantic & Wedding', url: 'https://ia800301.us.archive.org/15/items/ClairDeLune_563/Debussy-ClairDeLune.mp3' },
+  { id: 'm3', name: 'Mendelssohn - Wedding March (Royal Procession)', category: 'Romantic & Wedding', url: 'https://ia800703.us.archive.org/19/items/WeddingMarch_201405/WeddingMarch.mp3' },
+  { id: 'm4', name: 'Chopin - Nocturne in E-flat major, Op. 9, No. 2', category: 'Romantic & Wedding', url: 'https://ia800301.us.archive.org/1/items/ChopinNocturneOp.9No.2/Chopin-NocturneOp.9No.2.mp3' },
+  { id: 'm5', name: 'Erik Satie - Gymnopédie No. 1 (Pure Serenity)', category: 'Romantic & Wedding', url: 'https://ia802809.us.archive.org/24/items/ErikSatieGymnopedieNo1/ErikSatieGymnopedieNo1.mp3' },
+  { id: 'm6', name: 'Liszt - Liebestraum No. 3 (Love Dream)', category: 'Romantic & Wedding', url: 'https://ia800501.us.archive.org/28/items/LisztLiebestraumNo.3InA-flatMajor/Liszt_Liebestraum_No3.mp3' },
+  { id: 'm7', name: 'J.S. Bach - Air on the G String', category: 'Romantic & Wedding', url: 'https://ia800503.us.archive.org/15/items/BachAirOnTheGString_412/Bach-AirOnTheGString.mp3' },
+  { id: 'm8', name: 'Brahms - Wiegenlied / Lullaby Op. 49', category: 'Romantic & Wedding', url: 'https://ia800302.us.archive.org/10/items/BrahmsLullaby_895/BrahmsLullaby.mp3' },
   { id: 'm9', name: 'Peaceful Gamelan Heritage Bells', category: 'Traditional & Heritage', url: 'https://ia800307.us.archive.org/28/items/GamelanMusic_201705/Gamelan_Peaceful_Melody.mp3' },
   { id: 'm10', name: 'Borneo Sape Fingerstyle Serenity', category: 'Traditional & Heritage', url: 'https://ia600307.us.archive.org/28/items/GamelanMusic_201705/Borneo_Sape_Acoustic.mp3' },
   { id: 'm11', name: 'Arabian Oud Royal Serenade', category: 'Traditional & Heritage', url: 'https://ia800504.us.archive.org/11/items/ArabianOudMelody/Arabian_Oud_Serenade.mp3' },
@@ -138,15 +138,15 @@ const MUSIC_LIBRARY: MusicItem[] = [
   { id: 'm39', name: 'Tender Motherly Music Box', category: 'Celebration & Joy', url: 'https://ia800302.us.archive.org/10/items/BrahmsLullaby_895/Baby_Gentle_MusicBox.mp3' },
   { id: 'm40', name: 'First Steps of Wonder', category: 'Celebration & Joy', url: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-12.mp3' },
   { id: 'm41', name: 'Lively Birthday Festive Waltz', category: 'Celebration & Joy', url: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-13.mp3' },
-  { id: 'm42', name: 'Vivaldi - Four Seasons (Spring Allegro)', category: 'Majestic Orchestra', url: 'https://upload.wikimedia.org/wikipedia/commons/3/3c/Antonio_Vivaldi_-_The_Four_Seasons_-_Spring_-_1._Allegro.ogg' },
-  { id: 'm43', name: 'Tchaikovsky - Waltz of the Flowers', category: 'Majestic Orchestra', url: 'https://upload.wikimedia.org/wikipedia/commons/c/c5/Tchaikovsky_Waltz_of_the_Flowers.ogg' },
-  { id: 'm44', name: 'Mozart - Eine kleine Nachtmusik', category: 'Majestic Orchestra', url: 'https://upload.wikimedia.org/wikipedia/commons/c/c8/Mozart_-_Eine_kleine_Nachtmusik_-_1._Allegro.ogg' },
-  { id: 'm45', name: 'J.S. Bach - Brandenburg Concerto No. 3', category: 'Majestic Orchestra', url: 'https://upload.wikimedia.org/wikipedia/commons/4/45/Bach_-_Brandenburg_Concerto_No._3_-_1._Allegro.ogg' },
-  { id: 'm46', name: 'Beethoven - Moonlight Sonata Adagio', category: 'Majestic Orchestra', url: 'https://upload.wikimedia.org/wikipedia/commons/e/eb/Beethoven_Moonlight_1st_movement.ogg' },
+  { id: 'm42', name: 'Vivaldi - Four Seasons (Spring Allegro)', category: 'Majestic Orchestra', url: 'https://ia800501.us.archive.org/31/items/VivaldiSpringMvt1Allegro/Vivaldi_Spring_1_Allegro.mp3' },
+  { id: 'm43', name: 'Tchaikovsky - Waltz of the Flowers', category: 'Majestic Orchestra', url: 'https://ia800502.us.archive.org/26/items/TchaikovskyWaltzOfTheFlowers/Tchaikovsky_WaltzFlowers.mp3' },
+  { id: 'm44', name: 'Mozart - Eine kleine Nachtmusik', category: 'Majestic Orchestra', url: 'https://ia800500.us.archive.org/11/items/MozartEineKleineNachtmusik_948/Mozart_EineKleineNachtmusik.mp3' },
+  { id: 'm45', name: 'J.S. Bach - Brandenburg Concerto No. 3', category: 'Majestic Orchestra', url: 'https://ia800503.us.archive.org/29/items/BachBrandenburgConcertoNo.3/Bach_Brandenburg_3.mp3' },
+  { id: 'm46', name: 'Beethoven - Moonlight Sonata Adagio', category: 'Majestic Orchestra', url: 'https://ia800304.us.archive.org/19/items/BeethovenMoonlightSonata_854/Beethoven_MoonlightSonata.mp3' },
   { id: 'm47', name: 'Royal Grand Ballroom Waltz', category: 'Majestic Orchestra', url: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-14.mp3' },
   { id: 'm48', name: 'Imperial Coronation Symphony', category: 'Majestic Orchestra', url: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-15.mp3' },
   { id: 'm49', name: 'Cinematic Gala Theme', category: 'Majestic Orchestra', url: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-16.mp3' },
-  { id: 'm50', name: 'Grand Finale Strings & Brass', category: 'Majestic Orchestra', url: 'https://upload.wikimedia.org/wikipedia/commons/2/2b/Pachelbel%27s_Canon.ogg' },
+  { id: 'm50', name: 'Grand Finale Strings & Brass', category: 'Majestic Orchestra', url: 'https://ia800504.us.archive.org/11/items/CanonInD_201405/Canon%20in%20D.mp3' },
 ];
 
 const MUSIC_CATEGORIES = [
@@ -236,9 +236,30 @@ export default function BuilderForm({
   const [isMusicModalOpen, setIsMusicModalOpen] = useState(false);
   const [selectedMusicCategory, setSelectedMusicCategory] = useState('All');
   const [previewTrackUrl, setPreviewTrackUrl] = useState<string | null>(null);
-  const [isLoadingAudio, setIsLoadingAudio] = useState(false);
+  const [isPlayingAudio, setIsPlayingAudio] = useState(false);
   
-  const modalAudioRef = useRef<HTMLAudioElement | null>(null);
+  // Single persistent Audio object for modal
+  const audioInstance = useRef<HTMLAudioElement | null>(null);
+
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      audioInstance.current = new Audio();
+      audioInstance.current.onended = () => {
+        setIsPlayingAudio(false);
+        setPreviewTrackUrl(null);
+      };
+      audioInstance.current.onerror = () => {
+        setIsPlayingAudio(false);
+        setPreviewTrackUrl(null);
+      };
+    }
+    return () => {
+      if (audioInstance.current) {
+        audioInstance.current.pause();
+        audioInstance.current = null;
+      }
+    };
+  }, []);
 
   const bgType = data.theme?.coverBgType || 'color';
   const currentOpacity = typeof data.theme?.cardOpacity === 'number' ? data.theme.cardOpacity : 90;
@@ -259,43 +280,40 @@ export default function BuilderForm({
     }
   };
 
-  // Immediate Audio Preview in Music Library Modal
+  // Instant Audio Playback in Modal
   const handleTogglePreviewMusic = (url: string) => {
-    if (!modalAudioRef.current) return;
-    const audio = modalAudioRef.current;
+    if (!audioInstance.current) {
+      audioInstance.current = new Audio();
+    }
+    const audio = audioInstance.current;
 
-    if (previewTrackUrl === url) {
+    if (previewTrackUrl === url && isPlayingAudio) {
       audio.pause();
+      setIsPlayingAudio(false);
       setPreviewTrackUrl(null);
-      setIsLoadingAudio(false);
     } else {
-      setIsLoadingAudio(true);
-      setPreviewTrackUrl(url);
       audio.pause();
-      audio.currentTime = 0;
       audio.src = url;
-      audio.load();
+      audio.currentTime = 0;
+      setPreviewTrackUrl(url);
 
-      const playPromise = audio.play();
-      if (playPromise !== undefined) {
-        playPromise
-          .then(() => {
-            setIsLoadingAudio(false);
-          })
-          .catch((err) => {
-            console.warn('Playback error:', err);
-            setIsLoadingAudio(false);
-          });
-      }
+      audio.play()
+        .then(() => {
+          setIsPlayingAudio(true);
+        })
+        .catch((err) => {
+          console.warn('Playback notice:', err);
+          setIsPlayingAudio(false);
+        });
     }
   };
 
   const handleSelectTrack = (url: string) => {
-    if (modalAudioRef.current) {
-      modalAudioRef.current.pause();
+    if (audioInstance.current) {
+      audioInstance.current.pause();
     }
+    setIsPlayingAudio(false);
     setPreviewTrackUrl(null);
-    setIsLoadingAudio(false);
     updateData({ ...data, cover: { ...data.cover, audioUrl: url } });
     setIsMusicModalOpen(false);
   };
@@ -456,7 +474,7 @@ export default function BuilderForm({
     } else if (newType === 'tentative' && !currentSlide.timeline) {
       updated.title = 'EVENT SCHEDULE';
       updated.timeline = [
-        { time: '05:00 PM', activity: 'Guest Arrival & Welcome Canapés' },
+        { time: '05:00 PM', activity: 'Guest Arrival & Welcome Drinks' },
         { time: '06:30 PM', activity: 'Solemnization / Main Ceremony' },
         { time: '08:00 PM', activity: 'Gala Dinner & Speeches' }
       ];
@@ -535,16 +553,6 @@ export default function BuilderForm({
   return (
     <div className="w-full bg-slate-900 border border-slate-800 rounded-3xl p-5 sm:p-7 text-slate-200 shadow-2xl space-y-5">
       
-      {/* Hidden Audio Element for Modal Preview */}
-      <audio 
-        ref={modalAudioRef} 
-        onEnded={() => setPreviewTrackUrl(null)}
-        onError={() => {
-          setIsLoadingAudio(false);
-          setPreviewTrackUrl(null);
-        }}
-      />
-
       <div>
         <h2 className="text-2xl font-bold text-white tracking-wide">Digital Invitation Studio</h2>
         <p className="text-xs text-slate-400 mt-1">Independent cover & slide font customization, box color & 0-100% transparency.</p>
@@ -1506,7 +1514,7 @@ export default function BuilderForm({
       )}
 
       {/* ========================================================================= */}
-      {/* 2. MODAL: 50-TRACK MUSIC LIBRARY WITH ACTIVE LIVE PREVIEW */}
+      {/* 2. MODAL: 50-TRACK MUSIC LIBRARY WITH INSTANT AUDIO PLAYBACK */}
       {/* ========================================================================= */}
       {isMusicModalOpen && (
         <div className="fixed inset-0 z-[200] bg-black/85 backdrop-blur-md flex items-center justify-center p-3 sm:p-6">
@@ -1517,14 +1525,14 @@ export default function BuilderForm({
                 <h3 className="text-lg font-bold text-white flex items-center gap-2">
                   <i className="fa-solid fa-compact-disc text-amber-400" /> Event Music Library
                 </h3>
-                <p className="text-xs text-slate-400">Click the Play (▶️) button to test live audio samples before selecting.</p>
+                <p className="text-xs text-slate-400">Click the Play (▶️) button to test audio tracks immediately.</p>
               </div>
               <button
                 type="button"
                 onClick={() => {
-                  if (modalAudioRef.current) modalAudioRef.current.pause();
+                  if (audioInstance.current) audioInstance.current.pause();
                   setPreviewTrackUrl(null);
-                  setIsLoadingAudio(false);
+                  setIsPlayingAudio(false);
                   setIsMusicModalOpen(false);
                 }}
                 className="w-8 h-8 rounded-full bg-slate-800 hover:bg-slate-700 text-slate-300 flex items-center justify-center text-sm cursor-pointer"
@@ -1553,7 +1561,7 @@ export default function BuilderForm({
             <div className="p-4 sm:p-5 overflow-y-auto space-y-2.5 flex-1">
               {filteredMusic.map((track) => {
                 const isSelected = data.cover?.audioUrl === track.url;
-                const isPreviewing = previewTrackUrl === track.url;
+                const isCurrentPreview = previewTrackUrl === track.url && isPlayingAudio;
 
                 return (
                   <div
@@ -1564,20 +1572,19 @@ export default function BuilderForm({
                         : 'bg-slate-950/60 border-slate-800 hover:border-slate-700'
                     }`}
                   >
+                    {/* Play / Pause Preview Button */}
                     <div className="flex items-center gap-3">
                       <button
                         type="button"
                         onClick={() => handleTogglePreviewMusic(track.url)}
                         className={`w-11 h-11 rounded-full flex items-center justify-center text-base transition-transform active:scale-90 cursor-pointer ${
-                          isPreviewing
-                            ? 'bg-amber-500 text-slate-950 shadow-lg animate-pulse'
+                          isCurrentPreview
+                            ? 'bg-amber-500 text-slate-950 shadow-lg ring-2 ring-amber-400'
                             : 'bg-slate-800 hover:bg-slate-700 text-amber-300 border border-amber-500/30'
                         }`}
-                        title={isPreviewing ? 'Stop Audio' : 'Preview Audio'}
+                        title={isCurrentPreview ? 'Stop Audio' : 'Play Audio'}
                       >
-                        {isPreviewing && isLoadingAudio ? (
-                          <i className="fa-solid fa-spinner fa-spin text-sm" />
-                        ) : isPreviewing ? (
+                        {isCurrentPreview ? (
                           <i className="fa-solid fa-pause" />
                         ) : (
                           <i className="fa-solid fa-play ml-0.5 text-sm" />
@@ -1585,11 +1592,19 @@ export default function BuilderForm({
                       </button>
 
                       <div>
-                        <span className="text-xs font-bold text-white block">{track.name}</span>
+                        <div className="flex items-center gap-2">
+                          <span className="text-xs font-bold text-white block">{track.name}</span>
+                          {isCurrentPreview && (
+                            <span className="flex items-center gap-0.5 text-amber-400 text-[10px] animate-pulse">
+                              <i className="fa-solid fa-waveform" /> Playing
+                            </span>
+                          )}
+                        </div>
                         <span className="text-[10px] text-amber-300/80 font-medium">{track.category}</span>
                       </div>
                     </div>
 
+                    {/* Choose Track Button */}
                     <div className="flex items-center gap-2">
                       {isSelected ? (
                         <span className="px-3.5 py-2 rounded-xl bg-emerald-500/20 border border-emerald-500/40 text-emerald-300 text-xs font-bold flex items-center gap-1.5">

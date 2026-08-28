@@ -29,9 +29,9 @@ export interface ThemeConfig {
   goldColor?: string;
   backgroundColor?: string;
   
-  // Card Box Appearance & Custom Color
+  // Card Box Appearance & 0-100% Opacity
   cardBoxColor?: string; // Hex color for card box (default: #ffffff)
-  cardOpacity?: number; // 0 to 100 (default: 90)
+  cardOpacity?: number; // 0 to 100 (0% = invisible)
 
   // Separate Wallpaper Controls
   slideBgUrl?: string;
@@ -43,12 +43,12 @@ export interface ThemeConfig {
   // Separate Cover Typography
   coverHeadingFont?: string;
   coverBodyFont?: string;
-  coverFontSizeScale?: number; // 90 to 130 (default: 100)
+  coverFontSizeScale?: number; // 90 to 130
 
   // Separate Slide Typography
   slideHeadingFont?: string;
   slideBodyFont?: string;
-  slideFontSizeScale?: number; // 90 to 130 (default: 100)
+  slideFontSizeScale?: number; // 90 to 130
 
   doorStyle?: string;
   [key: string]: any;
