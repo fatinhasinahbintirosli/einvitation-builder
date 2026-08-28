@@ -91,7 +91,7 @@ export function InvitationCard({
   const slides = maxSlides && maxSlides > 0 ? rawSlides.slice(0, maxSlides) : rawSlides;
   const totalSlides = slides.length;
 
-  // Reliable Audio Synchronization
+  // Auto-reload and synchronize music on select
   useEffect(() => {
     if (audioRef.current && data?.cover?.audioUrl) {
       const audio = audioRef.current;
@@ -231,7 +231,7 @@ export function InvitationCard({
         </div>
       )}
 
-      {/* 2. AUDIO STREAMING ENGINE */}
+      {/* 2. AUDIO STREAMING ELEMENT */}
       {data?.cover?.audioUrl && (
         <audio 
           ref={audioRef} 
@@ -307,7 +307,7 @@ export function InvitationCard({
         </div>
       </div>
 
-      {/* ================= 5. SLIDES SECTION (0-100% OPACITY & DYNAMIC TYPOGRAPHY) ================= */}
+      {/* ================= 5. SLIDES SECTION ================= */}
       <div className="relative w-full h-full overflow-hidden flex flex-col justify-center items-center">
         {slides.map((slide, idx) => {
           const offset = idx - currentSlide;
@@ -325,7 +325,6 @@ export function InvitationCard({
                 zIndex: isCurrent ? 20 : 10
               }}
             >
-              {/* Card Container (0% to 100% Opacity + Custom Box Color) */}
               <div 
                 className={`w-full max-w-[375px] h-[84%] max-h-[600px] rounded-[32px] p-6 sm:p-7 text-center flex flex-col justify-between items-center relative transition-all duration-300 ${
                   isCompletelyTransparent 
@@ -339,7 +338,6 @@ export function InvitationCard({
                   transform: 'translateZ(0)'
                 }}
               >
-                {/* Header Decoration */}
                 <div className="w-full flex justify-between items-center text-xs px-1" style={{ color: data?.theme?.goldColor || '#b59049' }}>
                   <span>❧</span>
                   <span 
@@ -355,10 +353,9 @@ export function InvitationCard({
                   <span>☙</span>
                 </div>
 
-                {/* Slide Body Content */}
                 <div className="my-auto w-full py-1 flex flex-col items-center justify-center">
                   
-                  {/* 1. INTRO */}
+                  {/* INTRO */}
                   {slide.type === 'intro' && (
                     <div className="space-y-3.5 w-full flex flex-col items-center">
                       <p 
@@ -396,7 +393,7 @@ export function InvitationCard({
                     </div>
                   )}
 
-                  {/* 2. LOCATION */}
+                  {/* LOCATION */}
                   {slide.type === 'location' && slide.locationDetails && (
                     <div className="space-y-4 max-w-[310px] w-full flex flex-col items-center">
                       <div className="w-14 h-14 rounded-full bg-amber-500/20 border border-amber-500/50 flex items-center justify-center text-amber-500 text-xl shadow-sm">
@@ -441,7 +438,7 @@ export function InvitationCard({
                     </div>
                   )}
 
-                  {/* 3. TENTATIVE */}
+                  {/* TENTATIVE */}
                   {slide.type === 'tentative' && (
                     <div className="w-full space-y-3.5 max-w-[300px]">
                       {slide.timeline?.map((item, tIdx) => (
@@ -467,7 +464,7 @@ export function InvitationCard({
                     </div>
                   )}
 
-                  {/* 4. IMAGE_QR */}
+                  {/* IMAGE_QR */}
                   {slide.type === 'image_qr' && (
                     <div className="space-y-3.5 max-w-[300px] flex flex-col items-center">
                       {slide.imageUrl ? (
@@ -502,7 +499,7 @@ export function InvitationCard({
                     </div>
                   )}
 
-                  {/* 5. GUESTBOOK */}
+                  {/* GUESTBOOK */}
                   {slide.type === 'guestbook' && (
                     <div className="space-y-3.5 max-w-[300px] w-full text-center">
                       <div className="w-12 h-12 mx-auto rounded-full bg-amber-500/20 border border-amber-500/40 flex items-center justify-center text-amber-400 text-lg">
@@ -531,7 +528,7 @@ export function InvitationCard({
                     </div>
                   )}
 
-                  {/* 6. THANK YOU */}
+                  {/* THANK_YOU */}
                   {slide.type === 'thank_you' && (
                     <div className="space-y-3.5 max-w-[300px] mx-auto">
                       <div className="text-3xl text-amber-500">❧ ❦ ☙</div>
@@ -550,7 +547,7 @@ export function InvitationCard({
                   )}
                 </div>
 
-                {/* Bottom Navigation Control */}
+                {/* Bottom Navigation */}
                 <div className="w-full flex flex-col items-center gap-1 pt-1">
                   {idx < totalSlides - 1 ? (
                     <button 

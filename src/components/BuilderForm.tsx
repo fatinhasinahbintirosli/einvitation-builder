@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef } from 'react';
 import { CardData, SlideType } from '@/types/invitation';
 
 type SlideItem = CardData['slides'][number];
@@ -226,6 +226,7 @@ export default function BuilderForm({
 }: Props) {
   const [activeTab, setActiveTab] = useState<'cover' | 'slides' | 'music'>('cover');
   const [uploadError, setUploadError] = useState<string | null>(null);
+  const [audioUploadSuccess, setAudioUploadSuccess] = useState<string | null>(null);
   const [isCheckingOut, setIsCheckingOut] = useState(false);
 
   // Modals state
@@ -238,28 +239,8 @@ export default function BuilderForm({
   const [previewTrackUrl, setPreviewTrackUrl] = useState<string | null>(null);
   const [isPlayingAudio, setIsPlayingAudio] = useState(false);
   
-  // Single persistent Audio object for modal
-  const audioInstance = useRef<HTMLAudioElement | null>(null);
-
-  useEffect(() => {
-    if (typeof window !== 'undefined') {
-      audioInstance.current = new Audio();
-      audioInstance.current.onended = () => {
-        setIsPlayingAudio(false);
-        setPreviewTrackUrl(null);
-      };
-      audioInstance.current.onerror = () => {
-        setIsPlayingAudio(false);
-        setPreviewTrackUrl(null);
-      };
-    }
-    return () => {
-      if (audioInstance.current) {
-        audioInstance.current.pause();
-        audioInstance.current = null;
-      }
-    };
-  }, []);
+  // Dedicated Modal Audio Player Element
+  const modalAudioRef = useRef<HTMLAudioElement | null>(null);
 
   const bgType = data.theme?.coverBgType || 'color';
   const currentOpacity = typeof data.theme?.cardOpacity === 'number' ? data.theme.cardOpacity : 90;
@@ -280,12 +261,30 @@ export default function BuilderForm({
     }
   };
 
-  // Instant Audio Playback in Modal
-  const handleTogglePreviewMusic = (url: string) => {
-    if (!audioInstance.current) {
-      audioInstance.current = new Audio();
+  // Direct Audio Upload from User's Device (100% Offline & Reliable!)
+  const handleAudioUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setAudioUploadSuccess(null);
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    if (file.size > 8 * 1024 * 1024) {
+      alert('Audio file size exceeds 8MB. Please choose a smaller MP3 file.');
+      return;
     }
-    const audio = audioInstance.current;
+
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      const base64Audio = event.target?.result as string;
+      updateData({ ...data, cover: { ...data.cover, audioUrl: base64Audio } });
+      setAudioUploadSuccess(`Loaded: ${file.name}`);
+    };
+    reader.readAsDataURL(file);
+  };
+
+  // Instant HTML5 Audio Toggle in Modal
+  const handleTogglePreviewMusic = (url: string) => {
+    if (!modalAudioRef.current) return;
+    const audio = modalAudioRef.current;
 
     if (previewTrackUrl === url && isPlayingAudio) {
       audio.pause();
@@ -293,8 +292,9 @@ export default function BuilderForm({
       setPreviewTrackUrl(null);
     } else {
       audio.pause();
-      audio.src = url;
       audio.currentTime = 0;
+      audio.src = url;
+      audio.load();
       setPreviewTrackUrl(url);
 
       audio.play()
@@ -302,15 +302,15 @@ export default function BuilderForm({
           setIsPlayingAudio(true);
         })
         .catch((err) => {
-          console.warn('Playback notice:', err);
+          console.warn('Browser Audio Note:', err);
           setIsPlayingAudio(false);
         });
     }
   };
 
   const handleSelectTrack = (url: string) => {
-    if (audioInstance.current) {
-      audioInstance.current.pause();
+    if (modalAudioRef.current) {
+      modalAudioRef.current.pause();
     }
     setIsPlayingAudio(false);
     setPreviewTrackUrl(null);
@@ -553,6 +553,19 @@ export default function BuilderForm({
   return (
     <div className="w-full bg-slate-900 border border-slate-800 rounded-3xl p-5 sm:p-7 text-slate-200 shadow-2xl space-y-5">
       
+      {/* Hidden Modal Audio Element */}
+      <audio 
+        ref={modalAudioRef} 
+        onEnded={() => {
+          setIsPlayingAudio(false);
+          setPreviewTrackUrl(null);
+        }}
+        onError={() => {
+          setIsPlayingAudio(false);
+          setPreviewTrackUrl(null);
+        }}
+      />
+
       <div>
         <h2 className="text-2xl font-bold text-white tracking-wide">Digital Invitation Studio</h2>
         <p className="text-xs text-slate-400 mt-1">Independent cover & slide font customization, box color & 0-100% transparency.</p>
@@ -1290,6 +1303,29 @@ export default function BuilderForm({
             Background Music & Audio Track
           </label>
 
+          {/* 1. DIRECT AUDIO FILE UPLOAD (100% RELIABLE) */}
+          <div className="p-4 rounded-2xl bg-slate-900 border border-emerald-500/30 space-y-3">
+            <div className="flex items-center justify-between">
+              <span className="text-xs font-bold text-white flex items-center gap-2">
+                <i className="fa-solid fa-cloud-arrow-up text-emerald-400 text-sm" /> 
+                Upload MP3 Audio File from Your Device
+              </span>
+              <span className="text-[10px] bg-emerald-500/20 text-emerald-300 px-2 py-0.5 rounded font-bold border border-emerald-500/30">
+                Guaranteed Audio
+              </span>
+            </div>
+            <p className="text-[11px] text-slate-400">
+              Upload any song directly from your phone or computer. Plays 100% offline with zero server restrictions.
+            </p>
+            
+            <label className="w-full py-3 px-4 rounded-xl bg-slate-950 border border-slate-700 hover:border-emerald-400/70 text-slate-200 text-xs font-bold flex items-center justify-center gap-2 cursor-pointer transition-all shadow-inner">
+              <i className="fa-solid fa-file-audio text-emerald-400 text-base" /> 
+              {audioUploadSuccess ? audioUploadSuccess : 'Choose MP3 File from Device (Max 8MB)'}
+              <input type="file" accept="audio/*" onChange={handleAudioUpload} className="hidden" />
+            </label>
+          </div>
+
+          {/* 2. PRESET 50 MUSIC LIBRARY */}
           <div className="p-4 rounded-2xl bg-slate-900 border border-amber-500/30 space-y-3">
             <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
               <div>
@@ -1309,21 +1345,22 @@ export default function BuilderForm({
             {data.cover?.audioUrl && (
               <div className="pt-2 border-t border-slate-800 flex items-center justify-between text-xs text-amber-300">
                 <span className="font-semibold flex items-center gap-2 truncate">
-                  <i className="fa-solid fa-music text-amber-400" /> Selected Track: {MUSIC_LIBRARY.find(m => m.url === data.cover?.audioUrl)?.name || 'Custom URL'}
+                  <i className="fa-solid fa-music text-amber-400" /> Active Audio: {MUSIC_LIBRARY.find(m => m.url === data.cover?.audioUrl)?.name || (data.cover?.audioUrl.startsWith('data:audio') ? 'Custom Uploaded MP3' : 'Custom URL')}
                 </span>
                 <span className="text-[10px] bg-emerald-500/20 text-emerald-300 px-2 py-0.5 rounded font-bold border border-emerald-500/40">
-                  Active
+                  Ready
                 </span>
               </div>
             )}
           </div>
 
+          {/* 3. MANUAL MP3 URL */}
           <div className="pt-1 space-y-1.5">
-            <label className="text-[11px] text-slate-400 block font-medium">Or enter a custom MP3 audio URL:</label>
+            <label className="text-[11px] text-slate-400 block font-medium">Or enter a custom direct MP3 URL:</label>
             <input
               type="text"
               placeholder="https://.../your-track.mp3"
-              value={data.cover?.audioUrl || ''}
+              value={data.cover?.audioUrl && !data.cover?.audioUrl.startsWith('data:audio') ? data.cover.audioUrl : ''}
               onChange={(e) => updateData({ ...data, cover: { ...data.cover, audioUrl: e.target.value } })}
               className="w-full px-3.5 py-2.5 rounded-xl bg-slate-900 border border-slate-700 text-xs focus:border-amber-400 outline-none"
             />
@@ -1514,7 +1551,7 @@ export default function BuilderForm({
       )}
 
       {/* ========================================================================= */}
-      {/* 2. MODAL: 50-TRACK MUSIC LIBRARY WITH INSTANT AUDIO PLAYBACK */}
+      {/* 2. MODAL: 50-TRACK MUSIC LIBRARY WITH ACTIVE LIVE PREVIEW */}
       {/* ========================================================================= */}
       {isMusicModalOpen && (
         <div className="fixed inset-0 z-[200] bg-black/85 backdrop-blur-md flex items-center justify-center p-3 sm:p-6">
@@ -1530,7 +1567,7 @@ export default function BuilderForm({
               <button
                 type="button"
                 onClick={() => {
-                  if (audioInstance.current) audioInstance.current.pause();
+                  if (modalAudioRef.current) modalAudioRef.current.pause();
                   setPreviewTrackUrl(null);
                   setIsPlayingAudio(false);
                   setIsMusicModalOpen(false);
@@ -1572,7 +1609,6 @@ export default function BuilderForm({
                         : 'bg-slate-950/60 border-slate-800 hover:border-slate-700'
                     }`}
                   >
-                    {/* Play / Pause Preview Button */}
                     <div className="flex items-center gap-3">
                       <button
                         type="button"
@@ -1604,7 +1640,6 @@ export default function BuilderForm({
                       </div>
                     </div>
 
-                    {/* Choose Track Button */}
                     <div className="flex items-center gap-2">
                       {isSelected ? (
                         <span className="px-3.5 py-2 rounded-xl bg-emerald-500/20 border border-emerald-500/40 text-emerald-300 text-xs font-bold flex items-center gap-1.5">
