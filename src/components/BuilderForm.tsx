@@ -119,7 +119,6 @@ export default function BuilderForm({
 
   const modalAudioRef = useRef<HTMLAudioElement | null>(null);
 
-  // Fetch live assets from Supabase
   useEffect(() => {
     const fetchAssets = async () => {
       const { data: wpData } = await supabase.from('wallpapers').select('*').order('order_index', { ascending: true });
@@ -150,7 +149,34 @@ export default function BuilderForm({
     }
   };
 
-  // Direct Audio File Upload from device
+  // Muat Naik Bingkai Daun / Frame Custom (PNG Transparent)
+  const handleFrameUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    if (file.size > 4 * 1024 * 1024) {
+      alert('Frame image size exceeds 4MB.');
+      return;
+    }
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      const base64Url = event.target?.result as string;
+      updateData({
+        ...data,
+        theme: { ...data.theme, frameOverlayUrl: base64Url }
+      });
+      if (activeSlideIndex === 'cover') onActiveSlideChange?.(0);
+    };
+    reader.readAsDataURL(file);
+  };
+
+  const handleRemoveFrame = () => {
+    updateData({
+      ...data,
+      theme: { ...data.theme, frameOverlayUrl: undefined }
+    });
+  };
+
+  // Direct Audio File Upload
   const handleAudioUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
@@ -166,7 +192,6 @@ export default function BuilderForm({
     reader.readAsDataURL(file);
   };
 
-  // Live Audio Preview in Modal
   const handleTogglePreviewMusic = (url: string) => {
     if (!modalAudioRef.current) return;
     const player = modalAudioRef.current;
@@ -419,7 +444,7 @@ export default function BuilderForm({
         }}
       />
 
-      {/* Header (Clean Studio Title - No visible Admin button) */}
+      {/* Header */}
       <div>
         <h2 className="text-2xl font-bold text-white tracking-wide">Digital Invitation Studio</h2>
         <p className="text-xs text-slate-400 mt-1">Independent cover & slide styling, custom fonts, 0-100% transparency & dynamic music.</p>
@@ -670,11 +695,40 @@ export default function BuilderForm({
         </div>
       )}
 
-      {/* ================= TAB 2: SLIDES & CARD BOX STYLING ================= */}
+      {/* ================= TAB 2: SLIDES, BOX STYLING & BINGKAI HIASAN ================= */}
       {activeTab === 'slides' && (
         <div className="space-y-4">
           
-          {/* 1. CARD BOX COLOR & 0-100% OPACITY */}
+          {/* 1. BINGKAI HIASAN HADAPAN KOTAK (FRAME OVERLAY SELECTOR) */}
+          <div className="p-4 rounded-2xl bg-slate-950/90 border border-emerald-500/30 space-y-3">
+            <div className="flex items-center justify-between">
+              <label className="text-xs font-bold text-emerald-300 uppercase tracking-wider flex items-center gap-1.5">
+                <i className="fa-solid fa-leaf" /> Bingkai Hiasan Kotak Kad (Frame Overlay)
+              </label>
+              {data.theme?.frameOverlayUrl && (
+                <button
+                  type="button"
+                  onClick={handleRemoveFrame}
+                  className="text-[10px] text-red-400 hover:text-red-300 font-semibold underline cursor-pointer"
+                >
+                  Padam Bingkai
+                </button>
+              )}
+            </div>
+
+            <p className="text-[11px] text-slate-400">
+              Tambah bingkai daun tropika monstera atau muat naik bingkai PNG lutsinar anda sendiri.
+            </p>
+
+            <div className="flex flex-col sm:flex-row gap-2">
+              <label className="flex-1 py-2.5 px-4 rounded-xl bg-slate-900 border border-slate-700 hover:border-emerald-400/60 text-slate-200 text-xs font-bold flex items-center justify-center gap-2 cursor-pointer transition-all">
+                <i className="fa-solid fa-cloud-arrow-up text-emerald-400" /> Muat Naik Gambar Bingkai Daun (PNG)
+                <input type="file" accept="image/*" onChange={handleFrameUpload} className="hidden" />
+              </label>
+            </div>
+          </div>
+
+          {/* 2. CARD BOX COLOR & 0-100% OPACITY */}
           <div className="p-4 rounded-2xl bg-slate-950/90 border border-amber-500/30 space-y-4">
             <div className="flex items-center justify-between">
               <label className="text-xs font-bold text-amber-300 uppercase tracking-wider flex items-center gap-1.5">
@@ -766,7 +820,7 @@ export default function BuilderForm({
             </div>
           </div>
 
-          {/* 2. SLIDE TYPOGRAPHY */}
+          {/* 3. SLIDE TYPOGRAPHY */}
           <div className="p-4 rounded-2xl bg-slate-900 border border-slate-800 space-y-3.5">
             <label className="text-xs font-bold text-amber-300 uppercase tracking-wider flex items-center gap-1.5">
               <i className="fa-solid fa-font" /> Slide Typography (Inner Pages Only)
@@ -831,7 +885,7 @@ export default function BuilderForm({
             </div>
           </div>
 
-          {/* 3. INNER SLIDE WALLPAPER */}
+          {/* 4. INNER SLIDE WALLPAPER */}
           <div className="p-4 rounded-2xl bg-slate-950/90 border border-slate-800 space-y-3">
             <label className="text-xs font-bold text-amber-300 uppercase tracking-wider flex items-center gap-1.5">
               <i className="fa-solid fa-layer-group" /> Inner Slide Wallpaper
@@ -853,7 +907,7 @@ export default function BuilderForm({
             </div>
           </div>
 
-          {/* 4. SLIDE LIST */}
+          {/* 5. SLIDE LIST */}
           <div className="space-y-4 max-h-[460px] overflow-y-auto pr-1">
             {data.slides.map((slide, idx) => {
               const isCurrentlyActive = activeSlideIndex === idx;

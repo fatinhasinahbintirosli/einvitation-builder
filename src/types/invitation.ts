@@ -30,8 +30,11 @@ export interface ThemeConfig {
   backgroundColor?: string;
   
   // Card Box Appearance & 0-100% Opacity
-  cardBoxColor?: string; // Hex color for card box (default: #ffffff)
-  cardOpacity?: number; // 0 to 100 (0% = invisible)
+  cardBoxColor?: string;
+  cardOpacity?: number; // 0 to 100
+
+  // Frame Overlay (Bingkai Hadapan Kotak Kad)
+  frameOverlayUrl?: string;
 
   // Separate Wallpaper Controls
   slideBgUrl?: string;
@@ -40,15 +43,13 @@ export interface ThemeConfig {
   coverBgColor?: string;
   coverBgUrl?: string;
 
-  // Separate Cover Typography
+  // Typography
   coverHeadingFont?: string;
   coverBodyFont?: string;
-  coverFontSizeScale?: number; // 90 to 130
-
-  // Separate Slide Typography
+  coverFontSizeScale?: number;
   slideHeadingFont?: string;
   slideBodyFont?: string;
-  slideFontSizeScale?: number; // 90 to 130
+  slideFontSizeScale?: number;
 
   doorStyle?: string;
   [key: string]: any;

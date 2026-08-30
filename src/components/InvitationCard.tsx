@@ -69,7 +69,7 @@ function TypewriterText({
   return <span className={className} style={style}>{displayedText}</span>;
 }
 
-export function InvitationCard({ 
+export default function InvitationCard({ 
   data, 
   showWatermark = false, 
   maxSlides, 
@@ -91,7 +91,6 @@ export function InvitationCard({
   const slides = maxSlides && maxSlides > 0 ? rawSlides.slice(0, maxSlides) : rawSlides;
   const totalSlides = slides.length;
 
-  // Auto-reload audio if track changes while playing
   useEffect(() => {
     if (audioRef.current && data?.cover?.audioUrl) {
       const audio = audioRef.current;
@@ -105,7 +104,6 @@ export function InvitationCard({
     }
   }, [data?.cover?.audioUrl, isPlaying]);
 
-  // Auto-flip to active slide / cover during builder editing
   useEffect(() => {
     if (activeSlideIndex === 'cover') {
       setIsOpen(false);
@@ -184,21 +182,21 @@ export function InvitationCard({
     touchStartY.current = null;
   };
 
-  // 1. Cover Background Resolution
+  // 1. Cover Background
   const isCoverImage = data?.theme?.coverBgType === 'image' && data?.theme?.coverBgUrl;
   const coverBgColor = data?.theme?.coverBgColor || data?.theme?.primaryColor || '#1e293b';
 
-  // 2. Inner Slide Wallpaper Resolution
+  // 2. Slide Wallpaper
   const slideWallpaperUrl = data?.theme?.slideBgUrl || data?.theme?.bgPatternUrl;
 
-  // 3. Card Box Color & 0-100% Opacity
+  // 3. Card Box Color & Opacity
   const boxBaseColor = data?.theme?.cardBoxColor || '#ffffff';
   const rawOpacity = typeof data?.theme?.cardOpacity === 'number' ? data.theme.cardOpacity : 90;
   const opacityVal = Math.min(100, Math.max(0, rawOpacity));
   const isCompletelyTransparent = opacityVal === 0;
   const cardBgStyle = isCompletelyTransparent ? 'transparent' : hexToRgba(boxBaseColor, opacityVal);
 
-  // 4. Typography: Cover vs Slide Sizing & Fonts
+  // 4. Typography
   const coverHeadingFont = data?.theme?.coverHeadingFont || 'Cinzel, serif';
   const coverBodyFont = data?.theme?.coverBodyFont || 'Playfair Display, serif';
   const coverScale = (data?.theme?.coverFontSizeScale || 100) / 100;
@@ -220,7 +218,7 @@ export function InvitationCard({
         backgroundPosition: 'center'
       }}
     >
-      {/* 1. PREVIEW WATERMARK */}
+      {/* PREVIEW WATERMARK */}
       {showWatermark && (
         <div className="absolute inset-0 z-[100] pointer-events-none flex flex-col items-center justify-around opacity-25">
           {[...Array(6)].map((_, i) => (
@@ -231,7 +229,7 @@ export function InvitationCard({
         </div>
       )}
 
-      {/* 2. AUDIO STREAMING ELEMENT */}
+      {/* AUDIO ELEMENT */}
       {data?.cover?.audioUrl && (
         <audio 
           ref={audioRef} 
@@ -240,7 +238,7 @@ export function InvitationCard({
         />
       )}
 
-      {/* 3. MUSIC TOGGLE BUTTON */}
+      {/* MUSIC BUTTON */}
       <button
         onClick={toggleMusic}
         type="button"
@@ -249,7 +247,7 @@ export function InvitationCard({
         <i className={`fa-solid text-sm ${isPlaying ? 'fa-compact-disc fa-spin text-amber-300' : 'fa-volume-xmark text-slate-400'}`} />
       </button>
 
-      {/* ================= 4. COVER SECTION ================= */}
+      {/* ================= COVER PAGE ================= */}
       <div 
         className={`absolute inset-0 z-50 flex flex-col items-center justify-center p-6 text-white transition-transform duration-[1000ms] ease-[cubic-bezier(0.16,1,0.3,1)] ${
           isOpen ? '-translate-y-full pointer-events-none' : 'translate-y-0 pointer-events-auto'
@@ -307,7 +305,7 @@ export function InvitationCard({
         </div>
       </div>
 
-      {/* ================= 5. SLIDES SECTION ================= */}
+      {/* ================= SLIDES SECTION ================= */}
       <div className="relative w-full h-full overflow-hidden flex flex-col justify-center items-center">
         {slides.map((slide, idx) => {
           const offset = idx - currentSlide;
@@ -338,7 +336,19 @@ export function InvitationCard({
                   transform: 'translateZ(0)'
                 }}
               >
-                <div className="w-full flex justify-between items-center text-xs px-1" style={{ color: data?.theme?.goldColor || '#b59049' }}>
+                {/* BINGKAI HIASAN HADAPAN KOTAK (TROPICAL FRAME OVERLAY) */}
+                {data?.theme?.frameOverlayUrl && (
+                  <div className="absolute inset-0 pointer-events-none z-30 overflow-hidden rounded-[32px]">
+                    <img 
+                      src={data.theme.frameOverlayUrl} 
+                      alt="Botanical Frame Overlay" 
+                      className="w-full h-full object-fill pointer-events-none select-none"
+                    />
+                  </div>
+                )}
+
+                {/* Header Deco */}
+                <div className="w-full flex justify-between items-center text-xs px-1 relative z-10" style={{ color: data?.theme?.goldColor || '#b59049' }}>
                   <span>❧</span>
                   <span 
                     className="font-bold uppercase tracking-[2.5px]" 
@@ -353,7 +363,8 @@ export function InvitationCard({
                   <span>☙</span>
                 </div>
 
-                <div className="my-auto w-full py-1 flex flex-col items-center justify-center">
+                {/* Slide Content */}
+                <div className="my-auto w-full py-1 flex flex-col items-center justify-center relative z-10">
                   
                   {/* INTRO */}
                   {slide.type === 'intro' && (
@@ -548,7 +559,7 @@ export function InvitationCard({
                 </div>
 
                 {/* Bottom Navigation */}
-                <div className="w-full flex flex-col items-center gap-1 pt-1">
+                <div className="w-full flex flex-col items-center gap-1 pt-1 relative z-10">
                   {idx < totalSlides - 1 ? (
                     <button 
                       onClick={nextSlide} 
@@ -578,5 +589,3 @@ export function InvitationCard({
     </div>
   );
 }
-
-export default InvitationCard;
