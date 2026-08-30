@@ -4,7 +4,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { supabase } from '@/lib/supabaseClient';
 import Link from 'next/link';
 
-interface WallpaperItem {
+interface AdminItem {
   id: string;
   name: string;
   category: string;
@@ -12,32 +12,31 @@ interface WallpaperItem {
   order_index: number;
 }
 
-interface MusicItem {
-  id: string;
-  name: string;
-  category: string;
-  url: string;
-  order_index: number;
-}
-
-const ADMIN_SECRET_PIN = '8899'; // Anda boleh tukar nombor PIN ini mengikut kehendak anda
+const ADMIN_SECRET_PIN = '8899';
 
 export default function SecretAdminPortalPage() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [pinInput, setPinInput] = useState('');
   const [pinError, setPinError] = useState(false);
 
-  const [activeTab, setActiveTab] = useState<'wallpapers' | 'music'>('wallpapers');
+  const [activeTab, setActiveTab] = useState<'wallpapers' | 'frames' | 'music'>('frames');
   
   // Wallpapers state
-  const [wallpapers, setWallpapers] = useState<WallpaperItem[]>([]);
+  const [wallpapers, setWallpapers] = useState<AdminItem[]>([]);
   const [wpName, setWpName] = useState('');
   const [wpCategory, setWpCategory] = useState('Heritage & Gold');
   const [wpUrl, setWpUrl] = useState('');
   const [isUploadingWp, setIsUploadingWp] = useState(false);
 
+  // Frames state
+  const [frames, setFrames] = useState<AdminItem[]>([]);
+  const [frameName, setFrameName] = useState('');
+  const [frameCategory, setFrameCategory] = useState('Botanical & Leaves');
+  const [frameUrl, setFrameUrl] = useState('');
+  const [isUploadingFrame, setIsUploadingFrame] = useState(false);
+
   // Music state
-  const [musicList, setMusicList] = useState<MusicItem[]>([]);
+  const [musicList, setMusicList] = useState<AdminItem[]>([]);
   const [musicName, setMusicName] = useState('');
   const [musicCategory, setMusicCategory] = useState('Romantic & Wedding');
   const [musicUrl, setMusicUrl] = useState('');
@@ -49,6 +48,7 @@ export default function SecretAdminPortalPage() {
   useEffect(() => {
     if (isAuthenticated) {
       fetchWallpapers();
+      fetchFrames();
       fetchMusic();
     }
   }, [isAuthenticated]);
@@ -64,29 +64,24 @@ export default function SecretAdminPortalPage() {
   };
 
   const fetchWallpapers = async () => {
-    const { data, error } = await supabase
-      .from('wallpapers')
-      .select('*')
-      .order('order_index', { ascending: true });
-    if (data && !error) setWallpapers(data);
+    const { data } = await supabase.from('wallpapers').select('*').order('order_index', { ascending: true });
+    if (data) setWallpapers(data);
+  };
+
+  const fetchFrames = async () => {
+    const { data } = await supabase.from('frames').select('*').order('order_index', { ascending: true });
+    if (data) setFrames(data);
   };
 
   const fetchMusic = async () => {
-    const { data, error } = await supabase
-      .from('music_tracks')
-      .select('*')
-      .order('order_index', { ascending: true });
-    if (data && !error) setMusicList(data);
+    const { data } = await supabase.from('music_tracks').select('*').order('order_index', { ascending: true });
+    if (data) setMusicList(data);
   };
 
-  // Upload Wallpaper File
+  // Upload Handlers
   const handleWpFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
-    if (file.size > 3 * 1024 * 1024) {
-      alert('Image file size exceeds 3MB.');
-      return;
-    }
     const reader = new FileReader();
     reader.onload = (event) => {
       setWpUrl(event.target?.result as string);
@@ -95,14 +90,20 @@ export default function SecretAdminPortalPage() {
     reader.readAsDataURL(file);
   };
 
-  // Upload MP3 File
+  const handleFrameFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      setFrameUrl(event.target?.result as string);
+      if (!frameName) setFrameName(file.name.replace(/\.[^/.]+$/, ''));
+    };
+    reader.readAsDataURL(file);
+  };
+
   const handleMusicFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
-    if (file.size > 8 * 1024 * 1024) {
-      alert('Audio file size exceeds 8MB.');
-      return;
-    }
     const reader = new FileReader();
     reader.onload = (event) => {
       setMusicUrl(event.target?.result as string);
@@ -111,111 +112,90 @@ export default function SecretAdminPortalPage() {
     reader.readAsDataURL(file);
   };
 
-  // Save Wallpaper
+  // Save Handlers
   const handleAddWallpaper = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!wpName || !wpUrl) {
-      alert('Please fill in the name and provide an image.');
-      return;
-    }
+    if (!wpName || !wpUrl) return alert('Name and image are required.');
     setIsUploadingWp(true);
     const nextIndex = wallpapers.length > 0 ? Math.max(...wallpapers.map(w => w.order_index || 0)) + 1 : 1;
-
-    const { error } = await supabase.from('wallpapers').insert([
-      {
-        name: wpName,
-        category: wpCategory,
-        url: wpUrl,
-        order_index: nextIndex
-      }
-    ]);
-
+    await supabase.from('wallpapers').insert([{ name: wpName, category: wpCategory, url: wpUrl, order_index: nextIndex }]);
     setIsUploadingWp(false);
-    if (error) {
-      alert('Error saving wallpaper: ' + error.message);
-    } else {
-      setWpName('');
-      setWpUrl('');
-      fetchWallpapers();
-    }
+    setWpName('');
+    setWpUrl('');
+    fetchWallpapers();
   };
 
-  // Save Music Track
+  const handleAddFrame = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!frameName || !frameUrl) return alert('Name and frame image are required.');
+    setIsUploadingFrame(true);
+    const nextIndex = frames.length > 0 ? Math.max(...frames.map(f => f.order_index || 0)) + 1 : 1;
+    await supabase.from('frames').insert([{ name: frameName, category: frameCategory, url: frameUrl, order_index: nextIndex }]);
+    setIsUploadingFrame(false);
+    setFrameName('');
+    setFrameUrl('');
+    fetchFrames();
+  };
+
   const handleAddMusic = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!musicName || !musicUrl) {
-      alert('Please fill in the track name and provide an audio file or URL.');
-      return;
-    }
+    if (!musicName || !musicUrl) return alert('Name and audio are required.');
     setIsUploadingMusic(true);
     const nextIndex = musicList.length > 0 ? Math.max(...musicList.map(m => m.order_index || 0)) + 1 : 1;
-
-    const { error } = await supabase.from('music_tracks').insert([
-      {
-        name: musicName,
-        category: musicCategory,
-        url: musicUrl,
-        order_index: nextIndex
-      }
-    ]);
-
+    await supabase.from('music_tracks').insert([{ name: musicName, category: musicCategory, url: musicUrl, order_index: nextIndex }]);
     setIsUploadingMusic(false);
-    if (error) {
-      alert('Error saving music track: ' + error.message);
-    } else {
-      setMusicName('');
-      setMusicUrl('');
-      fetchMusic();
-    }
+    setMusicName('');
+    setMusicUrl('');
+    fetchMusic();
   };
 
+  // Delete Handlers
   const handleDeleteWp = async (id: string) => {
-    if (!confirm('Are you sure you want to delete this wallpaper?')) return;
+    if (!confirm('Delete wallpaper?')) return;
     await supabase.from('wallpapers').delete().eq('id', id);
     fetchWallpapers();
   };
 
+  const handleDeleteFrame = async (id: string) => {
+    if (!confirm('Delete frame?')) return;
+    await supabase.from('frames').delete().eq('id', id);
+    fetchFrames();
+  };
+
   const handleDeleteMusic = async (id: string) => {
-    if (!confirm('Are you sure you want to delete this music track?')) return;
-    if (playingTrackId === id && audioPlayerRef.current) {
-      audioPlayerRef.current.pause();
-      setPlayingTrackId(null);
-    }
+    if (!confirm('Delete music track?')) return;
     await supabase.from('music_tracks').delete().eq('id', id);
     fetchMusic();
   };
 
-  // Move Up / Down Handlers
+  // Reorder Handlers
   const moveWp = async (index: number, direction: 'up' | 'down') => {
-    const targetIndex = direction === 'up' ? index - 1 : index + 1;
-    if (targetIndex < 0 || targetIndex >= wallpapers.length) return;
-
-    const currentItem = wallpapers[index];
-    const targetItem = wallpapers[targetIndex];
-
-    await supabase.from('wallpapers').update({ order_index: targetItem.order_index }).eq('id', currentItem.id);
-    await supabase.from('wallpapers').update({ order_index: currentItem.order_index }).eq('id', targetItem.id);
-
+    const target = direction === 'up' ? index - 1 : index + 1;
+    if (target < 0 || target >= wallpapers.length) return;
+    await supabase.from('wallpapers').update({ order_index: wallpapers[target].order_index }).eq('id', wallpapers[index].id);
+    await supabase.from('wallpapers').update({ order_index: wallpapers[index].order_index }).eq('id', wallpapers[target].id);
     fetchWallpapers();
   };
 
+  const moveFrame = async (index: number, direction: 'up' | 'down') => {
+    const target = direction === 'up' ? index - 1 : index + 1;
+    if (target < 0 || target >= frames.length) return;
+    await supabase.from('frames').update({ order_index: frames[target].order_index }).eq('id', frames[index].id);
+    await supabase.from('frames').update({ order_index: frames[index].order_index }).eq('id', frames[target].id);
+    fetchFrames();
+  };
+
   const moveMusic = async (index: number, direction: 'up' | 'down') => {
-    const targetIndex = direction === 'up' ? index - 1 : index + 1;
-    if (targetIndex < 0 || targetIndex >= musicList.length) return;
-
-    const currentItem = musicList[index];
-    const targetItem = musicList[targetIndex];
-
-    await supabase.from('music_tracks').update({ order_index: targetItem.order_index }).eq('id', currentItem.id);
-    await supabase.from('music_tracks').update({ order_index: currentItem.order_index }).eq('id', targetItem.id);
-
+    const target = direction === 'up' ? index - 1 : index + 1;
+    if (target < 0 || target >= musicList.length) return;
+    await supabase.from('music_tracks').update({ order_index: musicList[target].order_index }).eq('id', musicList[index].id);
+    await supabase.from('music_tracks').update({ order_index: musicList[index].order_index }).eq('id', musicList[target].id);
     fetchMusic();
   };
 
-  const handleTogglePlay = (track: MusicItem) => {
+  const handleTogglePlay = (track: AdminItem) => {
     if (!audioPlayerRef.current) return;
     const player = audioPlayerRef.current;
-
     if (playingTrackId === track.id) {
       player.pause();
       setPlayingTrackId(null);
@@ -224,13 +204,10 @@ export default function SecretAdminPortalPage() {
       player.src = track.url;
       player.currentTime = 0;
       player.load();
-      player.play().then(() => {
-        setPlayingTrackId(track.id);
-      }).catch(err => alert('Unable to play track: ' + err.message));
+      player.play().then(() => setPlayingTrackId(track.id));
     }
   };
 
-  // PIN PROTECTION SCREEN
   if (!isAuthenticated) {
     return (
       <main className="min-h-screen bg-slate-950 flex flex-col items-center justify-center p-4 text-slate-100">
@@ -264,7 +241,6 @@ export default function SecretAdminPortalPage() {
     );
   }
 
-  // AUTHENTICATED ADMIN DASHBOARD
   return (
     <main className="min-h-screen bg-slate-950 text-slate-100 p-4 sm:p-8 max-w-6xl mx-auto">
       
@@ -280,7 +256,7 @@ export default function SecretAdminPortalPage() {
             <i className="fa-solid fa-shield-halved text-xl" /> Secret Asset Management Portal
           </h1>
           <p className="text-xs sm:text-sm text-slate-400 mt-1">
-            Upload custom MP3 songs, wallpapers, assign categories, and arrange display order.
+            Upload custom MP3 songs, wallpapers, leaf frames, and arrange display order.
           </p>
         </div>
         <Link 
@@ -292,7 +268,16 @@ export default function SecretAdminPortalPage() {
       </header>
 
       {/* Tabs */}
-      <div className="flex rounded-2xl bg-slate-900 p-1.5 border border-slate-800 mb-8 max-w-md">
+      <div className="flex rounded-2xl bg-slate-900 p-1.5 border border-slate-800 mb-8 max-w-lg">
+        <button
+          type="button"
+          onClick={() => setActiveTab('frames')}
+          className={`flex-1 py-2.5 rounded-xl font-bold text-xs transition-all flex items-center justify-center gap-2 ${
+            activeTab === 'frames' ? 'bg-emerald-500 text-slate-950 shadow' : 'text-slate-400 hover:text-white'
+          }`}
+        >
+          <i className="fa-solid fa-leaf" /> Frames ({frames.length})
+        </button>
         <button
           type="button"
           onClick={() => setActiveTab('wallpapers')}
@@ -309,11 +294,143 @@ export default function SecretAdminPortalPage() {
             activeTab === 'music' ? 'bg-amber-500 text-slate-950 shadow' : 'text-slate-400 hover:text-white'
           }`}
         >
-          <i className="fa-solid fa-music" /> Music Tracks ({musicList.length})
+          <i className="fa-solid fa-music" /> Music ({musicList.length})
         </button>
       </div>
 
-      {/* WALLPAPERS SECTION */}
+      {/* ================= SECTION 1: FRAMES MANAGEMENT ================= */}
+      {activeTab === 'frames' && (
+        <div className="space-y-8">
+          <form onSubmit={handleAddFrame} className="p-6 rounded-3xl bg-slate-900 border border-slate-800 space-y-4 shadow-xl">
+            <h2 className="text-base font-bold text-white flex items-center gap-2">
+              <i className="fa-solid fa-cloud-arrow-up text-emerald-400" /> Upload New Foreground Frame (PNG Transparent)
+            </h2>
+
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+              <div>
+                <label className="text-xs text-slate-400 block mb-1 font-medium">Frame Title</label>
+                <input
+                  type="text"
+                  placeholder="e.g. Tropical Monstera Leaves Frame"
+                  value={frameName}
+                  onChange={(e) => setFrameName(e.target.value)}
+                  className="w-full px-3.5 py-2.5 rounded-xl bg-slate-950 border border-slate-700 text-xs focus:border-emerald-400 outline-none"
+                  required
+                />
+              </div>
+
+              <div>
+                <label className="text-xs text-slate-400 block mb-1 font-medium">Category</label>
+                <input
+                  type="text"
+                  list="frame-categories"
+                  placeholder="e.g. Botanical & Leaves"
+                  value={frameCategory}
+                  onChange={(e) => setFrameCategory(e.target.value)}
+                  className="w-full px-3.5 py-2.5 rounded-xl bg-slate-950 border border-slate-700 text-xs focus:border-emerald-400 outline-none"
+                  required
+                />
+                <datalist id="frame-categories">
+                  <option value="Botanical & Leaves" />
+                  <option value="Gold Borders" />
+                  <option value="Floral Bouquets" />
+                  <option value="Vintage Minimal" />
+                </datalist>
+              </div>
+
+              <div>
+                <label className="text-xs text-slate-400 block mb-1 font-medium">Upload Image or URL</label>
+                <div className="flex gap-2">
+                  <label className="px-3 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-emerald-300 text-xs font-semibold cursor-pointer border border-slate-700 whitespace-nowrap">
+                    Choose PNG
+                    <input type="file" accept="image/*" onChange={handleFrameFileUpload} className="hidden" />
+                  </label>
+                  <input
+                    type="text"
+                    placeholder="https://...frame.png"
+                    value={frameUrl.startsWith('data:image') ? 'Uploaded Local PNG File' : frameUrl}
+                    onChange={(e) => setFrameUrl(e.target.value)}
+                    className="w-full px-3 py-2 rounded-xl bg-slate-950 border border-slate-700 text-xs focus:border-emerald-400 outline-none"
+                  />
+                </div>
+              </div>
+            </div>
+
+            {frameUrl && (
+              <div className="flex items-center gap-3 p-3 rounded-2xl bg-slate-950 border border-emerald-500/30">
+                <img src={frameUrl} alt="Frame Preview" className="w-12 h-16 object-contain rounded-xl border border-emerald-400/50 bg-slate-900" />
+                <span className="text-xs text-emerald-300 font-medium truncate">Ready to save frame: {frameName || 'Untitled Frame'}</span>
+              </div>
+            )}
+
+            <button
+              type="submit"
+              disabled={isUploadingFrame}
+              className="px-6 py-2.5 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold text-xs uppercase tracking-wider shadow active:scale-95 transition-all cursor-pointer disabled:opacity-50"
+            >
+              {isUploadingFrame ? 'Saving Frame...' : 'Add Frame to Database'}
+            </button>
+          </form>
+
+          <div className="space-y-3">
+            <h3 className="text-sm font-bold text-slate-300 uppercase tracking-wider">
+              Existing Frames List (Display Order)
+            </h3>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+              {frames.map((frame, idx) => (
+                <div key={frame.id} className="p-3.5 rounded-2xl bg-slate-900 border border-slate-800 space-y-3 relative group">
+                  <div className="relative aspect-[9/16] rounded-xl overflow-hidden border border-slate-700 bg-slate-950 p-2 flex items-center justify-center">
+                    <img src={frame.url} alt={frame.name} className="w-full h-full object-contain" />
+                    <span className="absolute top-2 left-2 px-2 py-0.5 rounded-md bg-black/80 text-emerald-400 font-bold text-[10px] border border-emerald-400/30">
+                      #{idx + 1}
+                    </span>
+                  </div>
+
+                  <div>
+                    <h4 className="text-xs font-bold text-white truncate">{frame.name}</h4>
+                    <span className="text-[10px] text-emerald-300/80 font-medium block">{frame.category}</span>
+                  </div>
+
+                  <div className="flex items-center justify-between pt-1 border-t border-slate-800">
+                    <div className="flex items-center gap-1">
+                      <button
+                        type="button"
+                        onClick={() => moveFrame(idx, 'up')}
+                        disabled={idx === 0}
+                        className="w-7 h-7 rounded-lg bg-slate-800 hover:bg-slate-700 disabled:opacity-30 text-emerald-300 text-xs flex items-center justify-center cursor-pointer"
+                        title="Move Up"
+                      >
+                        ▲
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => moveFrame(idx, 'down')}
+                        disabled={idx === frames.length - 1}
+                        className="w-7 h-7 rounded-lg bg-slate-800 hover:bg-slate-700 disabled:opacity-30 text-emerald-300 text-xs flex items-center justify-center cursor-pointer"
+                        title="Move Down"
+                      >
+                        ▼
+                      </button>
+                    </div>
+
+                    <button
+                      type="button"
+                      onClick={() => handleDeleteFrame(frame.id)}
+                      className="w-7 h-7 rounded-lg bg-red-500/10 hover:bg-red-500/20 text-red-400 text-xs flex items-center justify-center cursor-pointer"
+                      title="Delete Frame"
+                    >
+                      <i className="fa-solid fa-trash" />
+                    </button>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ================= SECTION 2: WALLPAPERS MANAGEMENT ================= */}
       {activeTab === 'wallpapers' && (
         <div className="space-y-8">
           <form onSubmit={handleAddWallpaper} className="p-6 rounded-3xl bg-slate-900 border border-slate-800 space-y-4 shadow-xl">
@@ -338,21 +455,12 @@ export default function SecretAdminPortalPage() {
                 <label className="text-xs text-slate-400 block mb-1 font-medium">Category</label>
                 <input
                   type="text"
-                  list="wp-categories"
                   placeholder="e.g. Heritage & Gold"
                   value={wpCategory}
                   onChange={(e) => setWpCategory(e.target.value)}
                   className="w-full px-3.5 py-2.5 rounded-xl bg-slate-950 border border-slate-700 text-xs focus:border-amber-400 outline-none"
                   required
                 />
-                <datalist id="wp-categories">
-                  <option value="Heritage & Gold" />
-                  <option value="Floral & Botanical" />
-                  <option value="Luxury Marble" />
-                  <option value="Pastel & Minimalist" />
-                  <option value="Nature & Rustic" />
-                  <option value="Geometric & Art" />
-                </datalist>
               </div>
 
               <div>
@@ -373,13 +481,6 @@ export default function SecretAdminPortalPage() {
               </div>
             </div>
 
-            {wpUrl && (
-              <div className="flex items-center gap-3 p-3 rounded-2xl bg-slate-950 border border-amber-400/30">
-                <img src={wpUrl} alt="Preview" className="w-12 h-16 object-cover rounded-xl border border-amber-400/50" />
-                <span className="text-xs text-slate-300 font-medium truncate">Ready to save: {wpName || 'Untitled'}</span>
-              </div>
-            )}
-
             <button
               type="submit"
               disabled={isUploadingWp}
@@ -391,7 +492,7 @@ export default function SecretAdminPortalPage() {
 
           <div className="space-y-3">
             <h3 className="text-sm font-bold text-slate-300 uppercase tracking-wider">
-              Existing Wallpapers List (Display Order)
+              Existing Wallpapers List
             </h3>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
@@ -416,7 +517,6 @@ export default function SecretAdminPortalPage() {
                         onClick={() => moveWp(idx, 'up')}
                         disabled={idx === 0}
                         className="w-7 h-7 rounded-lg bg-slate-800 hover:bg-slate-700 disabled:opacity-30 text-amber-300 text-xs flex items-center justify-center cursor-pointer"
-                        title="Move Up"
                       >
                         ▲
                       </button>
@@ -425,7 +525,6 @@ export default function SecretAdminPortalPage() {
                         onClick={() => moveWp(idx, 'down')}
                         disabled={idx === wallpapers.length - 1}
                         className="w-7 h-7 rounded-lg bg-slate-800 hover:bg-slate-700 disabled:opacity-30 text-amber-300 text-xs flex items-center justify-center cursor-pointer"
-                        title="Move Down"
                       >
                         ▼
                       </button>
@@ -435,7 +534,6 @@ export default function SecretAdminPortalPage() {
                       type="button"
                       onClick={() => handleDeleteWp(wp.id)}
                       className="w-7 h-7 rounded-lg bg-red-500/10 hover:bg-red-500/20 text-red-400 text-xs flex items-center justify-center cursor-pointer"
-                      title="Delete Wallpaper"
                     >
                       <i className="fa-solid fa-trash" />
                     </button>
@@ -447,7 +545,7 @@ export default function SecretAdminPortalPage() {
         </div>
       )}
 
-      {/* MUSIC SECTION */}
+      {/* ================= SECTION 3: MUSIC MANAGEMENT ================= */}
       {activeTab === 'music' && (
         <div className="space-y-8">
           <form onSubmit={handleAddMusic} className="p-6 rounded-3xl bg-slate-900 border border-slate-800 space-y-4 shadow-xl">
@@ -472,25 +570,16 @@ export default function SecretAdminPortalPage() {
                 <label className="text-xs text-slate-400 block mb-1 font-medium">Category</label>
                 <input
                   type="text"
-                  list="music-categories"
                   placeholder="e.g. Romantic & Wedding"
                   value={musicCategory}
                   onChange={(e) => setMusicCategory(e.target.value)}
                   className="w-full px-3.5 py-2.5 rounded-xl bg-slate-950 border border-slate-700 text-xs focus:border-amber-400 outline-none"
                   required
                 />
-                <datalist id="music-categories">
-                  <option value="Romantic & Wedding" />
-                  <option value="Traditional & Heritage" />
-                  <option value="Acoustic & Chill" />
-                  <option value="Spiritual & Ambient" />
-                  <option value="Celebration & Joy" />
-                  <option value="Majestic Orchestra" />
-                </datalist>
               </div>
 
               <div>
-                <label className="text-xs text-slate-400 block mb-1 font-medium">Upload MP3 File or Direct URL</label>
+                <label className="text-xs text-slate-400 block mb-1 font-medium">Upload MP3 File or URL</label>
                 <div className="flex gap-2">
                   <label className="px-3 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-emerald-300 text-xs font-semibold cursor-pointer border border-slate-700 whitespace-nowrap">
                     Choose MP3
@@ -507,13 +596,6 @@ export default function SecretAdminPortalPage() {
               </div>
             </div>
 
-            {musicUrl && (
-              <div className="flex items-center gap-3 p-3 rounded-2xl bg-slate-950 border border-emerald-500/30">
-                <i className="fa-solid fa-file-audio text-emerald-400 text-xl" />
-                <span className="text-xs text-emerald-300 font-medium truncate">Ready to save track: {musicName || 'Untitled Track'}</span>
-              </div>
-            )}
-
             <button
               type="submit"
               disabled={isUploadingMusic}
@@ -525,7 +607,7 @@ export default function SecretAdminPortalPage() {
 
           <div className="space-y-3">
             <h3 className="text-sm font-bold text-slate-300 uppercase tracking-wider">
-              Existing Music Tracks (Display Order)
+              Existing Music Tracks
             </h3>
 
             <div className="space-y-2.5">
@@ -550,7 +632,6 @@ export default function SecretAdminPortalPage() {
                         className={`w-10 h-10 rounded-full flex items-center justify-center text-sm transition-transform active:scale-90 cursor-pointer ${
                           isPlaying ? 'bg-amber-500 text-slate-950 shadow-lg' : 'bg-slate-800 hover:bg-slate-700 text-amber-300'
                         }`}
-                        title={isPlaying ? 'Stop' : 'Play'}
                       >
                         <i className={`fa-solid ${isPlaying ? 'fa-pause' : 'fa-play ml-0.5'}`} />
                       </button>
@@ -568,7 +649,6 @@ export default function SecretAdminPortalPage() {
                           onClick={() => moveMusic(idx, 'up')}
                           disabled={idx === 0}
                           className="w-7 h-7 rounded-lg bg-slate-800 hover:bg-slate-700 disabled:opacity-30 text-amber-300 text-xs flex items-center justify-center cursor-pointer"
-                          title="Move Up"
                         >
                           ▲
                         </button>
@@ -577,7 +657,6 @@ export default function SecretAdminPortalPage() {
                           onClick={() => moveMusic(idx, 'down')}
                           disabled={idx === musicList.length - 1}
                           className="w-7 h-7 rounded-lg bg-slate-800 hover:bg-slate-700 disabled:opacity-30 text-amber-300 text-xs flex items-center justify-center cursor-pointer"
-                          title="Move Down"
                         >
                           ▼
                         </button>
@@ -587,7 +666,6 @@ export default function SecretAdminPortalPage() {
                         type="button"
                         onClick={() => handleDeleteMusic(track.id)}
                         className="w-8 h-8 rounded-lg bg-red-500/10 hover:bg-red-500/20 text-red-400 text-xs flex items-center justify-center cursor-pointer ml-1"
-                        title="Delete Track"
                       >
                         <i className="fa-solid fa-trash" />
                       </button>
@@ -598,7 +676,6 @@ export default function SecretAdminPortalPage() {
               })}
             </div>
           </div>
-
         </div>
       )}
 

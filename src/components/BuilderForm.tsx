@@ -18,15 +18,7 @@ interface Props {
   onActiveSlideChange?: (index: number | 'cover') => void;
 }
 
-interface DynamicWallpaper {
-  id: string;
-  name: string;
-  category: string;
-  url: string;
-  order_index: number;
-}
-
-interface DynamicMusic {
+interface DynamicItem {
   id: string;
   name: string;
   category: string;
@@ -104,13 +96,17 @@ export default function BuilderForm({
   const [isCheckingOut, setIsCheckingOut] = useState(false);
 
   // Dynamic Assets from Supabase
-  const [dbWallpapers, setDbWallpapers] = useState<DynamicWallpaper[]>([]);
-  const [dbMusic, setDbMusic] = useState<DynamicMusic[]>([]);
+  const [dbWallpapers, setDbWallpapers] = useState<DynamicItem[]>([]);
+  const [dbMusic, setDbMusic] = useState<DynamicItem[]>([]);
+  const [dbFrames, setDbFrames] = useState<DynamicItem[]>([]);
 
   // Modals state
   const [isWallpaperModalOpen, setIsWallpaperModalOpen] = useState(false);
   const [wallpaperModalTarget, setWallpaperModalTarget] = useState<'cover' | 'slide'>('cover');
   const [selectedWallpaperCategory, setSelectedWallpaperCategory] = useState('All');
+
+  const [isFrameModalOpen, setIsFrameModalOpen] = useState(false);
+  const [selectedFrameCategory, setSelectedFrameCategory] = useState('All');
 
   const [isMusicModalOpen, setIsMusicModalOpen] = useState(false);
   const [selectedMusicCategory, setSelectedMusicCategory] = useState('All');
@@ -119,6 +115,7 @@ export default function BuilderForm({
 
   const modalAudioRef = useRef<HTMLAudioElement | null>(null);
 
+  // Fetch live assets from Supabase
   useEffect(() => {
     const fetchAssets = async () => {
       const { data: wpData } = await supabase.from('wallpapers').select('*').order('order_index', { ascending: true });
@@ -126,6 +123,9 @@ export default function BuilderForm({
 
       const { data: mData } = await supabase.from('music_tracks').select('*').order('order_index', { ascending: true });
       if (mData) setDbMusic(mData);
+
+      const { data: fData } = await supabase.from('frames').select('*').order('order_index', { ascending: true });
+      if (fData) setDbFrames(fData);
     };
     fetchAssets();
   }, []);
@@ -133,6 +133,7 @@ export default function BuilderForm({
   const bgType = data.theme?.coverBgType || 'color';
   const currentOpacity = typeof data.theme?.cardOpacity === 'number' ? data.theme.cardOpacity : 90;
   const currentBoxColor = data.theme?.cardBoxColor || '#ffffff';
+  const currentFrameScale = data.theme?.frameScale || 100;
 
   const updateData = (newData: CardData) => {
     onChange(newData);
@@ -149,7 +150,7 @@ export default function BuilderForm({
     }
   };
 
-  // Muat Naik Bingkai Daun / Frame Custom (PNG Transparent)
+  // Direct Frame Image Upload
   const handleFrameUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
@@ -167,6 +168,15 @@ export default function BuilderForm({
       if (activeSlideIndex === 'cover') onActiveSlideChange?.(0);
     };
     reader.readAsDataURL(file);
+  };
+
+  const handleSelectFrame = (url: string) => {
+    updateData({
+      ...data,
+      theme: { ...data.theme, frameOverlayUrl: url }
+    });
+    setIsFrameModalOpen(false);
+    if (activeSlideIndex === 'cover') onActiveSlideChange?.(0);
   };
 
   const handleRemoveFrame = () => {
@@ -192,6 +202,7 @@ export default function BuilderForm({
     reader.readAsDataURL(file);
   };
 
+  // Live Audio Preview in Modal
   const handleTogglePreviewMusic = (url: string) => {
     if (!modalAudioRef.current) return;
     const player = modalAudioRef.current;
@@ -417,8 +428,10 @@ export default function BuilderForm({
     }
   };
 
+  // Categories
   const wallpaperCategories = ['All', ...Array.from(new Set(dbWallpapers.map(w => w.category).filter(Boolean)))];
   const musicCategories = ['All', ...Array.from(new Set(dbMusic.map(m => m.category).filter(Boolean)))];
+  const frameCategories = ['All', ...Array.from(new Set(dbFrames.map(f => f.category).filter(Boolean)))];
 
   const filteredWallpapers = selectedWallpaperCategory === 'All' 
     ? dbWallpapers 
@@ -427,6 +440,10 @@ export default function BuilderForm({
   const filteredMusic = selectedMusicCategory === 'All'
     ? dbMusic
     : dbMusic.filter(m => m.category === selectedMusicCategory);
+
+  const filteredFrames = selectedFrameCategory === 'All'
+    ? dbFrames
+    : dbFrames.filter(f => f.category === selectedFrameCategory);
 
   return (
     <div className="w-full bg-slate-900 border border-slate-800 rounded-3xl p-5 sm:p-7 text-slate-200 shadow-2xl space-y-5">
@@ -447,7 +464,7 @@ export default function BuilderForm({
       {/* Header */}
       <div>
         <h2 className="text-2xl font-bold text-white tracking-wide">Digital Invitation Studio</h2>
-        <p className="text-xs text-slate-400 mt-1">Independent cover & slide styling, custom fonts, 0-100% transparency & dynamic music.</p>
+        <p className="text-xs text-slate-400 mt-1">Independent cover & slide styling, foreground leaf frames, zoom controls & custom fonts.</p>
       </div>
 
       {/* Navigation Tabs */}
@@ -468,7 +485,7 @@ export default function BuilderForm({
             activeTab === 'slides' ? 'bg-amber-500 text-slate-950 font-bold shadow' : 'text-slate-400 hover:text-white'
           }`}
         >
-          2. Slides & Box Styling ({data.slides?.length || 0})
+          2. Slides, Box & Frame ({data.slides?.length || 0})
         </button>
         <button
           type="button"
@@ -695,15 +712,15 @@ export default function BuilderForm({
         </div>
       )}
 
-      {/* ================= TAB 2: SLIDES, BOX STYLING & BINGKAI HIASAN ================= */}
+      {/* ================= TAB 2: SLIDES, BOX & FOREGROUND FRAME ================= */}
       {activeTab === 'slides' && (
         <div className="space-y-4">
           
-          {/* 1. BINGKAI HIASAN HADAPAN KOTAK (FRAME OVERLAY SELECTOR) */}
-          <div className="p-4 rounded-2xl bg-slate-950/90 border border-emerald-500/30 space-y-3">
+          {/* 1. FOREGROUND DECORATIVE FRAME & ZOOM IN/OUT CONTROLS */}
+          <div className="p-4 rounded-2xl bg-slate-950/90 border border-emerald-500/30 space-y-3.5">
             <div className="flex items-center justify-between">
               <label className="text-xs font-bold text-emerald-300 uppercase tracking-wider flex items-center gap-1.5">
-                <i className="fa-solid fa-leaf" /> Bingkai Hiasan Kotak Kad (Frame Overlay)
+                <i className="fa-solid fa-leaf" /> Foreground Decorative Frame (Bingkai Hadapan)
               </label>
               {data.theme?.frameOverlayUrl && (
                 <button
@@ -711,21 +728,64 @@ export default function BuilderForm({
                   onClick={handleRemoveFrame}
                   className="text-[10px] text-red-400 hover:text-red-300 font-semibold underline cursor-pointer"
                 >
-                  Padam Bingkai
+                  Remove Frame
                 </button>
               )}
             </div>
 
             <p className="text-[11px] text-slate-400">
-              Tambah bingkai daun tropika monstera atau muat naik bingkai PNG lutsinar anda sendiri.
+              Select or upload a decorative botanical frame that overlays directly in front of the card.
             </p>
 
+            {/* Buttons: Select from Gallery or Upload Custom PNG */}
             <div className="flex flex-col sm:flex-row gap-2">
-              <label className="flex-1 py-2.5 px-4 rounded-xl bg-slate-900 border border-slate-700 hover:border-emerald-400/60 text-slate-200 text-xs font-bold flex items-center justify-center gap-2 cursor-pointer transition-all">
-                <i className="fa-solid fa-cloud-arrow-up text-emerald-400" /> Muat Naik Gambar Bingkai Daun (PNG)
+              <button
+                type="button"
+                onClick={() => setIsFrameModalOpen(true)}
+                className="flex-1 py-2.5 px-4 rounded-xl bg-gradient-to-r from-emerald-500/20 to-emerald-600/20 border border-emerald-400/50 hover:bg-emerald-500/30 text-emerald-300 font-bold text-xs flex items-center justify-center gap-2 transition-all cursor-pointer"
+              >
+                <i className="fa-solid fa-border-all" /> Choose Frame ({dbFrames.length} Items)
+              </button>
+
+              <label className="py-2.5 px-4 rounded-xl bg-slate-900 border border-slate-700 hover:border-emerald-400/60 text-slate-200 text-xs font-bold flex items-center justify-center gap-2 cursor-pointer transition-all">
+                <i className="fa-solid fa-cloud-arrow-up text-emerald-400" /> Upload PNG File
                 <input type="file" accept="image/*" onChange={handleFrameUpload} className="hidden" />
               </label>
             </div>
+
+            {/* ZOOM IN / ZOOM OUT SLIDER */}
+            {data.theme?.frameOverlayUrl && (
+              <div className="pt-2 border-t border-slate-800 space-y-2">
+                <div className="flex items-center justify-between">
+                  <span className="text-[11px] font-semibold text-slate-300 flex items-center gap-1.5">
+                    <i className="fa-solid fa-magnifying-glass-plus text-emerald-400" /> Frame Zoom In / Out Scale:
+                  </span>
+                  <span className="text-xs font-mono font-bold text-emerald-300 bg-emerald-500/15 px-2 py-0.5 rounded border border-emerald-500/30">
+                    {currentFrameScale}%
+                  </span>
+                </div>
+
+                <div className="flex items-center gap-3">
+                  <span className="text-[10px] text-slate-400 font-bold">70% (Zoom Out)</span>
+                  <input
+                    type="range"
+                    min="70"
+                    max="150"
+                    step="2"
+                    value={currentFrameScale}
+                    onChange={(e) => {
+                      updateData({
+                        ...data,
+                        theme: { ...data.theme, frameScale: Number(e.target.value) }
+                      });
+                      if (activeSlideIndex === 'cover') onActiveSlideChange?.(0);
+                    }}
+                    className="w-full accent-emerald-500 cursor-pointer h-2 bg-slate-900 rounded-lg"
+                  />
+                  <span className="text-[10px] text-slate-400 font-bold">150% (Zoom In)</span>
+                </div>
+              </div>
+            )}
           </div>
 
           {/* 2. CARD BOX COLOR & 0-100% OPACITY */}
@@ -1011,7 +1071,7 @@ export default function BuilderForm({
                   )}
 
                   {/* LOCATION */}
-                  {slide.type === 'location' && (
+                  {slide.type === 'location' && slide.locationDetails && (
                     <div className="space-y-3">
                       <div>
                         <label className="text-[11px] text-slate-400 block mb-1">Venue / Ballroom Name</label>
@@ -1227,7 +1287,6 @@ export default function BuilderForm({
               </button>
             </div>
 
-            {/* Currently Selected Track Status */}
             {data.cover?.audioUrl && (
               <div className="pt-2 border-t border-slate-800 flex items-center justify-between text-xs text-amber-300">
                 <span className="font-semibold flex items-center gap-2 truncate">
@@ -1286,7 +1345,6 @@ export default function BuilderForm({
                 </span>
               </div>
 
-              {/* 1. FREE LINK */}
               <div className="p-3 rounded-xl bg-slate-950 border border-emerald-500/30 space-y-1.5">
                 <div className="flex justify-between items-center text-[11px]">
                   <span className="text-emerald-400 font-bold">1. Free Link (2 Slides, Clean / No Watermark)</span>
@@ -1297,7 +1355,6 @@ export default function BuilderForm({
                 </a>
               </div>
 
-              {/* 2. PREMIUM PREVIEW LINK */}
               <div className="p-3 rounded-xl bg-slate-950 border border-amber-500/40 space-y-1.5">
                 <div className="flex justify-between items-center text-[11px]">
                   <span className="text-amber-400 font-bold">2. Premium Preview Link (All Slides, Watermarked)</span>
@@ -1308,7 +1365,6 @@ export default function BuilderForm({
                 </a>
               </div>
 
-              {/* STRIPE CHECKOUT BUTTON */}
               <div className="pt-2 flex flex-col sm:flex-row items-center justify-between gap-2.5">
                 <div className="text-left">
                   <span className="text-xs font-bold text-amber-200 block">Unlock Full Access Without Watermark</span>
@@ -1329,7 +1385,7 @@ export default function BuilderForm({
       )}
 
       {/* ========================================================================= */}
-      {/* 1. MODAL: DYNAMIC WALLPAPERS FROM SUPABASE */}
+      {/* 1. MODAL: DYNAMIC WALLPAPERS */}
       {/* ========================================================================= */}
       {isWallpaperModalOpen && (
         <div className="fixed inset-0 z-[200] bg-black/85 backdrop-blur-md flex items-center justify-center p-3 sm:p-6">
@@ -1407,7 +1463,88 @@ export default function BuilderForm({
       )}
 
       {/* ========================================================================= */}
-      {/* 2. MODAL: DYNAMIC MUSIC TRACKS FROM SUPABASE */}
+      {/* 2. MODAL: DYNAMIC FOREGROUND FRAMES */}
+      {/* ========================================================================= */}
+      {isFrameModalOpen && (
+        <div className="fixed inset-0 z-[200] bg-black/85 backdrop-blur-md flex items-center justify-center p-3 sm:p-6">
+          <div className="bg-slate-900 border border-slate-700 rounded-3xl w-full max-w-4xl h-[90vh] flex flex-col overflow-hidden shadow-2xl animate-in fade-in zoom-in duration-200">
+            
+            <div className="p-4 sm:p-5 border-b border-slate-800 flex items-center justify-between bg-slate-950">
+              <div>
+                <h3 className="text-lg font-bold text-white flex items-center gap-2">
+                  <i className="fa-solid fa-leaf text-emerald-400" /> 
+                  Decorative Frames Gallery ({dbFrames.length} Items)
+                </h3>
+                <p className="text-xs text-slate-400">Choose a transparent frame overlay for your card foreground.</p>
+              </div>
+              <button
+                type="button"
+                onClick={() => setIsFrameModalOpen(false)}
+                className="w-8 h-8 rounded-full bg-slate-800 hover:bg-slate-700 text-slate-300 flex items-center justify-center text-sm cursor-pointer"
+              >
+                <i className="fa-solid fa-xmark" />
+              </button>
+            </div>
+
+            <div className="px-4 py-3 bg-slate-950/60 border-b border-slate-800 flex gap-2 overflow-x-auto no-scrollbar">
+              {frameCategories.map((cat) => (
+                <button
+                  key={cat}
+                  type="button"
+                  onClick={() => setSelectedFrameCategory(cat)}
+                  className={`px-3.5 py-1.5 rounded-full text-xs font-semibold whitespace-nowrap transition-all cursor-pointer ${
+                    selectedFrameCategory === cat
+                      ? 'bg-emerald-500 text-slate-950 font-bold shadow'
+                      : 'bg-slate-800/80 text-slate-300 hover:bg-slate-700'
+                  }`}
+                >
+                  {cat}
+                </button>
+              ))}
+            </div>
+
+            <div className="p-4 sm:p-6 overflow-y-auto grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3.5 flex-1">
+              {filteredFrames.map((frame) => {
+                const isSelected = data.theme?.frameOverlayUrl === frame.url;
+
+                return (
+                  <div
+                    key={frame.id}
+                    onClick={() => handleSelectFrame(frame.url)}
+                    className={`group relative rounded-2xl overflow-hidden border-2 cursor-pointer transition-all aspect-[9/16] bg-slate-950/80 p-2 flex flex-col justify-between ${
+                      isSelected
+                        ? 'border-emerald-400 ring-4 ring-emerald-400/40 scale-[1.02]'
+                        : 'border-slate-800 hover:border-emerald-400/70 hover:scale-[1.02]'
+                    }`}
+                  >
+                    <img src={frame.url} alt={frame.name} className="w-full h-full object-contain group-hover:scale-105 transition-transform duration-500" loading="lazy" />
+                    
+                    <div className="bg-black/75 p-1.5 rounded-lg mt-1 text-center">
+                      <span className="text-[10px] font-bold text-white line-clamp-1">{frame.name}</span>
+                    </div>
+
+                    {isSelected && (
+                      <div className="absolute top-2 right-2 w-6 h-6 rounded-full bg-emerald-500 text-slate-950 flex items-center justify-center font-bold text-xs shadow-md">
+                        <i className="fa-solid fa-check" />
+                      </div>
+                    )}
+                  </div>
+                );
+              })}
+
+              {filteredFrames.length === 0 && (
+                <div className="col-span-full text-center py-12 text-xs text-slate-500">
+                  No frames found in this category. You can upload new frames via the Admin Portal.
+                </div>
+              )}
+            </div>
+
+          </div>
+        </div>
+      )}
+
+      {/* ========================================================================= */}
+      {/* 3. MODAL: DYNAMIC MUSIC TRACKS */}
       {/* ========================================================================= */}
       {isMusicModalOpen && (
         <div className="fixed inset-0 z-[200] bg-black/85 backdrop-blur-md flex items-center justify-center p-3 sm:p-6">

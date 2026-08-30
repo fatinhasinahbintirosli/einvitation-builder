@@ -33,8 +33,9 @@ export interface ThemeConfig {
   cardBoxColor?: string;
   cardOpacity?: number; // 0 to 100
 
-  // Frame Overlay (Bingkai Hadapan Kotak Kad)
+  // Frame Overlay & Zoom In/Out Scale
   frameOverlayUrl?: string;
+  frameScale?: number; // 70 to 150 (default: 100)
 
   // Separate Wallpaper Controls
   slideBgUrl?: string;
