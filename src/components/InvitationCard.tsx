@@ -196,21 +196,20 @@ export default function InvitationCard({
   const isCompletelyTransparent = opacityVal === 0;
   const cardBgStyle = isCompletelyTransparent ? 'transparent' : hexToRgba(boxBaseColor, opacityVal);
 
-  // 4. Typography & Custom Font Colors for Cover
+  // 4. Typography
   const coverHeadingFont = data?.theme?.coverHeadingFont || 'Cinzel, serif';
   const coverBodyFont = data?.theme?.coverBodyFont || 'Playfair Display, serif';
   const coverScale = (data?.theme?.coverFontSizeScale || 100) / 100;
   const coverHeadingColor = data?.theme?.coverHeadingColor || '#ffffff';
   const coverTextColor = data?.theme?.coverTextColor || '#e2e8f0';
 
-  // 5. Typography & Custom Font Colors for Slides
   const slideHeadingFont = data?.theme?.slideHeadingFont || 'Cinzel, serif';
   const slideBodyFont = data?.theme?.slideBodyFont || 'Playfair Display, serif';
   const slideScale = (data?.theme?.slideFontSizeScale || 100) / 100;
   const slideHeadingColor = data?.theme?.slideHeadingColor || data?.theme?.goldColor || '#b59049';
   const slideTextColor = data?.theme?.slideTextColor || (isCompletelyTransparent ? '#f8fafc' : '#334155');
 
-  // 6. Frame Scaling & Fullscreen Background Mode
+  // 5. Frame Scaling & Fullscreen Background Mode
   const frameScaleRatio = (data?.theme?.frameScale || 100) / 100;
   const isExtendedToBackground = data?.theme?.frameExtendToBackground === true;
 
@@ -346,13 +345,13 @@ export default function InvitationCard({
                 zIndex: isCurrent ? 20 : 10
               }}
             >
-              {/* OPTION A: FULLSCREEN / WALLPAPER BLEED FRAME */}
+              {/* OPTION A: FULLSCREEN / WALLPAPER BLEED FRAME (object-contain) */}
               {data?.theme?.frameOverlayUrl && isExtendedToBackground && (
                 <div className="absolute inset-0 pointer-events-none z-30 flex items-center justify-center overflow-hidden">
                   <img 
                     src={data.theme.frameOverlayUrl} 
                     alt="Extended Foreground Botanical Frame" 
-                    className="w-full h-full object-fill pointer-events-none select-none transition-transform duration-200"
+                    className="w-full h-full object-contain pointer-events-none select-none transition-transform duration-200"
                     style={{ transform: `scale(${frameScaleRatio})` }}
                   />
                 </div>
@@ -371,13 +370,13 @@ export default function InvitationCard({
                   transform: 'translateZ(0)'
                 }}
               >
-                {/* OPTION B: INSIDE CARD BOX ONLY FRAME */}
+                {/* OPTION B: INSIDE CARD BOX ONLY FRAME (object-contain) */}
                 {data?.theme?.frameOverlayUrl && !isExtendedToBackground && (
                   <div className="absolute inset-0 pointer-events-none z-30 flex items-center justify-center overflow-hidden rounded-[32px]">
                     <img 
                       src={data.theme.frameOverlayUrl} 
                       alt="Inside Card Decorative Frame" 
-                      className="w-full h-full object-fill pointer-events-none select-none transition-transform duration-200"
+                      className="w-full h-full object-contain pointer-events-none select-none transition-transform duration-200"
                       style={{ transform: `scale(${frameScaleRatio})` }}
                     />
                   </div>
