@@ -18,9 +18,15 @@ const initialData: CardData = {
     coverHeadingFont: 'Cinzel, serif',
     coverBodyFont: 'Playfair Display, serif',
     coverFontSizeScale: 100,
+    coverHeadingColor: '#ffffff',
+    coverTextColor: '#e2e8f0',
     slideHeadingFont: 'Cinzel, serif',
     slideBodyFont: 'Playfair Display, serif',
     slideFontSizeScale: 100,
+    slideHeadingColor: '#b59049',
+    slideTextColor: '#334155',
+    frameScale: 100,
+    frameExtendToBackground: true,
     bgPatternUrl: 'https://images.unsplash.com/photo-1607604276583-eef5d076aa5f?q=80&w=1080&auto=format&fit=crop',
     slideBgUrl: 'https://images.unsplash.com/photo-1607604276583-eef5d076aa5f?q=80&w=1080&auto=format&fit=crop'
   },
@@ -28,7 +34,7 @@ const initialData: CardData = {
     tagline: 'The Wedding Celebration Of',
     mainTitle: 'Emma & Liam',
     dateText: 'SUNDAY, OCTOBER 18, 2026',
-    audioUrl: 'm1'
+    audioUrl: ''
   },
   slides: [
     {
@@ -109,7 +115,6 @@ export default function BuilderPage() {
 
   return (
     <main className="min-h-screen p-4 md:p-8 max-w-7xl mx-auto flex flex-col items-center bg-slate-950 text-slate-100">
-      
       <header className="text-center mb-8">
         <h1 className="text-3xl sm:text-4xl font-bold text-amber-400 tracking-wider" style={{ fontFamily: 'Cinzel, serif' }}>
           E-INVITATION BUILDER STUDIO
@@ -120,7 +125,6 @@ export default function BuilderPage() {
       </header>
 
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 w-full items-start">
-        {/* Left Side: Builder Form */}
         <div className="lg:col-span-6 w-full">
           <BuilderForm
             data={cardData}
@@ -135,7 +139,6 @@ export default function BuilderPage() {
           />
         </div>
 
-        {/* Right Side: Live Card Preview */}
         <div className="lg:col-span-6 flex flex-col items-center justify-center sticky top-6">
           <div className="text-center mb-2">
             <span className="text-[11px] font-bold uppercase tracking-[2px] text-amber-400/80 bg-amber-500/10 px-3 py-1 rounded-full border border-amber-500/20">

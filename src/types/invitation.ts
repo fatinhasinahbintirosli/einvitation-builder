@@ -35,8 +35,8 @@ export interface ThemeConfig {
 
   // Frame Overlay, Zoom Scale & Fullscreen Wallpaper Bleed
   frameOverlayUrl?: string;
-  frameScale?: number; // 70 to 150 (default: 100)
-  frameExtendToBackground?: boolean; // true = limpah keluar ke wallpaper belakang
+  frameScale?: number; // 70 to 150
+  frameExtendToBackground?: boolean;
 
   // Separate Wallpaper Controls
   slideBgUrl?: string;
@@ -45,13 +45,19 @@ export interface ThemeConfig {
   coverBgColor?: string;
   coverBgUrl?: string;
 
-  // Typography
+  // Cover Typography & Font Colors
   coverHeadingFont?: string;
   coverBodyFont?: string;
   coverFontSizeScale?: number;
+  coverHeadingColor?: string; // Warna tajuk utama muka depan
+  coverTextColor?: string;    // Warna teks/tagline muka depan
+
+  // Slide Typography & Font Colors
   slideHeadingFont?: string;
   slideBodyFont?: string;
   slideFontSizeScale?: number;
+  slideHeadingColor?: string; // Warna tajuk helaian & aksen emas
+  slideTextColor?: string;    // Warna teks isi kandungan helaian
 
   doorStyle?: string;
   [key: string]: any;

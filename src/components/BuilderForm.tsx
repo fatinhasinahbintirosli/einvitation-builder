@@ -51,6 +51,17 @@ const FONT_SIZE_PRESETS = [
   { label: 'X-Large (120%)', value: 120 },
 ];
 
+const FONT_COLOR_PRESETS = [
+  { name: 'Pure White', hex: '#ffffff' },
+  { name: 'Warm Gold', hex: '#b59049' },
+  { name: 'Amber Glow', hex: '#f59e0b' },
+  { name: 'Champagne Cream', hex: '#fef3c7' },
+  { name: 'Charcoal Dark', hex: '#1e293b' },
+  { name: 'Emerald Green', hex: '#10b981' },
+  { name: 'Rose Pink', hex: '#f43f5e' },
+  { name: 'Navy Blue', hex: '#1e3a8a' },
+];
+
 const COLOR_PRESETS = [
   { name: 'Emerald Forest', hex: '#2d4a3e' },
   { name: 'Royal Navy', hex: '#172554' },
@@ -135,6 +146,12 @@ export default function BuilderForm({
   const currentFrameScale = data.theme?.frameScale || 100;
   const isExtendedToBackground = data.theme?.frameExtendToBackground === true;
 
+  // Font Colors State
+  const coverHeadingColor = data.theme?.coverHeadingColor || '#ffffff';
+  const coverTextColor = data.theme?.coverTextColor || '#e2e8f0';
+  const slideHeadingColor = data.theme?.slideHeadingColor || data.theme?.goldColor || '#b59049';
+  const slideTextColor = data.theme?.slideTextColor || '#334155';
+
   const updateData = (newData: CardData) => {
     onChange(newData);
   };
@@ -150,7 +167,6 @@ export default function BuilderForm({
     }
   };
 
-  // Direct Frame Image Upload
   const handleFrameUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
@@ -186,7 +202,6 @@ export default function BuilderForm({
     });
   };
 
-  // Direct Audio File Upload
   const handleAudioUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
@@ -202,7 +217,6 @@ export default function BuilderForm({
     reader.readAsDataURL(file);
   };
 
-  // Live Audio Preview in Modal
   const handleTogglePreviewMusic = (url: string) => {
     if (!modalAudioRef.current) return;
     const player = modalAudioRef.current;
@@ -464,7 +478,7 @@ export default function BuilderForm({
       {/* Header */}
       <div>
         <h2 className="text-2xl font-bold text-white tracking-wide">Digital Invitation Studio</h2>
-        <p className="text-xs text-slate-400 mt-1">Independent cover & slide styling, foreground leaf frames, zoom controls & custom fonts.</p>
+        <p className="text-xs text-slate-400 mt-1">Independent cover & slide font typography, colors, frames & transparency.</p>
       </div>
 
       {/* Navigation Tabs */}
@@ -502,10 +516,10 @@ export default function BuilderForm({
       {activeTab === 'cover' && (
         <div className="p-5 rounded-2xl bg-slate-950/70 border border-slate-800 space-y-4">
           
-          {/* COVER TYPOGRAPHY */}
-          <div className="p-4 rounded-2xl bg-slate-900 border border-amber-500/25 space-y-3.5">
+          {/* 1. COVER TYPOGRAPHY & FONT COLORS */}
+          <div className="p-4 rounded-2xl bg-slate-900 border border-amber-500/25 space-y-4">
             <label className="text-xs font-bold text-amber-300 uppercase tracking-wider flex items-center gap-1.5">
-              <i className="fa-solid fa-font" /> Cover Typography (Front Page Only)
+              <i className="fa-solid fa-font" /> Cover Typography & Font Colors
             </label>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
@@ -540,6 +554,69 @@ export default function BuilderForm({
               </div>
             </div>
 
+            {/* COLOR PICKERS FOR COVER */}
+            <div className="pt-2 border-t border-slate-800 space-y-3">
+              <span className="text-[11px] text-slate-300 font-semibold block">Cover Font Colors:</span>
+              
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                {/* Title / Accent Color */}
+                <div className="space-y-1.5 p-3 rounded-xl bg-slate-950 border border-slate-800">
+                  <div className="flex items-center justify-between">
+                    <label className="text-[10px] text-slate-400 font-medium">Title & Accent Color</label>
+                    <div className="flex items-center gap-1.5">
+                      <input
+                        type="color"
+                        value={coverHeadingColor}
+                        onChange={(e) => updateData({ ...data, theme: { ...data.theme, coverHeadingColor: e.target.value } })}
+                        className="w-5 h-5 rounded cursor-pointer bg-transparent border-0"
+                      />
+                      <span className="text-[10px] font-mono text-amber-300 font-bold">{coverHeadingColor}</span>
+                    </div>
+                  </div>
+                  <div className="flex gap-1 overflow-x-auto pt-1">
+                    {FONT_COLOR_PRESETS.map((c) => (
+                      <button
+                        key={c.hex}
+                        type="button"
+                        onClick={() => updateData({ ...data, theme: { ...data.theme, coverHeadingColor: c.hex } })}
+                        className={`w-6 h-6 rounded-md border shrink-0 transition-transform ${coverHeadingColor === c.hex ? 'border-amber-400 scale-110 shadow' : 'border-slate-700'}`}
+                        style={{ backgroundColor: c.hex }}
+                        title={c.name}
+                      />
+                    ))}
+                  </div>
+                </div>
+
+                {/* Subtitle / Text Color */}
+                <div className="space-y-1.5 p-3 rounded-xl bg-slate-950 border border-slate-800">
+                  <div className="flex items-center justify-between">
+                    <label className="text-[10px] text-slate-400 font-medium">Tagline & Date Color</label>
+                    <div className="flex items-center gap-1.5">
+                      <input
+                        type="color"
+                        value={coverTextColor}
+                        onChange={(e) => updateData({ ...data, theme: { ...data.theme, coverTextColor: e.target.value } })}
+                        className="w-5 h-5 rounded cursor-pointer bg-transparent border-0"
+                      />
+                      <span className="text-[10px] font-mono text-amber-300 font-bold">{coverTextColor}</span>
+                    </div>
+                  </div>
+                  <div className="flex gap-1 overflow-x-auto pt-1">
+                    {FONT_COLOR_PRESETS.map((c) => (
+                      <button
+                        key={c.hex}
+                        type="button"
+                        onClick={() => updateData({ ...data, theme: { ...data.theme, coverTextColor: c.hex } })}
+                        className={`w-6 h-6 rounded-md border shrink-0 transition-transform ${coverTextColor === c.hex ? 'border-amber-400 scale-110 shadow' : 'border-slate-700'}`}
+                        style={{ backgroundColor: c.hex }}
+                        title={c.name}
+                      />
+                    ))}
+                  </div>
+                </div>
+              </div>
+            </div>
+
             {/* Cover Font Size Scaling */}
             <div className="pt-2 border-t border-slate-800/80 space-y-2">
               <div className="flex items-center justify-between">
@@ -567,7 +644,7 @@ export default function BuilderForm({
             </div>
           </div>
 
-          {/* COVER BACKGROUND */}
+          {/* 2. COVER BACKGROUND */}
           <div className="p-4 rounded-2xl bg-slate-900 border border-slate-800 space-y-3">
             <div className="flex items-center justify-between">
               <label className="text-xs font-bold text-amber-300 uppercase tracking-wider">
@@ -703,7 +780,7 @@ export default function BuilderForm({
             <input
               type="text"
               value={data.cover?.dateText || ''}
-              onFocus={() => onActiveSlideChange?.(activeSlideIndex)}
+              onFocus={() => onActiveSlideChange?.('cover')}
               onChange={(e) => updateData({ ...data, cover: { ...data.cover, dateText: e.target.value } })}
               placeholder="e.g. SUNDAY, OCTOBER 18, 2026"
               className="w-full px-3.5 py-2.5 rounded-xl bg-slate-900 border border-slate-700 text-xs focus:border-amber-400 outline-none"
@@ -712,7 +789,7 @@ export default function BuilderForm({
         </div>
       )}
 
-      {/* ================= TAB 2: SLIDES, BOX & FOREGROUND FRAME ================= */}
+      {/* ================= TAB 2: SLIDES, BOX, TYPOGRAPHY & FOREGROUND FRAME ================= */}
       {activeTab === 'slides' && (
         <div className="space-y-4">
           
@@ -733,11 +810,6 @@ export default function BuilderForm({
               )}
             </div>
 
-            <p className="text-[11px] text-slate-400">
-              Pilih bingkai daun tropika monstera atau muat naik bingkai PNG lutsinar sendiri.
-            </p>
-
-            {/* Buttons: Select from Gallery or Upload Custom PNG */}
             <div className="flex flex-col sm:flex-row gap-2">
               <button
                 type="button"
@@ -753,11 +825,9 @@ export default function BuilderForm({
               </label>
             </div>
 
-            {/* CONTROLS APA BILA BINGKAI TELAH DIPILIH */}
+            {/* CONTROLS IF FRAME IS ACTIVE */}
             {data.theme?.frameOverlayUrl && (
               <div className="pt-2 border-t border-slate-800 space-y-3">
-                
-                {/* TICK BUTTON / CHECKBOX: LIMPAH KE WALLPAPER BELAKANG */}
                 <label className="flex items-start gap-3 p-3 rounded-xl bg-slate-900 border border-emerald-500/30 cursor-pointer hover:border-emerald-400 transition-all select-none">
                   <input
                     type="checkbox"
@@ -781,7 +851,6 @@ export default function BuilderForm({
                   </div>
                 </label>
 
-                {/* ZOOM IN / ZOOM OUT SLIDER */}
                 <div className="space-y-1.5">
                   <div className="flex items-center justify-between">
                     <span className="text-[11px] font-semibold text-slate-300 flex items-center gap-1.5">
@@ -812,12 +881,139 @@ export default function BuilderForm({
                     <span className="text-[10px] text-slate-400 font-bold">150% (Zoom In)</span>
                   </div>
                 </div>
-
               </div>
             )}
           </div>
 
-          {/* 2. CARD BOX COLOR & 0-100% OPACITY */}
+          {/* 2. SLIDE TYPOGRAPHY & FONT COLORS */}
+          <div className="p-4 rounded-2xl bg-slate-900 border border-slate-800 space-y-4">
+            <label className="text-xs font-bold text-amber-300 uppercase tracking-wider flex items-center gap-1.5">
+              <i className="fa-solid fa-font" /> Slide Typography & Font Colors
+            </label>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <div>
+                <label className="text-[11px] text-slate-400 block mb-1 font-medium">Slide Header Font</label>
+                <select
+                  value={data.theme?.slideHeadingFont || 'Cinzel, serif'}
+                  onChange={(e) => updateData({ ...data, theme: { ...data.theme, slideHeadingFont: e.target.value } })}
+                  className="w-full px-3 py-2 rounded-xl bg-slate-950 border border-slate-700 text-amber-300 text-xs font-semibold outline-none cursor-pointer focus:border-amber-400"
+                >
+                  {FONT_PRESETS_HEADING.map((f) => (
+                    <option key={f.value} value={f.value} style={{ fontFamily: f.value }}>
+                      {f.name}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              <div>
+                <label className="text-[11px] text-slate-400 block mb-1 font-medium">Slide Content Font</label>
+                <select
+                  value={data.theme?.slideBodyFont || 'Playfair Display, serif'}
+                  onChange={(e) => updateData({ ...data, theme: { ...data.theme, slideBodyFont: e.target.value } })}
+                  className="w-full px-3 py-2 rounded-xl bg-slate-950 border border-slate-700 text-slate-200 text-xs font-medium outline-none cursor-pointer focus:border-amber-400"
+                >
+                  {FONT_PRESETS_BODY.map((f) => (
+                    <option key={f.value} value={f.value} style={{ fontFamily: f.value }}>
+                      {f.name}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            </div>
+
+            {/* COLOR PICKERS FOR SLIDES */}
+            <div className="pt-2 border-t border-slate-800 space-y-3">
+              <span className="text-[11px] text-slate-300 font-semibold block">Slide Font Colors:</span>
+              
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                {/* Slide Header & Accent Color */}
+                <div className="space-y-1.5 p-3 rounded-xl bg-slate-950 border border-slate-800">
+                  <div className="flex items-center justify-between">
+                    <label className="text-[10px] text-slate-400 font-medium">Header & Gold Accent</label>
+                    <div className="flex items-center gap-1.5">
+                      <input
+                        type="color"
+                        value={slideHeadingColor}
+                        onChange={(e) => updateData({ ...data, theme: { ...data.theme, slideHeadingColor: e.target.value, goldColor: e.target.value } })}
+                        className="w-5 h-5 rounded cursor-pointer bg-transparent border-0"
+                      />
+                      <span className="text-[10px] font-mono text-amber-300 font-bold">{slideHeadingColor}</span>
+                    </div>
+                  </div>
+                  <div className="flex gap-1 overflow-x-auto pt-1">
+                    {FONT_COLOR_PRESETS.map((c) => (
+                      <button
+                        key={c.hex}
+                        type="button"
+                        onClick={() => updateData({ ...data, theme: { ...data.theme, slideHeadingColor: c.hex, goldColor: c.hex } })}
+                        className={`w-6 h-6 rounded-md border shrink-0 transition-transform ${slideHeadingColor === c.hex ? 'border-amber-400 scale-110 shadow' : 'border-slate-700'}`}
+                        style={{ backgroundColor: c.hex }}
+                        title={c.name}
+                      />
+                    ))}
+                  </div>
+                </div>
+
+                {/* Slide Body / Content Color */}
+                <div className="space-y-1.5 p-3 rounded-xl bg-slate-950 border border-slate-800">
+                  <div className="flex items-center justify-between">
+                    <label className="text-[10px] text-slate-400 font-medium">Body / Content Text</label>
+                    <div className="flex items-center gap-1.5">
+                      <input
+                        type="color"
+                        value={slideTextColor}
+                        onChange={(e) => updateData({ ...data, theme: { ...data.theme, slideTextColor: e.target.value } })}
+                        className="w-5 h-5 rounded cursor-pointer bg-transparent border-0"
+                      />
+                      <span className="text-[10px] font-mono text-amber-300 font-bold">{slideTextColor}</span>
+                    </div>
+                  </div>
+                  <div className="flex gap-1 overflow-x-auto pt-1">
+                    {FONT_COLOR_PRESETS.map((c) => (
+                      <button
+                        key={c.hex}
+                        type="button"
+                        onClick={() => updateData({ ...data, theme: { ...data.theme, slideTextColor: c.hex } })}
+                        className={`w-6 h-6 rounded-md border shrink-0 transition-transform ${slideTextColor === c.hex ? 'border-amber-400 scale-110 shadow' : 'border-slate-700'}`}
+                        style={{ backgroundColor: c.hex }}
+                        title={c.name}
+                      />
+                    ))}
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Slide Font Size Scaling */}
+            <div className="pt-2 border-t border-slate-800/80 space-y-2">
+              <div className="flex items-center justify-between">
+                <span className="text-[11px] text-slate-300 font-medium">Slide Content Scaling:</span>
+                <span className="text-xs font-mono font-bold text-amber-300 bg-amber-500/15 px-2 py-0.5 rounded border border-amber-500/30">
+                  {data.theme?.slideFontSizeScale || 100}%
+                </span>
+              </div>
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-1.5">
+                {FONT_SIZE_PRESETS.map((scalePreset) => (
+                  <button
+                    key={scalePreset.value}
+                    type="button"
+                    onClick={() => updateData({ ...data, theme: { ...data.theme, slideFontSizeScale: scalePreset.value } })}
+                    className={`py-1.5 px-2 rounded-lg text-[10px] font-semibold border transition-all ${
+                      (data.theme?.slideFontSizeScale || 100) === scalePreset.value
+                        ? 'bg-amber-500 text-slate-950 font-bold border-amber-400 shadow'
+                        : 'bg-slate-950 text-slate-300 border-slate-700 hover:border-slate-500'
+                    }`}
+                  >
+                    {scalePreset.label}
+                  </button>
+                ))}
+              </div>
+            </div>
+          </div>
+
+          {/* 3. CARD BOX COLOR & 0-100% OPACITY */}
           <div className="p-4 rounded-2xl bg-slate-950/90 border border-amber-500/30 space-y-4">
             <div className="flex items-center justify-between">
               <label className="text-xs font-bold text-amber-300 uppercase tracking-wider flex items-center gap-1.5">
@@ -828,7 +1024,6 @@ export default function BuilderForm({
               </span>
             </div>
 
-            {/* Choose Card Box Color */}
             <div className="space-y-2">
               <span className="text-[11px] text-slate-400 block font-medium">Select Card Box Color:</span>
               <div className="grid grid-cols-4 sm:grid-cols-7 gap-2">
@@ -862,7 +1057,6 @@ export default function BuilderForm({
               </div>
             </div>
 
-            {/* 0-100% Opacity Slider */}
             <div className="pt-2 border-t border-slate-800 space-y-2">
               <div className="flex items-center gap-3">
                 <span className="text-[10px] text-slate-400 font-bold">0% (Invisible)</span>
@@ -903,71 +1097,6 @@ export default function BuilderForm({
                     }`}
                   >
                     {preset.label}
-                  </button>
-                ))}
-              </div>
-            </div>
-          </div>
-
-          {/* 3. SLIDE TYPOGRAPHY */}
-          <div className="p-4 rounded-2xl bg-slate-900 border border-slate-800 space-y-3.5">
-            <label className="text-xs font-bold text-amber-300 uppercase tracking-wider flex items-center gap-1.5">
-              <i className="fa-solid fa-font" /> Slide Typography (Inner Pages Only)
-            </label>
-
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-              <div>
-                <label className="text-[11px] text-slate-400 block mb-1 font-medium">Slide Header Font</label>
-                <select
-                  value={data.theme?.slideHeadingFont || 'Cinzel, serif'}
-                  onChange={(e) => updateData({ ...data, theme: { ...data.theme, slideHeadingFont: e.target.value } })}
-                  className="w-full px-3 py-2 rounded-xl bg-slate-950 border border-slate-700 text-amber-300 text-xs font-semibold outline-none cursor-pointer focus:border-amber-400"
-                >
-                  {FONT_PRESETS_HEADING.map((f) => (
-                    <option key={f.value} value={f.value} style={{ fontFamily: f.value }}>
-                      {f.name}
-                    </option>
-                  ))}
-                </select>
-              </div>
-
-              <div>
-                <label className="text-[11px] text-slate-400 block mb-1 font-medium">Slide Content Font</label>
-                <select
-                  value={data.theme?.slideBodyFont || 'Playfair Display, serif'}
-                  onChange={(e) => updateData({ ...data, theme: { ...data.theme, slideBodyFont: e.target.value } })}
-                  className="w-full px-3 py-2 rounded-xl bg-slate-950 border border-slate-700 text-slate-200 text-xs font-medium outline-none cursor-pointer focus:border-amber-400"
-                >
-                  {FONT_PRESETS_BODY.map((f) => (
-                    <option key={f.value} value={f.value} style={{ fontFamily: f.value }}>
-                      {f.name}
-                    </option>
-                  ))}
-                </select>
-              </div>
-            </div>
-
-            {/* Slide Font Size Scaling */}
-            <div className="pt-2 border-t border-slate-800/80 space-y-2">
-              <div className="flex items-center justify-between">
-                <span className="text-[11px] text-slate-300 font-medium">Slide Content Scaling:</span>
-                <span className="text-xs font-mono font-bold text-amber-300 bg-amber-500/15 px-2 py-0.5 rounded border border-amber-500/30">
-                  {data.theme?.slideFontSizeScale || 100}%
-                </span>
-              </div>
-              <div className="grid grid-cols-2 sm:grid-cols-4 gap-1.5">
-                {FONT_SIZE_PRESETS.map((scalePreset) => (
-                  <button
-                    key={scalePreset.value}
-                    type="button"
-                    onClick={() => updateData({ ...data, theme: { ...data.theme, slideFontSizeScale: scalePreset.value } })}
-                    className={`py-1.5 px-2 rounded-lg text-[10px] font-semibold border transition-all ${
-                      (data.theme?.slideFontSizeScale || 100) === scalePreset.value
-                        ? 'bg-amber-500 text-slate-950 font-bold border-amber-400 shadow'
-                        : 'bg-slate-950 text-slate-300 border-slate-700 hover:border-slate-500'
-                    }`}
-                  >
-                    {scalePreset.label}
                   </button>
                 ))}
               </div>
@@ -1413,13 +1542,10 @@ export default function BuilderForm({
         </div>
       )}
 
-      {/* ========================================================================= */}
-      {/* 1. MODAL: DYNAMIC WALLPAPERS */}
-      {/* ========================================================================= */}
+      {/* ================= MODAL: DYNAMIC WALLPAPERS ================= */}
       {isWallpaperModalOpen && (
         <div className="fixed inset-0 z-[200] bg-black/85 backdrop-blur-md flex items-center justify-center p-3 sm:p-6">
           <div className="bg-slate-900 border border-slate-700 rounded-3xl w-full max-w-4xl h-[90vh] flex flex-col overflow-hidden shadow-2xl animate-in fade-in zoom-in duration-200">
-            
             <div className="p-4 sm:p-5 border-b border-slate-800 flex items-center justify-between bg-slate-950">
               <div>
                 <h3 className="text-lg font-bold text-white flex items-center gap-2">
@@ -1444,9 +1570,7 @@ export default function BuilderForm({
                   type="button"
                   onClick={() => setSelectedWallpaperCategory(cat)}
                   className={`px-3.5 py-1.5 rounded-full text-xs font-semibold whitespace-nowrap transition-all cursor-pointer ${
-                    selectedWallpaperCategory === cat
-                      ? 'bg-amber-500 text-slate-950 font-bold shadow'
-                      : 'bg-slate-800/80 text-slate-300 hover:bg-slate-700'
+                    selectedWallpaperCategory === cat ? 'bg-amber-500 text-slate-950 font-bold shadow' : 'bg-slate-800/80 text-slate-300 hover:bg-slate-700'
                   }`}
                 >
                   {cat}
@@ -1465,18 +1589,14 @@ export default function BuilderForm({
                     key={wp.id}
                     onClick={() => handleSelectWallpaper(wp.url)}
                     className={`group relative rounded-2xl overflow-hidden border-2 cursor-pointer transition-all aspect-[9/16] ${
-                      isSelected
-                        ? 'border-amber-400 ring-4 ring-amber-400/40 scale-[1.02]'
-                        : 'border-slate-800 hover:border-amber-400/70 hover:scale-[1.02]'
+                      isSelected ? 'border-amber-400 ring-4 ring-amber-400/40 scale-[1.02]' : 'border-slate-800 hover:border-amber-400/70 hover:scale-[1.02]'
                     }`}
                   >
                     <img src={wp.url} alt={wp.name} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" loading="lazy" />
-                    
                     <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/20 to-transparent flex flex-col justify-end p-2.5">
                       <span className="text-[11px] font-bold text-white line-clamp-1">{wp.name}</span>
                       <span className="text-[9px] text-amber-300/90 font-medium">{wp.category}</span>
                     </div>
-
                     {isSelected && (
                       <div className="absolute top-2 right-2 w-6 h-6 rounded-full bg-amber-500 text-slate-950 flex items-center justify-center font-bold text-xs shadow-md">
                         <i className="fa-solid fa-check" />
@@ -1486,18 +1606,14 @@ export default function BuilderForm({
                 );
               })}
             </div>
-
           </div>
         </div>
       )}
 
-      {/* ========================================================================= */}
-      {/* 2. MODAL: DYNAMIC FOREGROUND FRAMES */}
-      {/* ========================================================================= */}
+      {/* ================= MODAL: DYNAMIC FOREGROUND FRAMES ================= */}
       {isFrameModalOpen && (
         <div className="fixed inset-0 z-[200] bg-black/85 backdrop-blur-md flex items-center justify-center p-3 sm:p-6">
           <div className="bg-slate-900 border border-slate-700 rounded-3xl w-full max-w-4xl h-[90vh] flex flex-col overflow-hidden shadow-2xl animate-in fade-in zoom-in duration-200">
-            
             <div className="p-4 sm:p-5 border-b border-slate-800 flex items-center justify-between bg-slate-950">
               <div>
                 <h3 className="text-lg font-bold text-white flex items-center gap-2">
@@ -1522,9 +1638,7 @@ export default function BuilderForm({
                   type="button"
                   onClick={() => setSelectedFrameCategory(cat)}
                   className={`px-3.5 py-1.5 rounded-full text-xs font-semibold whitespace-nowrap transition-all cursor-pointer ${
-                    selectedFrameCategory === cat
-                      ? 'bg-emerald-500 text-slate-950 font-bold shadow'
-                      : 'bg-slate-800/80 text-slate-300 hover:bg-slate-700'
+                    selectedFrameCategory === cat ? 'bg-emerald-500 text-slate-950 font-bold shadow' : 'bg-slate-800/80 text-slate-300 hover:bg-slate-700'
                   }`}
                 >
                   {cat}
@@ -1541,17 +1655,13 @@ export default function BuilderForm({
                     key={frame.id}
                     onClick={() => handleSelectFrame(frame.url)}
                     className={`group relative rounded-2xl overflow-hidden border-2 cursor-pointer transition-all aspect-[9/16] bg-slate-950/80 p-2 flex flex-col justify-between ${
-                      isSelected
-                        ? 'border-emerald-400 ring-4 ring-emerald-400/40 scale-[1.02]'
-                        : 'border-slate-800 hover:border-emerald-400/70 hover:scale-[1.02]'
+                      isSelected ? 'border-emerald-400 ring-4 ring-emerald-400/40 scale-[1.02]' : 'border-slate-800 hover:border-emerald-400/70 hover:scale-[1.02]'
                     }`}
                   >
                     <img src={frame.url} alt={frame.name} className="w-full h-full object-contain group-hover:scale-105 transition-transform duration-500" loading="lazy" />
-                    
                     <div className="bg-black/75 p-1.5 rounded-lg mt-1 text-center">
                       <span className="text-[10px] font-bold text-white line-clamp-1">{frame.name}</span>
                     </div>
-
                     {isSelected && (
                       <div className="absolute top-2 right-2 w-6 h-6 rounded-full bg-emerald-500 text-slate-950 flex items-center justify-center font-bold text-xs shadow-md">
                         <i className="fa-solid fa-check" />
@@ -1560,25 +1670,15 @@ export default function BuilderForm({
                   </div>
                 );
               })}
-
-              {filteredFrames.length === 0 && (
-                <div className="col-span-full text-center py-12 text-xs text-slate-500">
-                  No frames found in this category. You can upload new frames via the Admin Portal.
-                </div>
-              )}
             </div>
-
           </div>
         </div>
       )}
 
-      {/* ========================================================================= */}
-      {/* 3. MODAL: DYNAMIC MUSIC TRACKS */}
-      {/* ========================================================================= */}
+      {/* ================= MODAL: DYNAMIC MUSIC TRACKS ================= */}
       {isMusicModalOpen && (
         <div className="fixed inset-0 z-[200] bg-black/85 backdrop-blur-md flex items-center justify-center p-3 sm:p-6">
           <div className="bg-slate-900 border border-slate-700 rounded-3xl w-full max-w-3xl h-[88vh] flex flex-col overflow-hidden shadow-2xl animate-in fade-in zoom-in duration-200">
-            
             <div className="p-4 sm:p-5 border-b border-slate-800 flex items-center justify-between bg-slate-950">
               <div>
                 <h3 className="text-lg font-bold text-white flex items-center gap-2">
@@ -1606,9 +1706,7 @@ export default function BuilderForm({
                   type="button"
                   onClick={() => setSelectedMusicCategory(cat)}
                   className={`px-3.5 py-1.5 rounded-full text-xs font-semibold whitespace-nowrap transition-all cursor-pointer ${
-                    selectedMusicCategory === cat
-                      ? 'bg-amber-500 text-slate-950 font-bold shadow'
-                      : 'bg-slate-800/80 text-slate-300 hover:bg-slate-700'
+                    selectedMusicCategory === cat ? 'bg-amber-500 text-slate-950 font-bold shadow' : 'bg-slate-800/80 text-slate-300 hover:bg-slate-700'
                   }`}
                 >
                   {cat}
@@ -1625,9 +1723,7 @@ export default function BuilderForm({
                   <div
                     key={track.id}
                     className={`p-3.5 rounded-2xl border flex items-center justify-between gap-3 transition-all ${
-                      isSelected 
-                        ? 'bg-amber-500/15 border-amber-400 shadow-md ring-1 ring-amber-400/40' 
-                        : 'bg-slate-950/60 border-slate-800 hover:border-slate-700'
+                      isSelected ? 'bg-amber-500/15 border-amber-400 shadow-md ring-1 ring-amber-400/40' : 'bg-slate-950/60 border-slate-800 hover:border-slate-700'
                     }`}
                   >
                     <div className="flex items-center gap-3">
@@ -1635,17 +1731,11 @@ export default function BuilderForm({
                         type="button"
                         onClick={() => handleTogglePreviewMusic(track.url)}
                         className={`w-11 h-11 rounded-full flex items-center justify-center text-base transition-transform active:scale-90 cursor-pointer ${
-                          isCurrentPreview
-                            ? 'bg-amber-500 text-slate-950 shadow-lg ring-2 ring-amber-400'
-                            : 'bg-slate-800 hover:bg-slate-700 text-amber-300 border border-amber-500/30'
+                          isCurrentPreview ? 'bg-amber-500 text-slate-950 shadow-lg ring-2 ring-amber-400' : 'bg-slate-800 hover:bg-slate-700 text-amber-300 border border-amber-500/30'
                         }`}
                         title={isCurrentPreview ? 'Stop Audio' : 'Play Audio'}
                       >
-                        {isCurrentPreview ? (
-                          <i className="fa-solid fa-pause" />
-                        ) : (
-                          <i className="fa-solid fa-play ml-0.5 text-sm" />
-                        )}
+                        {isCurrentPreview ? <i className="fa-solid fa-pause" /> : <i className="fa-solid fa-play ml-0.5 text-sm" />}
                       </button>
 
                       <div>
@@ -1680,7 +1770,6 @@ export default function BuilderForm({
                 );
               })}
             </div>
-
           </div>
         </div>
       )}
