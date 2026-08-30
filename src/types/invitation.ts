@@ -33,9 +33,10 @@ export interface ThemeConfig {
   cardBoxColor?: string;
   cardOpacity?: number; // 0 to 100
 
-  // Frame Overlay & Zoom In/Out Scale
+  // Frame Overlay, Zoom Scale & Fullscreen Wallpaper Bleed
   frameOverlayUrl?: string;
   frameScale?: number; // 70 to 150 (default: 100)
+  frameExtendToBackground?: boolean; // true = limpah keluar ke wallpaper belakang
 
   // Separate Wallpaper Controls
   slideBgUrl?: string;

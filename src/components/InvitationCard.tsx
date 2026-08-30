@@ -205,8 +205,9 @@ export default function InvitationCard({
   const slideBodyFont = data?.theme?.slideBodyFont || 'Playfair Display, serif';
   const slideScale = (data?.theme?.slideFontSizeScale || 100) / 100;
 
-  // 5. Frame Zoom / Scale Factor (70% - 150%)
+  // 5. Frame Scaling & Fullscreen Background Mode
   const frameScaleRatio = (data?.theme?.frameScale || 100) / 100;
+  const isExtendedToBackground = data?.theme?.frameExtendToBackground === true;
 
   return (
     <div 
@@ -326,7 +327,21 @@ export default function InvitationCard({
                 zIndex: isCurrent ? 20 : 10
               }}
             >
-              {/* KOTAK KAD DENGAN BINGKAI DI DEPAN SEKALI */}
+              {/* OPTION A: FULLSCREEN / WALLPAPER BLEED FRAME (TERKELUAR MELEPASI KOTAK KAD) */}
+              {data?.theme?.frameOverlayUrl && isExtendedToBackground && (
+                <div className="absolute inset-0 pointer-events-none z-30 flex items-center justify-center overflow-hidden">
+                  <img 
+                    src={data.theme.frameOverlayUrl} 
+                    alt="Extended Foreground Botanical Frame" 
+                    className="w-full h-full object-fill pointer-events-none select-none transition-transform duration-200"
+                    style={{
+                      transform: `scale(${frameScaleRatio})`
+                    }}
+                  />
+                </div>
+              )}
+
+              {/* KOTAK KAD UTAMA */}
               <div 
                 className={`w-full max-w-[375px] h-[84%] max-h-[600px] rounded-[32px] p-6 sm:p-7 text-center flex flex-col justify-between items-center relative transition-all duration-300 ${
                   isCompletelyTransparent 
@@ -340,12 +355,12 @@ export default function InvitationCard({
                   transform: 'translateZ(0)'
                 }}
               >
-                {/* 1. BINGKAI HIASAN DI DEPAN SEKALI (FOREGROUND FRAME WITH ZOOM IN/OUT) */}
-                {data?.theme?.frameOverlayUrl && (
+                {/* OPTION B: INSIDE CARD BOX ONLY FRAME (DI DALAM KOTAK KAD SAHAJA) */}
+                {data?.theme?.frameOverlayUrl && !isExtendedToBackground && (
                   <div className="absolute inset-0 pointer-events-none z-30 flex items-center justify-center overflow-hidden rounded-[32px]">
                     <img 
                       src={data.theme.frameOverlayUrl} 
-                      alt="Decorative Foreground Frame" 
+                      alt="Inside Card Decorative Frame" 
                       className="w-full h-full object-fill pointer-events-none select-none transition-transform duration-200"
                       style={{
                         transform: `scale(${frameScaleRatio})`
@@ -354,7 +369,7 @@ export default function InvitationCard({
                   </div>
                 )}
 
-                {/* 2. Header Deco */}
+                {/* Header Decoration */}
                 <div className="w-full flex justify-between items-center text-xs px-1 relative z-10" style={{ color: data?.theme?.goldColor || '#b59049' }}>
                   <span>❧</span>
                   <span 
@@ -370,7 +385,7 @@ export default function InvitationCard({
                   <span>☙</span>
                 </div>
 
-                {/* 3. Slide Content */}
+                {/* Slide Content */}
                 <div className="my-auto w-full py-1 flex flex-col items-center justify-center relative z-10">
                   
                   {/* INTRO */}
@@ -565,7 +580,7 @@ export default function InvitationCard({
                   )}
                 </div>
 
-                {/* 4. Bottom Navigation */}
+                {/* Bottom Navigation */}
                 <div className="w-full flex flex-col items-center gap-1 pt-1 relative z-10">
                   {idx < totalSlides - 1 ? (
                     <button 

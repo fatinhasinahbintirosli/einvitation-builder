@@ -115,7 +115,6 @@ export default function BuilderForm({
 
   const modalAudioRef = useRef<HTMLAudioElement | null>(null);
 
-  // Fetch live assets from Supabase
   useEffect(() => {
     const fetchAssets = async () => {
       const { data: wpData } = await supabase.from('wallpapers').select('*').order('order_index', { ascending: true });
@@ -134,6 +133,7 @@ export default function BuilderForm({
   const currentOpacity = typeof data.theme?.cardOpacity === 'number' ? data.theme.cardOpacity : 90;
   const currentBoxColor = data.theme?.cardBoxColor || '#ffffff';
   const currentFrameScale = data.theme?.frameScale || 100;
+  const isExtendedToBackground = data.theme?.frameExtendToBackground === true;
 
   const updateData = (newData: CardData) => {
     onChange(newData);
@@ -703,7 +703,7 @@ export default function BuilderForm({
             <input
               type="text"
               value={data.cover?.dateText || ''}
-              onFocus={() => onActiveSlideChange?.('cover')}
+              onFocus={() => onActiveSlideChange?.(activeSlideIndex)}
               onChange={(e) => updateData({ ...data, cover: { ...data.cover, dateText: e.target.value } })}
               placeholder="e.g. SUNDAY, OCTOBER 18, 2026"
               className="w-full px-3.5 py-2.5 rounded-xl bg-slate-900 border border-slate-700 text-xs focus:border-amber-400 outline-none"
@@ -716,7 +716,7 @@ export default function BuilderForm({
       {activeTab === 'slides' && (
         <div className="space-y-4">
           
-          {/* 1. FOREGROUND DECORATIVE FRAME & ZOOM IN/OUT CONTROLS */}
+          {/* 1. FOREGROUND DECORATIVE FRAME, TICK BOX & ZOOM CONTROLS */}
           <div className="p-4 rounded-2xl bg-slate-950/90 border border-emerald-500/30 space-y-3.5">
             <div className="flex items-center justify-between">
               <label className="text-xs font-bold text-emerald-300 uppercase tracking-wider flex items-center gap-1.5">
@@ -734,7 +734,7 @@ export default function BuilderForm({
             </div>
 
             <p className="text-[11px] text-slate-400">
-              Select or upload a decorative botanical frame that overlays directly in front of the card.
+              Pilih bingkai daun tropika monstera atau muat naik bingkai PNG lutsinar sendiri.
             </p>
 
             {/* Buttons: Select from Gallery or Upload Custom PNG */}
@@ -753,37 +753,66 @@ export default function BuilderForm({
               </label>
             </div>
 
-            {/* ZOOM IN / ZOOM OUT SLIDER */}
+            {/* CONTROLS APA BILA BINGKAI TELAH DIPILIH */}
             {data.theme?.frameOverlayUrl && (
-              <div className="pt-2 border-t border-slate-800 space-y-2">
-                <div className="flex items-center justify-between">
-                  <span className="text-[11px] font-semibold text-slate-300 flex items-center gap-1.5">
-                    <i className="fa-solid fa-magnifying-glass-plus text-emerald-400" /> Frame Zoom In / Out Scale:
-                  </span>
-                  <span className="text-xs font-mono font-bold text-emerald-300 bg-emerald-500/15 px-2 py-0.5 rounded border border-emerald-500/30">
-                    {currentFrameScale}%
-                  </span>
-                </div>
-
-                <div className="flex items-center gap-3">
-                  <span className="text-[10px] text-slate-400 font-bold">70% (Zoom Out)</span>
+              <div className="pt-2 border-t border-slate-800 space-y-3">
+                
+                {/* TICK BUTTON / CHECKBOX: LIMPAH KE WALLPAPER BELAKANG */}
+                <label className="flex items-start gap-3 p-3 rounded-xl bg-slate-900 border border-emerald-500/30 cursor-pointer hover:border-emerald-400 transition-all select-none">
                   <input
-                    type="range"
-                    min="70"
-                    max="150"
-                    step="2"
-                    value={currentFrameScale}
+                    type="checkbox"
+                    checked={isExtendedToBackground}
                     onChange={(e) => {
                       updateData({
                         ...data,
-                        theme: { ...data.theme, frameScale: Number(e.target.value) }
+                        theme: { ...data.theme, frameExtendToBackground: e.target.checked }
                       });
                       if (activeSlideIndex === 'cover') onActiveSlideChange?.(0);
                     }}
-                    className="w-full accent-emerald-500 cursor-pointer h-2 bg-slate-900 rounded-lg"
+                    className="w-4 h-4 mt-0.5 accent-emerald-500 rounded cursor-pointer shrink-0"
                   />
-                  <span className="text-[10px] text-slate-400 font-bold">150% (Zoom In)</span>
+                  <div>
+                    <span className="text-xs font-bold text-emerald-300 block">
+                      Limpah Bingkai ke Wallpaper Belakang (Full Bleed Mode)
+                    </span>
+                    <span className="text-[10px] text-slate-400 block mt-0.5">
+                      Tandakan tick untuk membiarkan daun keluar melepasi kotak putih hingga ke hujung skrin.
+                    </span>
+                  </div>
+                </label>
+
+                {/* ZOOM IN / ZOOM OUT SLIDER */}
+                <div className="space-y-1.5">
+                  <div className="flex items-center justify-between">
+                    <span className="text-[11px] font-semibold text-slate-300 flex items-center gap-1.5">
+                      <i className="fa-solid fa-magnifying-glass-plus text-emerald-400" /> Frame Zoom In / Out Scale:
+                    </span>
+                    <span className="text-xs font-mono font-bold text-emerald-300 bg-emerald-500/15 px-2 py-0.5 rounded border border-emerald-500/30">
+                      {currentFrameScale}%
+                    </span>
+                  </div>
+
+                  <div className="flex items-center gap-3">
+                    <span className="text-[10px] text-slate-400 font-bold">70% (Zoom Out)</span>
+                    <input
+                      type="range"
+                      min="70"
+                      max="150"
+                      step="2"
+                      value={currentFrameScale}
+                      onChange={(e) => {
+                        updateData({
+                          ...data,
+                          theme: { ...data.theme, frameScale: Number(e.target.value) }
+                        });
+                        if (activeSlideIndex === 'cover') onActiveSlideChange?.(0);
+                      }}
+                      className="w-full accent-emerald-500 cursor-pointer h-2 bg-slate-900 rounded-lg"
+                    />
+                    <span className="text-[10px] text-slate-400 font-bold">150% (Zoom In)</span>
+                  </div>
                 </div>
+
               </div>
             )}
           </div>
